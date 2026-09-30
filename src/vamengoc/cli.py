@@ -215,6 +215,27 @@ def release_verify(origin: Annotated[str, typer.Argument(help="'public' or 'synt
         raise typer.Exit(code=2)
 
 
+@release_app.command("rebuild")
+def release_rebuild(
+    run_id: Annotated[str | None, typer.Option("--run", help="Run id (default: most recent snapshot).")] = None,
+) -> None:
+    """Rebuild tables, macros, figures and bundle from a stored results snapshot, then verify."""
+    from vamengoc.pipeline import rebuild_release
+    from vamengoc.release.verify import verify_release
+
+    project = Project()
+    try:
+        root = rebuild_release(project, run_id)
+    except FileNotFoundError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=1) from exc
+    console.print(f"[green]Release rebuilt in {root}[/green]")
+    rep = verify_release(project, root)
+    _report_verification(rep)
+    if not rep.ok:
+        raise typer.Exit(code=2)
+
+
 @release_app.command("summary")
 def release_summary(origin: Annotated[str, typer.Argument()] = "synthetic") -> None:
     """Print the manifest summary of a release."""
@@ -250,7 +271,13 @@ def serve(
         raise typer.Exit(code=1) from exc
     if host not in {"127.0.0.1", "localhost", "::1"}:
         console.print("[yellow]Warning: binding to a non-loopback address exposes the local lab API.[/yellow]")
-    uvicorn.run("vamengoc.api.server:app", host=host, port=port, log_level="info")
+    token = os.environ.get("VAMENGOC_LAB_TOKEN") or secrets.token_urlsafe(24)
+    os.environ["VAMENGOC_LAB_TOKEN"] = token
+    console.print(f"[green]Local lab API on http://{host}:{port}[/green]")
+    console.print(f"Session token (paste it in the web app, 'Laboratorio local'): [bold]{token}[/bold]")
+    from vamengoc.api.server import create_app
+
+    uvicorn.run(create_app(token=token), host=host, port=port, log_level="info")  # pragma: no cover
 
 
 def main() -> None:  # pragma: no cover - console entry point
