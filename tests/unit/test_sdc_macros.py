@@ -70,3 +70,26 @@ def test_macro_names_and_rendering(tmp_path: Path) -> None:
     assert "\\PTInf}{\\ensuremath{\\infty}}" in text
     path = m.write(tmp_path / "m.tex", "hdr")
     assert path.read_text(encoding="utf-8").startswith("% hdr")
+
+
+def test_latex_text_and_bilingual(tmp_path: Path) -> None:
+    from vamengoc.release.macros import join_words, latex_text, lower_first
+
+    assert latex_text("Al(OH)₃ (log₁₀)") == "Al(OH)\\textsubscript{3} (log\\textsubscript{10})"
+    assert latex_text("Fever ≥39 °C") == "Fever \\ensuremath{\\geq}39\\,°C"
+    assert latex_text("T² – ok") == "T\\textsuperscript{2} -- ok"
+    with pytest.raises(ValueError, match="no LaTeX mapping"):
+        latex_text("emoji 🙂")
+    assert lower_first("Fever") == "fever"
+    assert lower_first("Al(OH)₃ concentration") == "Al(OH)₃ concentration"
+    assert lower_first("IgG") == "IgG"
+    assert lower_first("") == ""
+    assert join_words([], "en") == "none" and join_words([], "es") == "ninguno"
+    assert join_words(["a"], "en") == "a"
+    assert join_words(["a", "b"], "en") == "a and b"
+    assert join_words(["a", "b", "c"], "en") == "a, b, and c"
+    assert join_words(["fiebre", "infección"], "es") == "fiebre e infección"
+    assert join_words(["fiebre", "hielo"], "es") == "fiebre y hielo"
+    m = MacroSet("PO")
+    m.bilingual("Word", "increased", "aumentó")
+    assert "\\newcommand{\\POWord}{\\VLang{increased}{aumentó}}" in m.render("x")
