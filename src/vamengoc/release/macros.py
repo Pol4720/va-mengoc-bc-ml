@@ -13,7 +13,7 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-__all__ = ["MacroSet"]
+__all__ = ["MacroSet", "join_words", "latex_text", "lower_first"]
 
 _NAME = re.compile(r"^[A-Za-z]+$")
 _DIGIT_WORDS = {
@@ -74,7 +74,11 @@ class MacroSet:
         self._put(name, body, comment)
 
     def text(self, name: str, value: str, comment: str = "") -> None:
-        self._put(name, _escape(value), comment)
+        self._put(name, latex_text(value), comment)
+
+    def bilingual(self, name: str, en: str, es: str, comment: str = "") -> None:
+        """Language-dependent text, rendered through ``\\VLang{<en>}{<es>}`` (defined by the preamble)."""
+        self._put(name, f"\\VLang{{{latex_text(en)}}}{{{latex_text(es)}}}", comment)
 
     def interval(self, name: str, lo: float | None, hi: float | None, digits: int = 2, comment: str = "") -> None:
         """A confidence interval rendered as ``lo–hi`` with locale-aware numbers."""
@@ -114,6 +118,59 @@ class MacroSet:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(self.render(header), encoding="utf-8")
         return path
+
+
+_SUBSCRIPTS = str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789")
+_SUPERSCRIPTS = str.maketrans("⁰¹²³⁴⁵⁶⁷⁸⁹", "0123456789")
+_SYMBOLS = {
+    "≥": "\\ensuremath{\\geq}",
+    "≤": "\\ensuremath{\\leq}",
+    "×": "\\ensuremath{\\times}",
+    "±": "\\ensuremath{\\pm}",
+    "–": "--",
+    "—": "---",
+    "·": "\\textperiodcentered{}",
+}
+# Characters pdfLaTeX (inputenc utf8 + T1) typesets directly.
+_DIRECT = set("áéíóúÁÉÍÓÚñÑüÜ°¿¡àèìòùçÇ")
+
+
+def latex_text(s: str) -> str:
+    """Escape text for LaTeX and map the few Unicode symbols used in labels to LaTeX commands."""
+    out = _escape(s).replace(" °C", "\\,°C")
+    out = re.sub(r"[₀-₉]+", lambda m: "\\textsubscript{" + m.group(0).translate(_SUBSCRIPTS) + "}", out)
+    out = re.sub(r"[⁰¹²³⁴-⁹]+", lambda m: "\\textsuperscript{" + m.group(0).translate(_SUPERSCRIPTS) + "}", out)
+    for k, v in _SYMBOLS.items():
+        out = out.replace(k, v)
+    bad = sorted({ch for ch in out if ord(ch) > 127 and ch not in _DIRECT})
+    if bad:
+        msg = f"no LaTeX mapping for {bad} in {s!r}"
+        raise ValueError(msg)
+    return out
+
+
+_KEEP_CASE = ("Al(", "pH", "T²", "IgG", "OMV")
+
+
+def lower_first(label: str) -> str:
+    """Lower-case a label for use inside a sentence, preserving symbols and acronyms."""
+    if not label or label.startswith(_KEEP_CASE) or (len(label) > 1 and label[1].isupper()):
+        return label
+    return label[0].lower() + label[1:]
+
+
+def join_words(items: list[str], lang: str) -> str:
+    """Join ``items`` as a natural-language list (Spanish uses *e* before an /i/ sound)."""
+    if not items:
+        return "none" if lang == "en" else "ninguno"
+    if len(items) == 1:
+        return items[0]
+    last = items[-1]
+    if lang == "en":
+        return ", ".join(items[:-1]) + (", and " if len(items) > 2 else " and ") + last
+    low = last.lower()
+    conj = " e " if (low.startswith(("i", "hi")) and not low.startswith(("hie", "ia", "ie", "io", "iu"))) else " y "
+    return ", ".join(items[:-1]) + conj + last
 
 
 def _escape(s: str) -> str:

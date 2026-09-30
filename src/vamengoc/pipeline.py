@@ -14,6 +14,7 @@ Two phases (see docs/DATA_GOVERNANCE.md):
 from __future__ import annotations
 
 import json
+import pickle
 import warnings
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -45,7 +46,9 @@ from vamengoc.security import crypto
 from vamengoc.security.pseudonymize import Pseudonymizer, load_key
 from vamengoc.synth import MARKER_FILE
 
-__all__ = ["PipelineOutputs", "is_synthetic_dir", "run_pipeline"]
+__all__ = ["PipelineOutputs", "is_synthetic_dir", "load_results_snapshot", "rebuild_release", "run_pipeline"]
+
+SNAPSHOT_NAME = "results.pkl"
 
 
 @dataclass
@@ -123,6 +126,7 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
     # Disproportionality under the primary and sensitivity comparators.
     dp = a.disproportionality
     crit = dp.model_dump()
+    primary_criterion = str(crit.pop("primary_criterion"))
     is_t = rep["has_target"]
     vac = rep["vaccines"].fillna("")
     infant = rep["age_months"].astype("Float64").lt(a.infant_comparator_max_age_months + 1).fillna(False)
@@ -147,7 +151,13 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
     tables = []
     for name, (t_mask, c_mask) in designs.items():
         tab = disproportionality.disproportionality_table(
-            rep, t_mask, c_mask, ev_cols, prior=prior if name.startswith("primary") else None, criteria=crit
+            rep,
+            t_mask,
+            c_mask,
+            ev_cols,
+            prior=prior if name.startswith("primary") else None,
+            criteria=crit,
+            primary=primary_criterion,
         )
         tab["design"] = name
         tables.append(tab)
@@ -460,6 +470,90 @@ def _save_local(
     )
 
 
+def _save_results_snapshot(project: Project, ctx: RunContext, results: dict[str, Any]) -> Path:
+    """Keep the analysis results locally so the release can be rebuilt without re-running the analysis.
+
+    The snapshot lives in ``runs/<id>/local_only`` (never versioned) and is encrypted with the
+    curated-layer key when ``security.encrypt_curated`` is enabled.
+    """
+    sec = project.config.security
+    payload = pickle.dumps(
+        {
+            "format": 1,
+            "run_id": ctx.run_id,
+            "synthetic": ctx.synthetic,
+            "inputs": dict(ctx.inputs),
+            "config_sha256": project.config_fingerprint(),
+            "results": results,
+        },
+        protocol=pickle.HIGHEST_PROTOCOL,
+    )
+    name = SNAPSHOT_NAME
+    if sec.encrypt_curated:
+        payload = crypto.load_fernet(sec.fernet_key_env, sec.fernet_key_file).encrypt(payload)
+        name += ".enc"
+    path = ctx.run_dir / "local_only" / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(payload)
+    return path
+
+
+def load_results_snapshot(project: Project, run_id: str | None = None) -> dict[str, Any]:
+    """Load the snapshot of ``run_id`` (default: the most recent run that has one).
+
+    Snapshots are produced by this pipeline on the same workstation; they are trusted local files
+    (pickle must never be used on files from elsewhere).
+    """
+    runs = project.runs_dir
+    candidates = (
+        [runs / run_id]
+        if run_id
+        else sorted(
+            (d for d in runs.iterdir() if d.is_dir() and any((d / "local_only").glob(SNAPSHOT_NAME + "*"))),
+            key=lambda d: d.name,
+        )
+        if runs.is_dir()
+        else []
+    )
+    if not candidates:
+        msg = "no results snapshot found; run `vamengoc run` or `vamengoc demo` first"
+        raise FileNotFoundError(msg)
+    local = candidates[-1] / "local_only"
+    plain, enc = local / SNAPSHOT_NAME, local / (SNAPSHOT_NAME + ".enc")
+    if enc.is_file():
+        sec = project.config.security
+        data = crypto.load_fernet(sec.fernet_key_env, sec.fernet_key_file).decrypt(enc.read_bytes())
+    elif plain.is_file():
+        data = plain.read_bytes()
+    else:
+        msg = f"run {candidates[-1].name} has no results snapshot"
+        raise FileNotFoundError(msg)
+    snap: dict[str, Any] = pickle.loads(data)  # noqa: S301 - trusted local artefact written by _save_results_snapshot
+    if snap.get("format") != 1:
+        msg = f"unsupported snapshot format {snap.get('format')!r}"
+        raise ValueError(msg)
+    return snap
+
+
+def rebuild_release(project: Project, run_id: str | None = None) -> Path:
+    """Rebuild ``release/<origin>`` from a stored results snapshot (tables, macros, figures, bundle)."""
+    from vamengoc.release.builder import build_release_from_results
+
+    snap = load_results_snapshot(project, run_id)
+    ctx = RunContext(project, "release-rebuild", synthetic=bool(snap["synthetic"]))
+    ctx.inputs.update(snap["inputs"])
+    ctx.step(
+        "load_results_snapshot",
+        source_run=snap["run_id"],
+        config_changed=snap["config_sha256"] != project.config_fingerprint(),
+    )
+    if snap["config_sha256"] != project.config_fingerprint():
+        ctx.warn("configuration changed since the analysis run; analysis settings in the release are the old ones")
+    root = build_release_from_results(project, snap["results"], ctx)
+    ctx.close()
+    return root
+
+
 def _parquet_safe(df: pd.DataFrame) -> pd.DataFrame:
     out = df.copy()
     for c in out.columns:
@@ -532,6 +626,7 @@ def run_pipeline(
     }
     results["paper1"] = analyze_paper1(project, cur, lots, ctx)
     results["paper2"] = analyze_paper2(project, cur, lots, link, ctx)
+    _save_results_snapshot(project, ctx, results)
     outputs = PipelineOutputs(run=ctx, aefi=aefi, lots=lots, curated=cur, linkage=link, results=results)
     if build_release:
         from vamengoc.release.builder import build_release as _build

@@ -24,13 +24,14 @@ from vamengoc import __version__
 from vamengoc.config import Project
 from vamengoc.provenance import git_state
 from vamengoc.release import figures as figs
-from vamengoc.release.macros import MacroSet
+from vamengoc.release.macros import MacroSet, join_words, lower_first
 from vamengoc.release.sdc import SDCLog, suppress_counts, suppress_linked, suppress_wide_secondary
 
 if TYPE_CHECKING:
     from vamengoc.pipeline import PipelineOutputs
+    from vamengoc.provenance import RunContext
 
-__all__ = ["ATTRIBUTE_NAMES", "OUTCOME_NAMES", "build_release"]
+__all__ = ["ATTRIBUTE_NAMES", "OUTCOME_NAMES", "build_release", "build_release_from_results"]
 
 ATTRIBUTE_NAMES = {
     "en": {
@@ -312,7 +313,13 @@ def _paper1_tables(w: _Writer, p1: dict[str, Any], labels: dict[str, Any], targe
         description="Pairwise co-reporting (log OR)",
     )
     ser = p1["seriousness"]
-    w.table("p1_seriousness_logistic", ser.logistic, description="Adjusted odds ratios of hospitalisation")
+    w.table(
+        "p1_seriousness_logistic",
+        ser.logistic,
+        person_counts=["n_with_term"],
+        linked={"n_with_term": ["or", "or_lo", "or_hi", "p_value"]},
+        description="Adjusted odds ratios of hospitalisation (Firth logistic regression)",
+    )
     w.json(
         "p1_seriousness_metrics",
         {
@@ -649,10 +656,14 @@ def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, s
         )
         m1.number(f"{ev} ICLow", r["ic025"], 2)
         m1.number(f"{ev} EBLow", r.get("eb05"), 2)
-    n_signals = {d: int(g["signal_any"].astype(bool).sum()) for d, g in dp.groupby("design")}
+    sig_col = "signal_primary" if "signal_primary" in dp.columns else "signal_any"
+    n_signals = {d: int(g[sig_col].astype(bool).sum()) for d, g in dp.groupby("design")}
     for d, n in n_signals.items():
         m1.number(f"Signals {d}", n)
+    for d, g in dp.groupby("design"):
+        m1.number(f"SignalsAny {d}", int(g["signal_any"].astype(bool).sum()))
     m1.number("NEventsScreened", int(prim.shape[0]))
+    _p1_words(m1, dp, sig_col, p1, project, a.expected_national_rate_per_100k)
     m1.number("LCABestK", p1["lca_best_k"])
     m1.number("LCAAri", p1["lca_bootstrap_ari_median"], 2)
     gt = p1.get("lca_group_test") or {}
@@ -731,8 +742,143 @@ def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, s
             m2.number(f"{r['outcome']} PermP", r["perm_p"], 3)
             m2.number(f"{r['outcome']} AUCBase", r["auc_base"], 3)
     m2.number("NPermutations", project.config.analysis.qc_safety.permutation_tests)
+    _p2_words(m2, g, p2, a.qc_safety.fdr_alpha)
     paths.append(m2.write(root / "latex" / "macros_p2.tex", "Paper 2 macros"))
     return paths
+
+
+def _label(labels: dict[str, Any], key: str, lang: str) -> str:
+    return str(labels.get(key, {}).get(f"label_{lang}", key))
+
+
+def _both(fn: Any) -> tuple[str, str]:
+    return fn("en"), fn("es")
+
+
+def _p1_words(
+    m1: MacroSet, dp: pd.DataFrame, sig_col: str, p1: dict[str, Any], project: Project, expected: float
+) -> None:
+    """Data-driven wording for paper 1, so that the prose follows the results in both languages."""
+    ev = project.events["events"]
+    tr = p1["rates_trend"]
+    if tr.get("estimable"):
+        lo, hi = _num(tr["rr_lo"]), _num(tr["rr_hi"])
+        m1.bilingual(
+            "TrendWord",
+            "increased" if lo > 1 else "decreased" if hi < 1 else "showed no significant linear trend",
+            "aumentó" if lo > 1 else "disminuyó" if hi < 1 else "no mostró una tendencia lineal significativa",
+        )
+        plo, phi = _num(tr["pooled_rate_lo"]), _num(tr["pooled_rate_hi"])
+        m1.bilingual(
+            "RateVsExpected",
+            "below" if phi < expected else "above" if plo > expected else "consistent with",
+            "inferior a" if phi < expected else "superior a" if plo > expected else "compatible con",
+        )
+    prim = dp[dp["design"] == "primary_all_other_vaccines"]
+    flagged = list(prim.loc[prim[sig_col].astype(bool), "event"])
+    designs = sorted(dp["design"].unique())
+    robust = [
+        e for e in flagged if all(bool(g.set_index("event")[sig_col].get(e, False)) for _, g in dp.groupby("design"))
+    ]
+    m1.number("NDesigns", len(designs))
+    m1.number("NSignalsRobust", len(robust))
+    for name, items in (("SignalList", flagged), ("SignalRobustList", robust)):
+        en, es = _both(lambda lang, items=items: join_words([lower_first(_label(ev, e, lang)) for e in items], lang))
+        m1.bilingual(name, en, es)
+    gt = p1.get("lca_group_test") or {}
+    pv = _num(gt.get("p_value"))
+    if not math.isnan(pv):
+        m1.bilingual(
+            "LCAGroupWord", "differed" if pv < 0.05 else "did not differ", "difirió" if pv < 0.05 else "no difirió"
+        )
+    met = p1["seriousness"].metrics
+    auc = {k: _num(v.get("auroc")) for k, v in met.items() if k.endswith("test")}
+    if auc and not all(math.isnan(v) for v in auc.values()):
+        best = max(auc, key=lambda k: -math.inf if math.isnan(auc[k]) else auc[k])
+        b = auc[best]
+        m1.bilingual(
+            "BestModel",
+            "gradient boosting" if best.startswith("gbm") else "logistic regression",
+            "potenciación del gradiente" if best.startswith("gbm") else "regresión logística",
+        )
+        m1.number("BestAuroc", b, 3)
+        grade_en = "poor" if b < 0.6 else "modest" if b < 0.7 else "acceptable" if b < 0.8 else "good"
+        grade_es = {"poor": "pobre", "modest": "modesta", "acceptable": "aceptable", "good": "buena"}[grade_en]
+        m1.bilingual("DiscriminationWord", grade_en, grade_es)
+    its = p1["incidence_its"]["level_change_rr"]
+    lo, hi = _num(its["lo"]), _num(its["hi"])
+    m1.bilingual(
+        "ITSWord",
+        "an abrupt fall" if hi < 1 else "an abrupt rise" if lo > 1 else "no significant step change",
+        "una caída abrupta" if hi < 1 else "un aumento abrupto" if lo > 1 else "ningún cambio de nivel significativo",
+    )
+
+
+def _p2_words(m2: MacroSet, gee: pd.DataFrame, p2: dict[str, Any], alpha: float) -> None:
+    """Data-driven wording for paper 2 (directions, lists) in both languages."""
+    single = gee[gee["model"] == "single"]
+    primary = single[~single["negative_control"].astype(bool)]
+    m2.number("NPrimaryTests", len(primary))
+    m2.number("FDRAlpha", alpha, 2)
+    sig_items: dict[str, list[str]] = {"en": [], "es": []}
+    for _, r in single.iterrows():
+        orr, p, q = _num(r["or_per_sd"]), _num(r["p_value"]), _num(r.get("p_bh"))
+        neg = bool(r["negative_control"])
+        crit = p if neg else q
+        up = orr > 1
+        if not math.isnan(crit) and crit < (0.05 if neg else alpha):
+            en = "positively associated with" if up else "inversely associated with"
+            es = "asociado positivamente con" if up else "asociado inversamente con"
+            if not neg:
+                for lang in ("en", "es"):
+                    sig_items[lang].append(
+                        f"{lower_first(ATTRIBUTE_NAMES[lang].get(r['exposure'], r['exposure']))}"
+                        f" {'and' if lang == 'en' else 'y'} "
+                        f"{lower_first(OUTCOME_NAMES[lang].get(r['outcome'], r['outcome']))}"
+                    )
+        elif not math.isnan(p) and p < 0.05:
+            en, es = "only nominally associated with", "asociado solo nominalmente con"
+        else:
+            en, es = "not associated with", "no asociado con"
+        m2.bilingual(f"{r['outcome']} {r['exposure']} Dir", en, es)
+    m2.bilingual("SignificantList", join_words(sig_items["en"], "en"), join_words(sig_items["es"], "es"))
+    neg = single[single["negative_control"].astype(bool)]
+    n_neg = int((pd.to_numeric(neg["p_value"], errors="coerce") < 0.05).sum())
+    m2.number("NNegControlNominal", n_neg)
+    m2.bilingual(
+        "NegControlWord",
+        "was associated" if n_neg else "was not associated",
+        "se asoció" if n_neg else "no se asoció",
+    )
+    inc = p2["incremental_value"]
+    ok = inc[inc["estimable"].astype(bool)] if len(inc) else inc
+    improved = bool(len(ok) and ((pd.to_numeric(ok["perm_p"]) < 0.05) & (pd.to_numeric(ok["delta_auc"]) > 0)).any())
+    m2.bilingual(
+        "IncrementalWord",
+        "improved" if improved else "did not improve",
+        "mejoró" if improved else "no mejoró",
+    )
+    ep = _num(p2["energy_test"]["p_value"])
+    m2.bilingual(
+        "EnergyWord",
+        "differed" if ep < 0.05 else "did not differ",
+        "difirieron" if ep < 0.05 else "no difirieron",
+    )
+    cap = p2["capability"]
+    capall = cap[cap["period"] == "all"]
+    low = [a for a, v in zip(capall["attribute"], pd.to_numeric(capall["ppk"]), strict=True) if v < 1.0]
+    m2.bilingual(
+        "PpkBelowOneList",
+        join_words([lower_first(ATTRIBUTE_NAMES["en"].get(a, a)) for a in low], "en"),
+        join_words([lower_first(ATTRIBUTE_NAMES["es"].get(a, a)) for a in low], "es"),
+    )
+    cps = p2["changepoints"]
+    items = list(zip(cps["attribute"], cps["production_year"], strict=True)) if len(cps) else []
+    m2.bilingual(
+        "ChangepointList",
+        join_words([f"{lower_first(ATTRIBUTE_NAMES['en'].get(a, a))} ({int(y)})" for a, y in items], "en"),
+        join_words([f"{lower_first(ATTRIBUTE_NAMES['es'].get(a, a))} ({int(y)})" for a, y in items], "es"),
+    )
 
 
 def _figures(
@@ -891,7 +1037,11 @@ def _web_bundle(w: _Writer, root: Path, meta: dict[str, Any], project: Project) 
 
 def build_release(project: Project, outputs: PipelineOutputs) -> Path:
     """Write ``release/<origin>/`` and return its path."""
-    ctx = outputs.run
+    return build_release_from_results(project, outputs.results, outputs.run)
+
+
+def build_release_from_results(project: Project, results: dict[str, Any], ctx: RunContext) -> Path:
+    """Write ``release/<origin>/`` from analysis results and the provenance context of the run."""
     synthetic = ctx.synthetic
     origin = "synthetic" if synthetic else "public"
     root = project.release_dir / origin
@@ -899,7 +1049,6 @@ def build_release(project: Project, outputs: PipelineOutputs) -> Path:
         shutil.rmtree(root)
     root.mkdir(parents=True)
     w = _Writer(root, project)
-    results = outputs.results
     target = project.config.analysis.target_vaccine
     _dq_tables(w, results["data_quality"])
     _paper1_tables(w, results["paper1"], project.events["events"], target)

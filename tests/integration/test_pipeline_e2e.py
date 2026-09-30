@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pandas as pd
+import pytest
 
+from tests.conftest import make_project
 from vamengoc.config import Project
 from vamengoc.pipeline import PipelineOutputs
 from vamengoc.release.verify import verify_release
@@ -104,3 +107,42 @@ def test_release_is_complete_and_clean(pipeline_run: tuple[Project, PipelineOutp
     assert (out.run.run_dir / "manifest.json").is_file()
     local = out.run.run_dir / "local_only"
     assert (local / "README.txt").is_file() and not str(local).startswith(str(root))
+    assert (local / "results.pkl").is_file()
+    p1 = (root / "latex" / "macros_p1.tex").read_text(encoding="utf-8")
+    p2 = (root / "latex" / "macros_p2.tex").read_text(encoding="utf-8")
+    for name in ("POTrendWord", "PORateVsExpected", "POSignalList", "POBestModel", "POITSWord"):
+        assert f"\\newcommand{{\\{name}}}{{\\VLang{{" in p1, name
+    for name in ("PTSignificantList", "PTNegControlWord", "PTIncrementalWord", "PTEnergyWord", "PTChangepointList"):
+        assert f"\\newcommand{{\\{name}}}{{\\VLang{{" in p2, name
+
+
+def test_release_rebuild_from_snapshot(pipeline_run: tuple[Project, PipelineOutputs]) -> None:
+    from vamengoc.pipeline import load_results_snapshot, rebuild_release
+
+    project, out = pipeline_run
+    snap = load_results_snapshot(project)
+    assert snap["synthetic"] is True and snap["run_id"] == out.run.run_id
+    assert load_results_snapshot(project, out.run.run_id)["run_id"] == out.run.run_id
+    before = (out.release_dir / "latex" / "macros_p2.tex").read_text(encoding="utf-8")  # type: ignore[operator]
+    root = rebuild_release(project)
+    assert verify_release(project, root).ok
+    assert (root / "latex" / "macros_p2.tex").read_text(encoding="utf-8") == before
+    manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["inputs_sha256"] == dict(sorted(out.run.inputs.items()))
+
+
+def test_snapshot_errors(tmp_path: Path) -> None:
+    from vamengoc.pipeline import SNAPSHOT_NAME, load_results_snapshot
+
+    project = make_project(tmp_path)
+    with pytest.raises(FileNotFoundError, match="no results snapshot"):
+        load_results_snapshot(project)
+    run = project.runs_dir / "20000101T000000Z-aaaaaa"
+    (run / "local_only").mkdir(parents=True)
+    with pytest.raises(FileNotFoundError, match="has no results snapshot"):
+        load_results_snapshot(project, run.name)
+    import pickle
+
+    (run / "local_only" / SNAPSHOT_NAME).write_bytes(pickle.dumps({"format": 99}))
+    with pytest.raises(ValueError, match="unsupported snapshot format"):
+        load_results_snapshot(project, run.name)
