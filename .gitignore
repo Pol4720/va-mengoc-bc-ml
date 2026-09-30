@@ -1,0 +1,112 @@
+# =============================================================================
+#  DATA PROTECTION — READ BEFORE EDITING
+#  Raw, interim and curated data contain personal health data (AEFI reports)
+#  and confidential industrial data (lot release records). They must NEVER be
+#  committed. Only the disclosure-controlled public release (release/) and the
+#  synthetic development release are versioned. See docs/DATA_GOVERNANCE.md.
+# =============================================================================
+
+# ---- Data tiers (never versioned) -------------------------------------------
+/data/**
+!/data/README.md
+!/data/*/
+!/data/*/.gitkeep
+
+# Any spreadsheet / data dump anywhere in the tree is refused by default.
+*.xlsx
+*.xlsm
+*.xls
+*.xlsb
+*.ods
+*.csv.gz
+*.sav
+*.dta
+*.sqlite
+*.sqlite3
+*.db
+*.duckdb
+*.parquet
+*.feather
+*.pkl
+*.pickle
+*.joblib
+# ...except the public release, which only contains aggregated CSV/JSON/PDF.
+!/release/**/*.csv
+!/release/**/*.json
+
+# Secrets (pseudonymisation key, encryption key, env files)
+*.key
+*.pem
+.env
+.env.*
+!.env.example
+secrets/
+.vamengoc/
+
+# Local run artefacts that may embed row-level information
+/runs/
+/logs/
+*.log
+!/release/**/*.log
+
+# ---- Python ------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.ipynb_checkpoints/
+
+# ---- Node / web --------------------------------------------------------------
+node_modules/
+web/dist/
+web/.vite/
+web/test-results/
+web/playwright-report/
+web/coverage/
+web/public/data/
+
+# ---- LaTeX build products ----------------------------------------------------
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+*.nav
+*.snm
+*.vrb
+*.spl
+*.lol
+_minted*/
+/build/
+
+# ---- Editors / OS ------------------------------------------------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# ---- Compiled documents (built by CI / `make`) -------------------------------
+*.pdf
+!/release/**/*.pdf
+!/docs/assets/**/*.pdf

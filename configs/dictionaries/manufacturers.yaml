@@ -1,0 +1,44 @@
+# Manufacturer normalisation. Tokens are normalised (upper case, no accents,
+# punctuation and spaces removed) before regex matching; unmatched tokens are
+# matched fuzzily against `fuzzy_anchors` (rapidfuzz, threshold below) and any
+# remaining token is mapped to OTHER and listed in the normalisation log.
+schema_version: 1
+fuzzy_threshold: 85
+separators: '\s*(?:,|;|/|\+|\s+Y\s+|&)\s*'
+manufacturers:
+  FINLAY:
+    label: "Finlay Vaccine Institute (Instituto Finlay de Vacunas)"
+    patterns: ['.*FINLAY.*', 'IFV', 'INSTFINLAY.*', 'IF']
+    fuzzy_anchors: ['FINLAY', 'INSTITUTOFINLAY', 'INSTITUTOFINLAYDEVACUNAS']
+  CIGB:
+    label: "Center for Genetic Engineering and Biotechnology (CIGB) / Heber Biotec"
+    patterns: ['.*HEBER.*', '.*CIGB.*', '.*INGENIERIAGENETICA.*']
+    fuzzy_anchors: ['HEBERBIOTEC', 'CIGB', 'HEBER']
+  SII:
+    label: "Serum Institute of India"
+    patterns: ['.*SERUM.*', 'SII', '.*INDIA.*']
+    fuzzy_anchors: ['SERUMINSTITUTEOFINDIA', 'SERUMINSTITUTE']
+  CENSA:
+    label: "CENSA"
+    patterns: ['.*CENSA.*']
+    fuzzy_anchors: ['CENSA']
+  SANOFI:
+    label: "Sanofi Pasteur"
+    patterns: ['.*SANOFI.*', '.*PASTEUR.*', '.*AVENTIS.*']
+    fuzzy_anchors: ['SANOFIPASTEUR']
+  GSK:
+    label: "GlaxoSmithKline"
+    patterns: ['.*GSK.*', '.*GLAXO.*']
+    fuzzy_anchors: ['GLAXOSMITHKLINE']
+  BIOFARMA:
+    label: "Bio Farma"
+    patterns: ['.*BIOFARMA.*']
+    fuzzy_anchors: ['BIOFARMA']
+  CIM:
+    label: "Center of Molecular Immunology"
+    patterns: ['CIM', '.*INMUNOLOGIAMOLECULAR.*']
+    fuzzy_anchors: ['CENTRODEINMUNOLOGIAMOLECULAR']
+  UNKNOWN:
+    label: "Not recorded"
+    patterns: ['', 'N', 'NA', 'ND', 'NO', 'DESCONOCIDO', 'SINDATOS', '-']
+    fuzzy_anchors: []

@@ -1,0 +1,121 @@
+# =============================================================================
+#  Vaccine code dictionary for the Cuban national immunisation programme.
+#  Keys are canonical codes used throughout the analysis. `patterns` are matched
+#  against the normalised token (upper case, no accents, punctuation removed,
+#  spaces collapsed) with full-string regex semantics.
+#  confidence: confirmed | inferred  — inferred meanings MUST be confirmed with
+#  the data owner (see docs/OPEN_QUESTIONS.md) before publication.
+# =============================================================================
+schema_version: 1
+separators: '\s*(?:,|;|/|\+|\s+Y\s+|&)\s*'   # split multi-vaccine cells
+
+vaccines:
+  AM-BC:
+    label_en: "VA-MENGOC-BC (meningococcal B–C, OMV + serogroup C polysaccharide)"
+    label_es: "VA-MENGOC-BC (antimeningocócica B–C)"
+    manufacturer: FINLAY
+    target: true
+    confidence: inferred
+    patterns: ['AM ?BC', 'AMBC', 'AM-BC', 'VA ?MENGOC ?BC', 'VAMENGOC', 'MENGOC', 'ANTIMENINGOCOCICA ?BC', 'ANTIMENINGO ?BC', 'MENINGO ?BC']
+  PENTA-L:
+    label_en: "Heberpenta-L (DTwP-HepB-Hib, liquid)"
+    label_es: "Heberpenta-L (pentavalente líquida)"
+    manufacturer: CIGB
+    confidence: inferred
+    patterns: ['PENTA ?L', 'PENTAL', 'PENTAVALENTE( ?L)?', 'HEBERPENTA( ?L)?', 'PENTA']
+  DPT:
+    label_en: "DTwP (diphtheria–tetanus–whole-cell pertussis)"
+    label_es: "DPT (difteria-tétanos-pertussis)"
+    manufacturer: FINLAY
+    confidence: inferred
+    patterns: ['DPT', 'DTP', 'DTWP', 'TRIPLE BACTERIANA']
+  HIB:
+    label_en: "Hib conjugate (Quimi-Hib)"
+    label_es: "Hib conjugada (Quimi-Hib)"
+    manufacturer: CIGB
+    confidence: inferred
+    patterns: ['HIB', 'QUIMI ?HIB', 'HAEMOPHILUS']
+  PRS:
+    label_en: "MMR (measles–mumps–rubella)"
+    label_es: "PRS (parotiditis-rubéola-sarampión)"
+    manufacturer: SII
+    confidence: inferred
+    patterns: ['PRS', 'MMR', 'SRP', 'TRIPLE VIRAL', 'TRIPLE VIRICA']
+  AG:
+    label_en: "Influenza"
+    label_es: "Antigripal"
+    manufacturer: OTHER
+    confidence: inferred
+    patterns: ['AG', 'ANTIGRIPAL', 'INFLUENZA', 'GRIPE']
+  TT:
+    label_en: "Tetanus toxoid"
+    label_es: "Toxoide tetánico"
+    manufacturer: FINLAY
+    confidence: inferred
+    patterns: ['TT', 'TOXOIDE TETANICO', 'ANTITETANICA']
+  AT:
+    label_en: "Tetanus toxoid (booster, AT)"
+    label_es: "Antitetánica (AT)"
+    manufacturer: FINLAY
+    confidence: inferred
+    patterns: ['AT']
+  DT:
+    label_en: "DT / dT (diphtheria–tetanus)"
+    label_es: "DT (difteria-tétanos)"
+    manufacturer: FINLAY
+    confidence: inferred
+    patterns: ['DT', 'D T', 'DUPLE']
+  OPV:
+    label_en: "Oral poliovirus vaccine"
+    label_es: "Antipoliomielítica oral"
+    manufacturer: OTHER
+    confidence: inferred
+    patterns: ['OPV', 'POLIO ORAL', 'VPO', 'ANTIPOLIO ORAL', 'BOPV']
+  IPV:
+    label_en: "Inactivated poliovirus vaccine"
+    label_es: "Antipoliomielítica inactivada"
+    manufacturer: OTHER
+    confidence: inferred
+    patterns: ['IPV', 'VPI', 'FIPV', 'POLIO INACTIVADA']
+  HB:
+    label_en: "Hepatitis B (Heberbiovac HB)"
+    label_es: "Hepatitis B (Heberbiovac HB)"
+    manufacturer: CIGB
+    confidence: inferred
+    patterns: ['HB', 'HBV', 'HEPATITIS ?B', 'HEBERBIOVAC( ?HB)?']
+  AA:
+    label_en: "AA (to be confirmed with data owner)"
+    label_es: "AA (por confirmar con el propietario de los datos)"
+    manufacturer: OTHER
+    confidence: inferred
+    patterns: ['AA']
+  AL:
+    label_en: "Leptospirosis (vax-SPIRAL)"
+    label_es: "Antileptospirósica (vax-SPIRAL)"
+    manufacturer: FINLAY
+    confidence: inferred
+    patterns: ['AL', 'ANTILEPTOSPIROSICA', 'LEPTOSPIRA', 'VAX ?SPIRAL']
+  BCG:
+    label_en: "BCG"
+    label_es: "BCG"
+    manufacturer: OTHER
+    confidence: inferred
+    patterns: ['BCG']
+  TYPHOID:
+    label_en: "Typhoid Vi polysaccharide (vax-TyVi)"
+    label_es: "Antitifoídica Vi (vax-TyVi)"
+    manufacturer: FINLAY
+    confidence: inferred
+    patterns: ['VI', 'TIFOIDICA', 'ANTITIFOIDICA', 'VAX ?TYVI', 'TYVI', 'AT VI']
+  PCV:
+    label_en: "Pneumococcal conjugate"
+    label_es: "Antineumocócica conjugada"
+    manufacturer: FINLAY
+    confidence: inferred
+    patterns: ['PCV\d*', 'QUIMI ?VIO', 'NEUMO\w*', 'ANTINEUMOCOCICA']
+  COVID-19:
+    label_en: "COVID-19 (any)"
+    label_es: "COVID-19 (cualquiera)"
+    manufacturer: OTHER
+    confidence: inferred
+    patterns: ['SOBERANA\w*', 'ABDALA', 'COVID\w*', 'SOBERANA ?PLUS', 'SOBERANA ?0?2']

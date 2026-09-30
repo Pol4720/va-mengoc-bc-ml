@@ -1,0 +1,99 @@
+# =============================================================================
+#  Schema registry — AEFI annual files (EA_<YEAR>_TOTAL.xlsx)
+#
+#  Each canonical field lists the header aliases observed or anticipated in the
+#  source files. Matching is accent-, case-, punctuation- and whitespace-
+#  insensitive, with a fuzzy fallback (see io/schema_registry.py).
+#  `occurrence` disambiguates headers repeated in the same sheet (the personal
+#  and family history blocks both use "CONVULSON" and "ASMA").
+#
+#  kind:
+#    pii_direct   -> removed at ingestion (only used, transiently, to derive the
+#                    HMAC pseudonym); never persisted beyond the staging layer
+#    pii_indirect -> generalised or kept only in the encrypted curated layer
+#    quasi_id     -> kept in curated layer, generalised/suppressed in releases
+#    date, sex, age, category, yes_no, text, lot, multi, integer, sensitive_text
+# =============================================================================
+schema_version: 1
+dataset: aefi
+min_required_matches: 8
+
+fields:
+  full_name:        {kind: pii_direct, type: text, required: false,
+                     aliases: ["NOMBRES Y APELLIDOS", "NOMBRE Y APELLIDOS", "NOMBRE Y APELLIDO", "NOMBRES", "NOMBRE", "PACIENTE"]}
+  sex:              {kind: quasi_id, type: sex, required: true, aliases: ["SEXO", "SEX"]}
+  birth_date:       {kind: pii_indirect, type: date, required: false,
+                     aliases: ["F.NACIMIENTO", "F. NACIMIENTO", "FECHA DE NACIMIENTO", "FECHA NACIMIENTO", "FNAC", "F NAC"]}
+  age_raw:          {kind: quasi_id, type: age, required: false, aliases: ["EDAD"]}
+  age_group_raw:    {kind: quasi_id, type: category, required: false,
+                     aliases: ["GRUPO DE EDAD", "GRUPO EDAD", "GRUPOS DE EDAD", "GRUPO ETARIO"]}
+  address:          {kind: pii_direct, type: text, required: false,
+                     aliases: ["DIRECCION", "DIRECCIÓN", "DOMICILIO", "DIRECCION PARTICULAR"]}
+  clinic:           {kind: quasi_id, type: text, required: false, aliases: ["CONSULTORIO", "CMF", "NO. CONSULTORIO"]}
+  health_area:      {kind: quasi_id, type: text, required: false,
+                     aliases: ["AREA DE SALUD", "ÁREA DE SALUD", "AREA SALUD", "POLICLINICO", "POLICLÍNICO"]}
+  municipality:     {kind: quasi_id, type: text, required: false, aliases: ["MUNICIPIO", "MUNIC", "MUNICIPIOS"]}
+  province:         {kind: quasi_id, type: province, required: true, aliases: ["PROVINCIAS", "PROVINCIA", "PROV"]}
+  pregnant:         {kind: quasi_id, type: yes_no, required: false, aliases: ["EMBARAZADA", "EMBARAZO", "GESTANTE"]}
+  month:            {kind: category, type: integer, required: false, aliases: ["MES"]}
+  vaccination_date: {kind: date, type: date, required: true,
+                     aliases: ["F.VACUNACION", "F. VACUNACION", "FECHA DE VACUNACION", "FECHA VACUNACION", "F.VACUNACIÓN"]}
+  notification_date: {kind: date, type: date, required: false,
+                     aliases: ["F.NOTIFICACION", "F. NOTIFICACION", "FECHA DE NOTIFICACION", "FECHA NOTIFICACION"]}
+  vaccine_raw:      {kind: category, type: multi, required: true,
+                     aliases: ["TIPO DE VACUNA", "TIPO VACUNA", "VACUNA", "VACUNAS"]}
+  dose_raw:         {kind: category, type: multi, required: false, aliases: ["DOSIS", "NO. DOSIS", "NUMERO DE DOSIS"]}
+  site_raw:         {kind: category, type: multi, required: false,
+                     aliases: ["S.APLICACION", "S. APLICACION", "SITIO DE APLICACION", "SITIO"]}
+  route_raw:        {kind: category, type: multi, required: false,
+                     aliases: ["V.ADMON.", "V.ADMON", "V. ADMON", "VIA DE ADMINISTRACION", "VIA ADMON", "VIA"]}
+  place_raw:        {kind: category, type: text, required: false,
+                     aliases: ["L.APLICACION", "L. APLICACION", "LUGAR DE APLICACION", "LUGAR"]}
+  manufacturer_raw: {kind: category, type: multi, required: false,
+                     aliases: ["FABRICNATE", "FABRICANTE", "LABORATORIO", "PRODUCTOR"]}
+  lot_raw:          {kind: category, type: lot, required: false, aliases: ["LOTE", "LOTES", "NO. LOTE", "NUMERO DE LOTE"]}
+
+  # --- Personal (APP) and family (APF) history ------------------------------
+  hist_personal_allergy: {kind: category, type: yes_no, required: false, aliases: ["APP ALERGIA", "APP ALERGIAS", "ALERGIA"], occurrence: 1}
+  hist_personal_seizure: {kind: category, type: yes_no, required: false, aliases: ["CONVULSON", "CONVULSION", "CONVULSIONES"], occurrence: 1}
+  hist_personal_asthma:  {kind: category, type: yes_no, required: false, aliases: ["ASMA"], occurrence: 1}
+  hist_family_allergy:   {kind: category, type: yes_no, required: false, aliases: ["APF ALERGIA", "APF ALERGIAS"], occurrence: 1}
+  hist_family_seizure:   {kind: category, type: yes_no, required: false, aliases: ["CONVULSON", "CONVULSION", "CONVULSIONES", "CONVULSON.1"], occurrence: 2}
+  hist_family_asthma:    {kind: category, type: yes_no, required: false, aliases: ["ASMA", "ASMA.1"], occurrence: 2}
+
+  # --- Event indicators (non-exclusive) -------------------------------------
+  ev_sterile_abscess:        {kind: event, type: yes_no, required: false, aliases: ["ABS.ESTERIL", "ABS. ESTERIL", "ABSCESO ESTERIL"]}
+  ev_bacterial_abscess:      {kind: event, type: yes_no, required: false, aliases: ["ABS.BACTERIAN", "ABS.BACTERIANO", "ABSCESO BACTERIANO"]}
+  ev_lymphadenitis:          {kind: event, type: yes_no, required: false, aliases: ["LINFADENITIS"]}
+  ev_severe_local_reaction:  {kind: event, type: yes_no, required: false, aliases: ["R.L.S", "R.L.S.", "RLS", "REACCION LOCAL SEVERA"]}
+  ev_acute_paralysis:        {kind: event, type: yes_no, required: false, aliases: ["P.AGUDA", "P. AGUDA", "PARALISIS AGUDA"]}
+  ev_encephalopathy:         {kind: event, type: yes_no, required: false, aliases: ["ENCEFALOPATIAS", "ENCEFALOPATIA"]}
+  ev_behaviour_change:       {kind: event, type: yes_no, required: false, aliases: ["C.DE CONDUCTA", "C. DE CONDUCTA", "CAMBIO DE CONDUCTA", "CAMBIOS DE CONDUCTA"]}
+  ev_brain_damage:           {kind: event, type: yes_no, required: false, aliases: ["DAÑO CEREBRAL", "DANO CEREBRAL"]}
+  ev_encephalitis:           {kind: event, type: yes_no, required: false, aliases: ["ENCEFALITIS"]}
+  ev_meningitis:             {kind: event, type: yes_no, required: false, aliases: ["MENINGITIS"]}
+  ev_allergic_reaction:      {kind: event, type: yes_no, required: false, aliases: ["R.ALERGICA", "R. ALERGICA", "REACCION ALERGICA"]}
+  ev_febrile_seizure:        {kind: event, type: yes_no, required: false, aliases: ["C.FEBRIL", "C. FEBRIL", "CONVULSION FEBRIL"]}
+  ev_afebrile_seizure:       {kind: event, type: yes_no, required: false, aliases: ["C.AFEBRIL", "C. AFEBRIL", "CONVULSION AFEBRIL"]}
+  ev_anaphylactic_reaction:  {kind: event, type: yes_no, required: false, aliases: ["R.ANAFILACTICA", "R. ANAFILACTICA", "REACCION ANAFILACTICA"]}
+  ev_anaphylactic_shock:     {kind: event, type: yes_no, required: false, aliases: ["SHOCK ANAFIL.", "SHOCK ANAFIL", "SHOCK ANAFILACTICO"]}
+  ev_arthralgia:             {kind: event, type: yes_no, required: false, aliases: ["ARTRALGIAS", "ARTRALGIA"]}
+  ev_fever_39:               {kind: event, type: yes_no, required: false, aliases: ["FIEBRE 39", "FIEBRE39", "FIEBRE > 39", "FIEBRE >=39"]}
+  ev_fever_40:               {kind: event, type: yes_no, required: false, aliases: ["FIEBRE 40", "FIEBRE40", "FIEBRE > 40", "FIEBRE >=40"]}
+  ev_collapse:               {kind: event, type: yes_no, required: false, aliases: ["COLAPSO", "EHH", "HIPOTONIA HIPORREACTIVIDAD"]}
+  ev_osteitis:               {kind: event, type: yes_no, required: false, aliases: ["OSTEI/OSTEO", "OSTEITIS", "OSTEOMIELITIS"]}
+  ev_persistent_crying:      {kind: event, type: yes_no, required: false, aliases: ["LLANTO PERSST.", "LLANTO PERSST", "LLANTO PERSISTENTE"]}
+  ev_sepsis:                 {kind: event, type: yes_no, required: false, aliases: ["SEPSS", "SEPSIS"]}
+  ev_toxic_shock:            {kind: event, type: yes_no, required: false, aliases: ["SHOCK TOXICO", "SHOCK TÓXICO"]}
+  ev_rash:                   {kind: event, type: yes_no, required: false, aliases: ["RASH", "EXANTEMA"]}
+  ev_purpura:                {kind: event, type: yes_no, required: false, aliases: ["PURPURA", "PÚRPURA"]}
+  ev_other:                  {kind: event, type: yes_no, required: false, aliases: ["OTROS", "OTRO", "OTRAS"]}
+  other_text:                {kind: sensitive_text, type: text, required: false, aliases: ["CUAL (OTRO)", "CUAL", "CUAL(OTRO)", "CUALES"]}
+
+  # --- Outcome --------------------------------------------------------------
+  hospitalized:     {kind: outcome, type: yes_no, required: false, aliases: ["INGRESO", "INGRESADO", "HOSPITALIZADO"]}
+  admission_date:   {kind: date, type: date, required: false, aliases: ["F.INGRESO", "F. INGRESO", "FECHA DE INGRESO"]}
+  discharge_date:   {kind: date, type: date, required: false, aliases: ["F.EGRESO", "F. EGRESO", "FECHA DE EGRESO", "FECHA EGRESO"]}
+  recovered:        {kind: outcome, type: yes_no, required: false, aliases: ["CURADO", "RECUPERADO"]}
+  died:             {kind: outcome, type: yes_no, required: false, aliases: ["FALLECIDO", "FALLECIDA", "MUERTE"]}
+  sequelae:         {kind: outcome, type: yes_no, required: false, aliases: ["SECUELA", "SECUELAS"]}
