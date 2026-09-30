@@ -1,0 +1,41 @@
+# Install once with:  uv run pre-commit install
+# Every commit is checked for restricted data, secrets, lint, format and release integrity.
+repos:
+  - repo: local
+    hooks:
+      - id: data-guard
+        name: data guard (no restricted data, secrets or oversized files)
+        entry: python tools/check_no_data.py
+        language: system
+        pass_filenames: true
+      - id: ruff-lint
+        name: ruff lint
+        entry: uv run ruff check --force-exclude
+        language: system
+        types: [python]
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format --check --force-exclude
+        language: system
+        types: [python]
+      - id: release-verify
+        name: verify disclosure control of committed releases
+        entry: uv run python tools/verify_releases.py
+        language: system
+        files: ^release/
+        pass_filenames: false
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: check-json
+        exclude: ^web/tsconfig
+      - id: end-of-file-fixer
+        exclude: ^release/
+      - id: trailing-whitespace
+        exclude: ^release/
+      - id: detect-private-key
+      - id: check-added-large-files
+        args: ["--maxkb=5000"]
+        exclude: ^release/

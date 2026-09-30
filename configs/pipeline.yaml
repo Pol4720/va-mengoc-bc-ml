@@ -1,0 +1,124 @@
+# =============================================================================
+#  VA-MENGOC-BC analytics — pipeline configuration (versioned).
+#  Every run records the SHA-256 of this file in its provenance manifest.
+#  Paths are relative to the repository root unless absolute.
+# =============================================================================
+schema_version: 1
+
+paths:
+  raw_dir: data/raw                 # read-only inputs (never committed)
+  interim_dir: data/interim         # typed staging layer (never committed)
+  curated_dir: data/curated         # pseudonymised relational model (never committed)
+  synthetic_dir: data/synthetic     # generated synthetic workbooks (never committed)
+  release_dir: release              # disclosure-controlled public outputs (committed)
+  runs_dir: runs                    # provenance manifests and audit logs (never committed)
+
+inputs:
+  # File discovery is pattern based so that renamed or extra files are handled.
+  aefi_file_pattern: '(?i)^EA[ _-]*(?P<year>(19|20)\d{2}).*\.(xlsx|xlsm|xls)$'
+  aefi_preferred_sheet: TOTAL
+  lots_file_pattern: '(?i)^BD.*lote.*\.(xlsx|xlsm|xls)$'
+  sheet_patterns:
+    lots: '(?i)lote'
+    incidence: '(?i)incidencia'
+    coverage: '(?i)cobertura'
+  header_search_rows: 15            # rows scanned to locate a header row
+  min_header_matches: 5             # canonical columns required to accept a header row
+
+security:
+  # HMAC-SHA256 key for pseudonymisation. Resolved in this order:
+  #   1. environment variable VAMENGOC_HMAC_KEY (hex or base64, >= 32 bytes)
+  #   2. file at `hmac_key_file` (outside the repository by default)
+  # A run on real data refuses to start without a key; synthetic runs derive
+  # a fixed public test key so that CI is reproducible.
+  hmac_key_env: VAMENGOC_HMAC_KEY
+  hmac_key_file: ~/.config/vamengoc/hmac.key
+  encrypt_curated: false            # Fernet-encrypt curated parquet files at rest
+  fernet_key_env: VAMENGOC_FERNET_KEY
+  fernet_key_file: ~/.config/vamengoc/fernet.key
+
+analysis:
+  seed: 20260930
+  # Which date defines the analytic year of an AEFI report.
+  analytic_year_from: vaccination_date   # vaccination_date | notification_date | file_year
+  study_years: [2017, 2025]              # inclusive window on the analytic year
+  target_vaccine: AM-BC                  # canonical code of VA-MENGOC-BC in the AEFI files
+  target_manufacturer: FINLAY
+  infant_comparator_max_age_months: 11   # active-comparator restriction (Paper 1)
+  expected_national_rate_per_100k: 50    # Cuban programme reference rate (Cruz-Rodriguez 2021)
+  plausibility:
+    max_age_years: 110
+    max_notification_delay_days: 365
+    max_hospital_stay_days: 180
+    age_tolerance_months: 2              # reported vs date-derived age
+  deduplication:
+    key: [person_id, vaccination_date, vaccine_set, lot_set]
+  disproportionality:
+    min_reports: 3                       # minimum a (target & event) to screen
+    ror_lower_threshold: 1.0
+    prr_threshold: 2.0
+    prr_chi2_threshold: 4.0
+    ic025_threshold: 0.0
+    eb05_threshold: 2.0
+  lca:
+    k_range: [1, 7]
+    n_starts: 20
+    max_iter: 500
+    tol: 1.0e-7
+    bootstrap: 50
+  seriousness_model:
+    train_years: [2017, 2022]
+    test_years: [2023, 2025]
+    n_estimators: 300
+    learning_rate: 0.05
+    num_leaves: 15
+    min_child_samples: 30
+  qc:
+    capability_bootstrap: 2000
+    ewma_lambda: 0.2
+    mspc_alpha: 0.01
+    changepoint_penalty: bic             # bic | aic | numeric
+    equivalence_margin_fraction: 0.10    # TOST margin as a fraction of the spec window
+  qc_safety:
+    primary_outcomes: [ev_fever_39, ev_fever_40, ev_severe_local_reaction]
+    secondary_outcomes: [ev_persistent_crying, ev_other, hospitalized]
+    primary_exposures: [endotoxin, aloh3_conc, protein_conc, protein_adsorption]
+    negative_control_exposures: [fill_volume]
+    covariates: [age_months, sex, dose_number, coadministered, analytic_year]
+    gee_cov_struct: exchangeable
+    permutation_tests: 500
+    cv_folds: 5
+    fdr_alpha: 0.05
+  linkage:
+    fuzzy_threshold: 92                  # rapidfuzz ratio for fuzzy lot matching
+    allow_fuzzy: true
+    max_years_after_production: 4        # shelf life + distribution window (plausibility)
+
+sdc:
+  # Statistical disclosure control applied to every released table.
+  min_cell: 5                            # counts 1..min_cell-1 are suppressed
+  suppression_token: "<5"
+  secondary_suppression: true
+  round_rates_digits: 1
+  release_lot_values: normalized         # none | normalized | raw
+  forbidden_columns:                     # must never appear in any released file
+    - full_name
+    - address
+    - birth_date
+    - clinic
+    - health_area
+    - other_text
+    - person_id
+    - notification_id
+    - lot_id_raw
+  forbidden_patterns:                    # regexes scanned in every released text file
+    - '(?i)nombres?\s+y\s+apellidos'
+    - '(?i)\bdirecci[oó]n\s+(particular|postal|de\s+residencia)\b'
+    - '(?i)\bdomicilio\b'
+    - '(?i)f\.?\s*nacimiento'
+
+release:
+  origin_auto: true                      # 'synthetic' when inputs are synthetic, else 'public'
+  languages: [en, es]
+  figure_format: pdf
+  figure_dpi: 300

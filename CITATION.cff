@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software or its public releases, please cite it as below."
+title: "VA-MENGOC-BC pharmacovigilance and lot-quality analytics"
+type: software
+version: 0.1.0
+license: MIT
+repository-code: "https://github.com/Pol4720/va-mengoc-bc-ml"
+authors:
+  - family-names: "Matos Arderí"
+    given-names: "Richard Alejandro"
+    orcid: "https://orcid.org/0009-0008-0751-5855"
+    affiliation: "Finlay Vaccine Institute (IFV), DICEI, Havana, Cuba"
+  - family-names: "Ponce González"
+    given-names: "Abel"
+    orcid: "https://orcid.org/0009-0001-9200-4564"
+    affiliation: "Finlay Vaccine Institute (IFV), DICEI, Havana, Cuba"
+keywords:
+  - pharmacovigilance
+  - vaccine safety
+  - VA-MENGOC-BC
+  - disproportionality analysis
+  - statistical process control
+  - statistical disclosure control

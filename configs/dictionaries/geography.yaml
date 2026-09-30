@@ -1,0 +1,72 @@
+# Cuban provinces (2011 political-administrative division, 15 provinces + the
+# special municipality Isla de la Juventud). Codes as used in the AEFI files.
+# `region` groups provinces for disclosure-safe geographic aggregation.
+schema_version: 1
+provinces:
+  PR: {name: "Pinar del Río",        region: Occidente, patterns: ['PR', 'PINAR( DEL RIO)?', 'P RIO']}
+  AT: {name: "Artemisa",             region: Occidente, patterns: ['AT', 'ART', 'ARTEMISA']}
+  LH: {name: "La Habana",            region: Occidente, patterns: ['LH', 'CH', 'HAB', '(LA )?HABANA', 'CIUDAD (DE )?(LA )?HABANA']}
+  MY: {name: "Mayabeque",            region: Occidente, patterns: ['MY', 'MAY', 'MAYABEQUE']}
+  MT: {name: "Matanzas",             region: Occidente, patterns: ['MT', 'MTZ', 'MATANZAS']}
+  IJ: {name: "Isla de la Juventud",  region: Occidente, patterns: ['IJ', 'IS', 'ISLA( DE LA JUVENTUD)?', 'MEIJ']}
+  VC: {name: "Villa Clara",          region: Centro,    patterns: ['VC', 'VCL', 'VILLA CLARA']}
+  CF: {name: "Cienfuegos",           region: Centro,    patterns: ['CF', 'CFG', 'CIENFUEGOS']}
+  SS: {name: "Sancti Spíritus",      region: Centro,    patterns: ['SS', 'SSP', 'SANCTI SPIRITUS']}
+  CA: {name: "Ciego de Ávila",       region: Centro,    patterns: ['CA', 'CAV', 'CIEGO( DE AVILA)?']}
+  CM: {name: "Camagüey",             region: Centro,    patterns: ['CM', 'CMG', 'CAMAGUEY']}
+  LT: {name: "Las Tunas",            region: Oriente,   patterns: ['LT', 'LTU', 'LAS TUNAS', 'TUNAS']}
+  HO: {name: "Holguín",              region: Oriente,   patterns: ['HO', 'HOL', 'HLG', 'HOLGUIN']}
+  GM: {name: "Granma",               region: Oriente,   patterns: ['GM', 'GRM', 'GRANMA']}
+  SC: {name: "Santiago de Cuba",     region: Oriente,   patterns: ['SC', 'SCU', 'STGO', 'SANTIAGO( DE CUBA)?']}
+  GT: {name: "Guantánamo",           region: Oriente,   patterns: ['GT', 'GTM', 'GTMO', 'GUANTANAMO']}
+
+# Place of administration (L.APLICACION): free text grouped in a few classes.
+places:
+  VACCINATION_ROOM: {label: "Vaccination room (vacunatorio)", patterns: ['.*VACUNATORIO.*', '.*VAC\b.*', 'SALA DE VACUNACION']}
+  POLYCLINIC:       {label: "Polyclinic",                     patterns: ['.*POLICLINIC.*', '.*POLI\b.*', 'POLIC.*']}
+  FAMILY_DOCTOR:    {label: "Family doctor's office (CMF)",   patterns: ['.*CMF.*', '.*CONSULTORIO.*', '.*MEDICO DE (LA )?FAMILIA.*']}
+  SCHOOL:           {label: "School",                         patterns: ['.*ESCUELA.*', '.*CIRCULO.*', '.*SEMINTERNADO.*', '.*SECUNDARIA.*', '.*PRIMARIA.*']}
+  VACCINATION_POST: {label: "Vaccination post",               patterns: ['.*PUNTO.*', '.*PUESTO.*']}
+  HOSPITAL:         {label: "Hospital / maternity",           patterns: ['.*HOSPITAL.*', '.*MATERNIDAD.*', '.*MATERNO.*']}
+  WORKPLACE:        {label: "Workplace / other institution",  patterns: ['.*CENTRO DE TRABAJO.*', '.*EMPRESA.*', '.*UNIVERSIDAD.*']}
+  HOME:             {label: "Home visit",                     patterns: ['.*DOMICILIO.*', '.*CASA.*', '.*TERRENO.*']}
+
+# Injection site and route (multi-valued cells are split before mapping).
+sites:
+  THIGH:    {label: "Anterolateral thigh", patterns: ['.*CALM.*', '.*MUSLO.*', '1 ?/ ?3.*', '.*VASTO.*', 'TMCALM']}
+  DELTOID:  {label: "Deltoid",             patterns: ['.*DELTOID.*', '.*BRAZO.*']}
+  ORAL:     {label: "Oral",                patterns: ['.*BOCA.*', 'ORAL', 'VO']}
+  GLUTEAL:  {label: "Gluteal",             patterns: ['.*GLUTE.*', '.*NALGA.*']}
+  FOREARM:  {label: "Forearm (intradermal)", patterns: ['.*ANTEBRAZO.*']}
+routes:
+  IM:   {label: "Intramuscular",  patterns: ['IM', 'I M', 'INTRAMUSCULAR']}
+  SC:   {label: "Subcutaneous",   patterns: ['SC', 'S C', 'SUBCUTANEA', 'SUBCUTANEO']}
+  ORAL: {label: "Oral",           patterns: ['ORAL', 'VO', 'BOCA']}
+  ID:   {label: "Intradermal",    patterns: ['ID', 'I D', 'INTRADERMICA', 'INTRADERMAL']}
+
+# Lot destination countries/markets (lot-release workbook). Cells may combine
+# several destinations with hyphens: they are exploded to a many-to-many table.
+destinations:
+  separators: '\s*(?:-|,|;|/|\+|\s+Y\s+)\s*'
+  map:
+    CU: {label: "Cuba (national programme)", patterns: ['NACIONAL', 'CUBA', 'NAC']}
+    VN: {label: "Viet Nam",                 patterns: ['VIETNAM', 'VIET NAM']}
+    VE: {label: "Venezuela",                patterns: ['VENEZUELA']}
+    CO: {label: "Colombia",                 patterns: ['COLOMBIA']}
+    GT: {label: "Guatemala",                patterns: ['GUATEMALA']}
+    BR: {label: "Brazil",                   patterns: ['BRASIL', 'BRAZIL']}
+    UY: {label: "Uruguay",                  patterns: ['URUGUAY']}
+    AR: {label: "Argentina",                patterns: ['ARGENTINA']}
+    NI: {label: "Nicaragua",                patterns: ['NICARAGUA']}
+    BO: {label: "Bolivia",                  patterns: ['BOLIVIA']}
+    EC: {label: "Ecuador",                  patterns: ['ECUADOR']}
+    PE: {label: "Peru",                     patterns: ['PERU']}
+    SV: {label: "El Salvador",              patterns: ['EL SALVADOR', 'SALVADOR']}
+    HN: {label: "Honduras",                 patterns: ['HONDURAS']}
+    PA: {label: "Panama",                   patterns: ['PANAMA']}
+    DO: {label: "Dominican Republic",       patterns: ['REPUBLICA DOMINICANA', 'RD', 'DOMINICANA']}
+    MX: {label: "Mexico",                   patterns: ['MEXICO']}
+    CN: {label: "China",                    patterns: ['CHINA']}
+    IR: {label: "Iran",                     patterns: ['IRAN']}
+    PK: {label: "Pakistan",                 patterns: ['PAKISTAN']}
+    OTHER: {label: "Other / unspecified",   patterns: ['EXPORTACION', 'EXPORT', 'OTROS?']}

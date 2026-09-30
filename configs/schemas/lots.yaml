@@ -1,0 +1,91 @@
+# =============================================================================
+#  Schema registry — lot-release workbook (BD_para_publicación_lotes_final.xlsx)
+#  Three independent sheets: lot release records, national incidence series and
+#  vaccination coverage. `spec_fallback` holds the acceptance criteria as
+#  documented by the data owner; the pipeline parses the specification row of
+#  the sheet and reports any divergence from these values (spec drift).
+# =============================================================================
+schema_version: 1
+dataset: lots
+
+lots_sheet:
+  min_required_matches: 6
+  fields:
+    row_number:         {type: integer, required: false, aliases: ["NO", "#", "NO.", "NUMERO", "NRO"]}
+    lot_id:             {type: lot, required: true, aliases: ["LOTE DE VACUNA ENVASADA", "LOTE", "LOTE VACUNA", "LOTE ENVASADO"]}
+    production_year:    {type: integer, required: true,
+                         aliases: ["AÑO PRODUCCION DE LA VACUNA", "AÑO PRODUCCIÓN DE LA VACUNA", "AÑO DE PRODUCCION", "AÑO PRODUCCION", "AÑO"]}
+    destination_raw:    {type: text, required: false, aliases: ["DESTINO", "PAIS DESTINO", "MERCADO"]}
+    organoleptic:       {type: qualitative, required: false, aliases: ["CARACTERISTICAS ORGANOLEPTICAS", "CARACTERÍSTICAS ORGANOLÉPTICAS", "ASPECTO"]}
+    ph:                 {type: quantitative, required: true, aliases: ["PH"]}
+    protein_conc:       {type: quantitative, required: true, aliases: ["CONCENTRACION DE PROTEINAS", "CONCENTRACIÓN DE PROTEÍNAS", "PROTEINAS"]}
+    protein_adsorption: {type: quantitative, required: true, aliases: ["ADSORCION DE PROTEINAS (%)", "ADSORCIÓN DE PROTEÍNAS (%)", "ADSORCION DE PROTEINAS"]}
+    ps_conc:            {type: quantitative, required: true,
+                         aliases: ["CONCENTRACION DE POLISACARIDOS", "CONCENTRACIÓN DE POLISACÁRIDOS", "POLISACARIDOS"]}
+    ps_adsorption:      {type: quantitative, required: true,
+                         aliases: ["ADSORCION DE POLISACARIDOS (%)", "ADSORCIÓN DE POLISACÁRIDOS (%)", "ADSORCION DE POLISACARIDOS"]}
+    aloh3_conc:         {type: quantitative, required: true, aliases: ["CONCENTRACION DE AL(OH)3", "CONCENTRACIÓN DE AL(OH)3", "AL(OH)3", "HIDROXIDO DE ALUMINIO"]}
+    thiomersal_conc:    {type: quantitative, required: true, aliases: ["CONCENTRACION DE TIOMERSAL", "CONCENTRACIÓN DE TIOMERSAL", "TIOMERSAL"]}
+    bactericidal_titer: {type: quantitative, required: true,
+                         aliases: ["INMUNOGENICIDAD (ACT. ANTIC. BACT.)", "INMUNOGENICIDAD (ACT ANTIC BACT)", "ACTIVIDAD BACTERICIDA", "INMUNOGENICIDAD BACT"]}
+    igg_elisa:          {type: quantitative, required: true,
+                         aliases: ["INMUNOGENICIDAD (ACT. ANTIC. IGG)", "INMUNOGENICIDAD (ACT ANTIC IGG)", "IGG", "INMUNOGENICIDAD IGG"]}
+    sterility:          {type: qualitative, required: false, aliases: ["ESTERILIDAD"]}
+    endotoxin:          {type: quantitative, required: true,
+                         aliases: ["CONTENIDO DE ENDOTOXINAS (UE/ML)", "CONTENIDO DE ENDOTOXINAS", "ENDOTOXINAS"]}
+    fill_volume:        {type: quantitative, required: true,
+                         aliases: ["CONTENIDO PROMEDIO DEL BULBO", "CONTENIDO DEL BULBO", "VOLUMEN DE LLENADO"]}
+    identity_ps:        {type: qualitative, required: false, aliases: ["IDENTIDAD DEL POLISACARIDO", "IDENTIDAD DEL POLISACÁRIDO"]}
+    identity_protein:   {type: qualitative, required: false, aliases: ["IDENTIDAD DE LA PROTEINA", "IDENTIDAD DE LA PROTEÍNA"]}
+    safety_test:        {type: qualitative, required: false, aliases: ["INOCUIDAD"]}
+
+  # Acceptance criteria documented by the data owner (used as fallback and to
+  # detect specification drift). op: range | ge | gt | le | lt
+  spec_fallback:
+    ph:                 {op: range, low: 6.0, high: 7.2, unit: ""}
+    protein_conc:       {op: range, low: 70, high: 130, unit: "µg/mL"}
+    protein_adsorption: {op: ge, low: 80, unit: "%"}
+    ps_conc:            {op: range, low: 70, high: 130, unit: "µg/mL"}
+    ps_adsorption:      {op: ge, low: 80, unit: "%"}
+    aloh3_conc:         {op: range, low: 3, high: 5, unit: "mg/mL"}
+    thiomersal_conc:    {op: range, low: 0.07, high: 0.13, unit: "mg/mL"}
+    bactericidal_titer: {op: gt, low: 4, unit: "titre"}
+    igg_elisa:          {op: ge, low: 7000, unit: "UIgG/mL"}
+    endotoxin:          {op: le, high: 20000, unit: "EU/mL"}
+    fill_volume:        {op: ge, low: 0.5, unit: "mL"}
+
+  # For one-sided specifications the analysis needs a finite reference window
+  # to express values on a common 0-1 scale. `natural_bound` gives the
+  # physically meaningful other end (e.g. 100 % adsorption, 0 EU/mL).
+  natural_bounds:
+    protein_adsorption: {high: 100}
+    ps_adsorption:      {high: 100}
+    endotoxin:          {low: 0}
+    bactericidal_titer: {transform: log2}
+    igg_elisa:          {transform: log10}
+
+  # Log-scale analysis for dilution titres and heavy-tailed assays.
+  transforms:
+    bactericidal_titer: log2
+    igg_elisa: log10
+    endotoxin: log10p1
+
+incidence_sheet:
+  min_required_matches: 2
+  fields:
+    year:              {type: integer, required: true, aliases: ["AÑO", "ANO", "AÑOS"]}
+    cases:             {type: quantitative, required: true, aliases: ["CASOS", "NO. CASOS"]}
+    incidence_rate:    {type: quantitative, required: false, aliases: ["TASA X 100 000 HAB.", "TASA X 100000 HAB", "TASA", "TASA DE INCIDENCIA"]}
+    deaths:            {type: quantitative, required: false, aliases: ["DEFUNCIONES", "FALLECIDOS", "MUERTES"]}
+    mortality_rate:    {type: quantitative, required: false,
+                        aliases: ["TASA DE DEFUNCIONES X 100 000 HAB.", "TASA DE DEFUNCIONES", "TASA DE MORTALIDAD"]}
+    source_text:       {type: text, required: false, aliases: ["FUENTE", "FUENTES", "REFERENCIA", "REFERENCIAS"]}
+
+coverage_sheet:
+  min_required_matches: 2
+  fields:
+    year:              {type: integer, required: true, aliases: ["AÑO", "ANO"]}
+    doses_administered: {type: quantitative, required: false, aliases: ["DOSIS APLICADAS", "DOSIS ADMINISTRADAS", "DOSIS"]}
+    coverage_pct:      {type: quantitative, required: false, aliases: ["COBERTURA (%)", "COBERTURA", "COBERTURA %"]}
+    reference_text:    {type: text, required: false, aliases: ["REFERENCIA", "REFERENCIAS", "FUENTE"]}
+  cumulative_block_marker: '(?i)total\s+de\s+dosis\s+aplicadas\s+desde'
