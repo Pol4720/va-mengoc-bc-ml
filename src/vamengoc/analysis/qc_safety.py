@@ -354,12 +354,15 @@ def lot_level_models(frame: QCSafetyFrame, outcomes: list[str], min_reports: int
         agg = agg[agg["n"] >= min_reports]
         if len(agg) < 10 or agg["events"].sum() == 0:
             continue
-        endog = np.column_stack([agg["events"], agg["n"] - agg["events"]])
+        # Proportions with var_weights = n: the Pearson dispersion is then on the count scale.
+        # (With a two-column endog, statsmodels' scale="X2" is computed on the proportion scale and
+        # underestimates the dispersion by a factor of about the mean lot size.)
+        prop = (agg["events"] / agg["n"]).astype(float)
         for e in frame.exposures:
             x = sm.add_constant(agg[[e, "year"]].astype(float))
             with warnings.catch_warnings(record=True):
                 warnings.simplefilter("always")
-                res = sm.GLM(endog, x, family=sm.families.Binomial()).fit(scale="X2")
+                res = sm.GLM(prop, x, family=sm.families.Binomial(), var_weights=agg["n"].astype(float)).fit(scale="X2")
             ci = res.conf_int()
             rows.append(
                 {

@@ -100,3 +100,18 @@ def test_vaccine_event_counts() -> None:
     got = out.set_index(["vaccine", "event"])["n"].to_dict()
     assert got[("A", "e1")] == 2 and got[("B", "e1")] == 1 and got[("B", "e2")] == 1 and got[("A", "e2")] == 0
     assert out["expected"].sum() == pytest.approx((out["n_vaccine"] * out["n_event"] / 3).sum())
+
+
+@pytest.mark.parametrize("primary", ["ic", "ror", "prr", "ebgm", "consensus2"])
+def test_primary_signal_criterion(primary: str) -> None:
+    rng = np.random.default_rng(3)
+    n = 4000
+    target = pd.Series(rng.random(n) < 0.2)
+    ev = pd.Series(np.where(target, rng.random(n) < 0.30, rng.random(n) < 0.05))
+    reports = pd.DataFrame({"ev_x": ev.astype(int)})
+    tab = dp.disproportionality_table(reports, target, ~target, ["ev_x"], primary=primary)
+    row = tab.iloc[0]
+    expected = row["n_criteria_met"] >= 2 if primary == "consensus2" else row[f"signal_{primary}"]
+    assert bool(row["signal_primary"]) == bool(expected)
+    if primary != "ebgm":
+        assert bool(row["signal_primary"])

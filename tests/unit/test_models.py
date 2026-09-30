@@ -161,3 +161,46 @@ def test_lca_recovers_two_classes() -> None:
     assert len(prof) == 10
     one = lca.fit_lca(df, 1, n_starts=1)
     assert one.entropy_r2 == 1.0
+
+
+def test_calibration_degenerate_predictions() -> None:
+    from vamengoc.analysis.seriousness import _calibration, _metrics
+
+    y = np.array([0, 0, 1, 0, 1, 0])
+    icpt, slope = _calibration(y, np.full(6, 0.3))
+    assert np.isfinite(icpt) and np.isnan(slope)
+    m = _metrics(np.zeros(5), np.full(5, 0.1))
+    assert np.isnan(m["auroc"]) and m["prevalence"] == 0.0
+
+
+def test_dose_category_collapses_combinations() -> None:
+    from vamengoc.analysis.descriptive import dose_category
+
+    s = pd.Series(["1", "2", "3", "R", "U", "R|1", "1|1", None, "X", float("nan")])
+    out = dose_category(s).tolist()
+    assert out[:7] == ["1", "2", "3", "R", "U", "multiple", "multiple"]
+    assert out[7] is None and out[8] == "other" and pd.isna(out[9])
+
+
+def test_firth_matches_haldane_on_two_by_two_and_handles_separation() -> None:
+    from vamengoc.analysis.stats_utils import drop_collinear_columns, firth_logit
+
+    # Saturated 2x2 model: Firth estimate of the log OR equals the Haldane-corrected log OR.
+    a, b, c, d = 12, 30, 4, 60  # exposed cases, exposed non-cases, unexposed cases, unexposed non-cases
+    xe = np.r_[np.ones(a + b), np.zeros(c + d)]
+    y = np.r_[np.ones(a), np.zeros(b), np.ones(c), np.zeros(d)]
+    res = firth_logit(np.column_stack([np.ones_like(xe), xe]), y)
+    assert res.converged
+    expected = np.log((a + 0.5) * (d + 0.5) / ((b + 0.5) * (c + 0.5)))
+    assert res.params[1] == pytest.approx(expected, abs=1e-6)
+    lo, hi = res.conf_int()[1]
+    assert lo < res.params[1] < hi and 0 <= res.pvalues()[1] <= 1
+    # Complete separation: maximum likelihood diverges, Firth stays finite.
+    xs = np.r_[np.ones(10), np.zeros(40)]
+    ys = np.r_[np.ones(10), np.zeros(40)]
+    sep = firth_logit(np.column_stack([np.ones_like(xs), xs]), ys)
+    assert np.isfinite(sep.params).all() and sep.params[1] > 2
+    # Collinearity helper keeps the first of two identical columns.
+    x = np.column_stack([np.ones(5), [1, 0, 1, 0, 1], [1, 0, 1, 0, 1], [0, 1, 0, 1, 0]])
+    keep, dropped = drop_collinear_columns(x, ["c", "a", "a2", "b"])
+    assert keep == [0, 1] and dropped == ["a2", "b"]

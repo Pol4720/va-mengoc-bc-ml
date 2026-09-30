@@ -201,8 +201,14 @@ def disproportionality_table(
     *,
     prior: MGPSPrior | None = None,
     criteria: dict[str, float] | None = None,
+    primary: str = "ic",
 ) -> pd.DataFrame:
-    """One row per event with every measure and the signal criteria met."""
+    """One row per event with every measure and the signal criteria met.
+
+    ``signal_primary`` applies the prespecified criterion (``primary``: ``ic``, ``ror``, ``prr``,
+    ``ebgm`` or ``consensus2`` = at least two methods); ``signal_any`` (any method) is reported
+    as a sensitivity analysis only.
+    """
     crit = {
         "min_reports": 3,
         "ror_lower_threshold": 1.0,
@@ -248,6 +254,9 @@ def disproportionality_table(
         row["signal_ebgm"] = bool(prior is not None and row.get("eb05", 0) >= crit["eb05_threshold"])
         row["signal_any"] = row["signal_ror"] or row["signal_prr"] or row["signal_ic"] or row["signal_ebgm"]
         row["n_criteria_met"] = sum(row[k] for k in ("signal_ror", "signal_prr", "signal_ic", "signal_ebgm"))
+        row["signal_primary"] = bool(
+            enough and (row["n_criteria_met"] >= 2 if primary == "consensus2" else row[f"signal_{primary}"])
+        )
         rows.append(row)
     out = pd.DataFrame.from_records(rows)
     if len(out):
