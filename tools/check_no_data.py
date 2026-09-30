@@ -15,8 +15,25 @@ import sys
 from pathlib import Path
 
 FORBIDDEN_SUFFIXES = {
-    ".xlsx", ".xlsm", ".xls", ".xlsb", ".ods", ".sav", ".dta", ".sqlite", ".sqlite3", ".db", ".duckdb",
-    ".parquet", ".feather", ".pkl", ".pickle", ".joblib", ".key", ".pem", ".enc",
+    ".xlsx",
+    ".xlsm",
+    ".xls",
+    ".xlsb",
+    ".ods",
+    ".sav",
+    ".dta",
+    ".sqlite",
+    ".sqlite3",
+    ".db",
+    ".duckdb",
+    ".parquet",
+    ".feather",
+    ".pkl",
+    ".pickle",
+    ".joblib",
+    ".key",
+    ".pem",
+    ".enc",
 }
 FORBIDDEN_PREFIXES = ("data/raw/", "data/interim/", "data/curated/", "data/synthetic/", "runs/", "secrets/")
 ALLOWED_IN_DATA = {"data/README.md"}
@@ -27,8 +44,23 @@ CONTENT_PATTERNS = [
     (re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"), "private key"),
     (re.compile(r"(?i)VAMENGOC_(HMAC|FERNET)_KEY\s*=\s*['\"]?[0-9a-zA-Z+/=]{32,}"), "secret key value"),
 ]
-TEXT_SUFFIXES = {".csv", ".tsv", ".txt", ".json", ".md", ".tex", ".py", ".yaml", ".yml", ".toml", ".ts", ".tsx",
-                 ".js", ".html", ".css"}
+TEXT_SUFFIXES = {
+    ".csv",
+    ".tsv",
+    ".txt",
+    ".json",
+    ".md",
+    ".tex",
+    ".py",
+    ".yaml",
+    ".yml",
+    ".toml",
+    ".ts",
+    ".tsx",
+    ".js",
+    ".html",
+    ".css",
+}
 SELF = "tools/check_no_data.py"
 
 
