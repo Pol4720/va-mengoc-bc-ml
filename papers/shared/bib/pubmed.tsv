@@ -1,0 +1,84 @@
+# bibkey<TAB>PMID — journal articles cited in the manuscripts and reports.
+# Regenerate pubmed.bib with: python tools/bib_pubmed.py
+# --- VA-MENGOC-BC and the Cuban programme
+Sierra1991	1812432
+Rodriguez1999	10445998
+Sotolongo2007	21487356
+Reed2007	21487351
+Uli2006	16673438
+Masforrol2017	29083947
+OchoaAzze2018HVI	29420119
+OchoaAzze2018MEDICC	31242158
+SierraGonzalez2019	32335565
+Galindo2012	22334111
+GalindoSantana2011	23444612
+GalindoSantana2019	32335572
+CruzRodriguez2021	33780421
+# --- Outer membrane vesicle vaccines, endotoxin and adjuvant
+Holst2009	19481313
+Holst2013	23857274
+Nokleby2007	17287053
+Rosenqvist1998	9554288
+Sheerin2019	31551511
+Zariri2016	27481244
+vandeWaterbeemd2013	23741478
+Keiser2011	21199704
+Jefferson2004	14871632
+# --- Batch (lot) dependence of adverse event reports
+Schmeling2023	36997290
+Schmeling2025	41235861
+Manniche2024	39202624
+Furst2024	38937903
+Mahaux2019	30470642
+# --- Spontaneous reporting and disproportionality
+Bate1998	9696956
+Noren2013	21705438
+Evans2001	11828828
+vanPuijenbroek2002	11998548
+Szarfman2002	12071774
+Maignen2014	24243665
+Pariente2007	17867726
+Salvo2013	23673817
+Hazell2006	16689555
+Caster2014	25052742
+Harpaz2012	22549283
+Shimabukuro2015	26209838
+Lei2018	29454518
+Mahaux2016	26602179
+Salas2022	35904529
+Fusaroli2024Statement	38713346
+Fusaroli2024Elaboration	38713347
+Fusaroli2026Pitfalls	40993470
+Fusaroli2026Causal	41381798
+Woolf1955	14388528
+Haldane1956	13314400
+# --- Brighton Collaboration case definitions
+Marcy2004	14741143
+Bonhoeffer2004Crying	14741148
+Bonhoeffer2004Seizure	14741144
+Ruggeberg2007	17448577
+Kohl2007	17540485
+Buettcher2007	17537554
+Wise2007	17493712
+Gidudu2008	18950670
+Kohl2008	18805456
+Sejvar2007	17570566
+Tapiainen2007	17574313
+# --- Statistical and machine-learning methods, reporting guidelines
+Zeger1986	3719049
+Piegorsch1994	8122051
+Schuirmann1987	3450848
+Hsieh1998	9699234
+Lipsitch2010	20335814
+Arnold2016	28027378
+Rothman1990	2081237
+Bernal2017	27283160
+Lundberg2020	32607472
+VanCalster2019	31842878
+Collins2024	38626948
+Langan2018	30429167
+Kahn2016	27713905
+Sandve2013	24204232
+Wilkinson2016	26978244
+Virtanen2020	32015543
+Harris2020	32939066
