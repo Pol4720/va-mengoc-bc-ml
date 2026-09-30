@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  data-guard:
+    name: Data guard (no restricted data or secrets)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check every tracked file
+        run: python3 tools/check_no_data.py --all
+
+  python:
+    name: Python quality gate
+    runs-on: ubuntu-24.04
+    needs: data-guard
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Install (locked)
+        run: uv sync --all-extras --locked
+      - name: Lint
+        run: uv run ruff check src tests tools
+      - name: Format
+        run: uv run ruff format --check src tests tools
+      - name: Type check (mypy --strict)
+        run: uv run mypy
+      - name: Tests with coverage
+        run: uv run pytest -p no:cacheprovider --cov --cov-report=xml --cov-report=term
+      - name: Verify committed releases (disclosure control)
+        run: uv run python tools/verify_releases.py
+      - name: Synthetic end-to-end run from the CLI
+        run: |
+          uv run vamengoc synth --out build/ci-synthetic --scale 0.03 --seed 7
+          uv run vamengoc schema-check --input build/ci-synthetic
+          uv run vamengoc run --input build/ci-synthetic \
+            --set paths.release_dir=build/ci-release --set paths.runs_dir=build/ci-runs \
+            --set paths.curated_dir=build/ci-curated --set analysis.qc_safety.permutation_tests=5 \
+            --set analysis.lca.n_starts=4 --set analysis.qc.capability_bootstrap=200
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.xml
+          retention-days: 14
+
+  latex:
+    name: LaTeX (0 errors, 0 warnings, 0 bad boxes)
+    runs-on: ubuntu-24.04
+    needs: data-guard
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install TeX Live (same distribution as the development environment)
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended \
+            texlive-fonts-extra texlive-science texlive-bibtex-extra texlive-lang-spanish \
+            texlive-lang-english texlive-pictures texlive-plain-generic texlive-publishers \
+            latexmk biber lmodern cm-super poppler-utils > /dev/null
+      - name: Build every document
+        run: python3 tools/latex_build.py --json build/latex-report.json
+      - name: Check fonts are embedded
+        run: |
+          for f in $(find build/pdf -name '*.pdf'); do
+            if pdffonts "$f" | awk 'NR>2 && $(NF-4)!="yes"{bad=1} END{exit bad}'; then :; else
+              echo "Non-embedded font in $f"; exit 1; fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pdfs
+          path: |
+            build/pdf
+            build/latex-report.json
+          retention-days: 30
