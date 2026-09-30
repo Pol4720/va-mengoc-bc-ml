@@ -119,6 +119,7 @@ class DisproportionalityConfig(_Frozen):
     prr_chi2_threshold: float
     ic025_threshold: float
     eb05_threshold: float
+    primary_criterion: Literal["ic", "ror", "prr", "ebgm", "consensus2"] = "ic"
 
 
 class LCAConfig(_Frozen):

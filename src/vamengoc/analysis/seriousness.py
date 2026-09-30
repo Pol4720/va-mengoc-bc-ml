@@ -2,7 +2,9 @@
 
 Two complementary models on the same prespecified predictors:
 
-* multivariable logistic regression — interpretable adjusted odds ratios;
+* multivariable logistic regression — interpretable adjusted odds ratios, fitted with Firth's
+  penalised likelihood because rare, serious event types separate the outcome (finite estimates
+  under separation); predictions use the FLIC intercept correction (Puhr et al. 2017);
 * gradient-boosted trees (LightGBM) — non-linearities and interactions,
   explained with exact TreeSHAP contributions (``pred_contrib``).
 
@@ -14,6 +16,7 @@ is explanatory/exploratory and is not intended for clinical triage.
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -23,6 +26,7 @@ import pandas as pd
 import statsmodels.api as sm
 from sklearn.metrics import average_precision_score, brier_score_loss, roc_auc_score
 
+from vamengoc.analysis.stats_utils import drop_collinear_columns, firth_logit
 from vamengoc.curate.aefi_model import event_columns
 
 __all__ = ["SeriousnessResult", "build_design", "fit_seriousness"]
@@ -57,7 +61,7 @@ def build_design(df: pd.DataFrame, min_prevalence: float = 0.002) -> tuple[pd.Da
     vac = d["vaccines"].fillna("")
     for v in TOP_VACCINES:
         x[f"vac_{v}"] = vac.str.split("|").map(lambda s, v=v: int(v in s))
-    for region in ("Occidente", "Centro", "Oriente"):
+    for region in ("Centro", "Oriente"):  # reference: Occidente (and unknown region)
         x[f"region_{region}"] = d["region"].eq(region).astype(int)
     for ev in event_columns(d):
         col = d[ev].astype("boolean").fillna(False).astype(int)
@@ -72,9 +76,21 @@ def build_design(df: pd.DataFrame, min_prevalence: float = 0.002) -> tuple[pd.Da
 def _calibration(y: np.ndarray, p: np.ndarray) -> tuple[float, float]:
     """Calibration intercept (calibration-in-the-large) and slope on the logit scale."""
     lp = np.log(np.clip(p, 1e-9, 1 - 1e-9) / (1 - np.clip(p, 1e-9, 1 - 1e-9)))
-    slope_fit = sm.GLM(y, sm.add_constant(lp), family=sm.families.Binomial()).fit()
-    int_fit = sm.GLM(y, np.ones_like(lp), family=sm.families.Binomial(), offset=lp).fit()
-    return float(int_fit.params[0]), float(slope_fit.params[1])
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")  # separation on tiny test sets is reported as NaN below
+        try:
+            int_fit = sm.GLM(y, np.ones_like(lp), family=sm.families.Binomial(), offset=lp).fit()
+            intercept = float(int_fit.params[0])
+        except (ValueError, np.linalg.LinAlgError):  # pragma: no cover - degenerate
+            intercept = float("nan")
+        if np.std(lp) < 1e-9:
+            return intercept, float("nan")  # constant predictions: slope undefined
+        try:
+            slope_fit = sm.GLM(y, sm.add_constant(lp, has_constant="add"), family=sm.families.Binomial()).fit()
+            slope = float(slope_fit.params[1])
+        except (ValueError, np.linalg.LinAlgError):  # pragma: no cover - degenerate
+            slope = float("nan")
+    return intercept, slope
 
 
 def _metrics(y: np.ndarray, p: np.ndarray) -> dict[str, float]:
@@ -98,6 +114,24 @@ def _metrics(y: np.ndarray, p: np.ndarray) -> dict[str, float]:
     }
 
 
+def _flic_predict(xtr: pd.DataFrame, ytr: pd.Series, xte: pd.DataFrame) -> np.ndarray:
+    """Firth fit on the training years with FLIC intercept correction, predicted on the test years.
+
+    Firth's penalty biases the average predicted probability upwards for rare outcomes; FLIC
+    re-estimates the intercept by maximum likelihood with the Firth linear predictor as offset.
+    """
+    dtr = np.column_stack([np.ones(len(xtr)), xtr.to_numpy(dtype=float)])
+    kept, _ = drop_collinear_columns(dtr, ["const", *xtr.columns])
+    res = firth_logit(dtr[:, kept], ytr.to_numpy(dtype=float))
+    slopes = res.params[1:]
+    cols = [xtr.columns[i - 1] for i in kept if i > 0]
+    lp_tr = xtr[cols].to_numpy(dtype=float) @ slopes
+    intercept = sm.GLM(ytr.to_numpy(dtype=float), np.ones((len(xtr), 1)), family=sm.families.Binomial(), offset=lp_tr)
+    b0 = float(intercept.fit().params[0])
+    lp_te = b0 + xte[cols].to_numpy(dtype=float) @ slopes
+    return np.asarray(1.0 / (1.0 + np.exp(-lp_te)))
+
+
 def fit_seriousness(
     df: pd.DataFrame, *, train_years: tuple[int, int], test_years: tuple[int, int], params: dict[str, Any], seed: int
 ) -> SeriousnessResult:
@@ -109,24 +143,32 @@ def fit_seriousness(
     xtr, ytr, xte, yte = x[tr], y[tr], x[te], y[te]
 
     # --- logistic regression (full data, interpretable) --------------------------------
-    keep = [c for c in x.columns if x[c].sum() >= 5]
-    logit = sm.GLM(y, sm.add_constant(x[keep].astype(float)), family=sm.families.Binomial())
+    # n_events is the sum of the event indicators: exactly collinear, so it is used by the boosted
+    # model only. Remaining exact collinearity is removed column by column (reported in notes).
+    candidates = [c for c in x.columns if c != "n_events" and x[c].sum() >= 5]
+    design = np.column_stack([np.ones(len(x)), x[candidates].to_numpy(dtype=float)])
+    kept_idx, dropped = drop_collinear_columns(design, ["const", *candidates])
+    keep = [candidates[i - 1] for i in kept_idx if i > 0]
+    notes.extend(f"term {t} dropped from the logistic model (exact collinearity)" for t in dropped)
     try:
-        res = logit.fit()
+        res = firth_logit(design[:, kept_idx], y.to_numpy(dtype=float))
+        if not res.converged:
+            notes.append("Firth logistic regression did not converge")
         ci = res.conf_int()
         coef = pd.DataFrame(
             {
-                "term": res.params.index,
-                "or": np.exp(res.params.to_numpy()),
-                "or_lo": np.exp(ci[0].to_numpy()),
-                "or_hi": np.exp(ci[1].to_numpy()),
-                "p_value": res.pvalues.to_numpy(),
+                "term": ["const", *keep],
+                "or": np.exp(res.params),
+                "or_lo": np.exp(ci[:, 0]),
+                "or_hi": np.exp(ci[:, 1]),
+                "p_value": res.pvalues(),
+                "n_with_term": [None, *(int(x[c].sum()) if x[c].nunique() == 2 else None for c in keep)],
             }
         )
         coef = coef[coef["term"] != "const"].reset_index(drop=True)
-    except (np.linalg.LinAlgError, ValueError) as exc:  # pragma: no cover - separation
+    except np.linalg.LinAlgError as exc:  # pragma: no cover - singular after rank check
         notes.append(f"logistic regression failed: {exc}")
-        coef = pd.DataFrame(columns=["term", "or", "or_lo", "or_hi", "p_value"])
+        coef = pd.DataFrame(columns=["term", "or", "or_lo", "or_hi", "p_value", "n_with_term"])
 
     # --- gradient boosting with temporal validation -------------------------------------
     lgb_params: dict[str, Any] = {
@@ -154,11 +196,8 @@ def fit_seriousness(
         model.fit(xtr, ytr)
         p_te = np.asarray(model.predict_proba(xte))[:, 1]
         metrics["gbm_test"] = _metrics(yte.to_numpy(), p_te)
-        lr_tr = sm.GLM(
-            ytr, sm.add_constant(xtr[keep].astype(float), has_constant="add"), family=sm.families.Binomial()
-        ).fit()
-        p_lr = lr_tr.predict(sm.add_constant(xte[keep].astype(float), has_constant="add"))
-        metrics["logistic_test"] = _metrics(yte.to_numpy(), np.asarray(p_lr))
+        p_lr = _flic_predict(xtr[keep], ytr, xte[keep])
+        metrics["logistic_test"] = _metrics(yte.to_numpy(), p_lr)
         contrib = np.asarray(model.booster_.predict(xte, pred_contrib=True))
         sv = pd.DataFrame(contrib[:, :-1], columns=x.columns, index=xte.index)
         shap_imp = (

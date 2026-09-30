@@ -118,7 +118,11 @@ def test_mixed_lot_level_mde_incremental(planted: qs.QCSafetyFrame) -> None:
     endo = mm[mm.exposure == "endotoxin"].iloc[0]
     assert endo["cri_lo"] > 1.0
     ll = qs.lot_level_models(planted, ["ev_fever_39"])
-    assert ll[ll.exposure == "endotoxin"].iloc[0]["or_per_sd"] > 1.2
+    ll_endo = ll[ll.exposure == "endotoxin"].iloc[0]
+    assert ll_endo["or_per_sd"] > 1.2
+    # Binomial sampling only: the Pearson dispersion must be close to 1 on the count scale.
+    assert 0.5 < ll_endo["dispersion"] < 2.0
+    assert ll_endo["or_hi"] / ll_endo["or_lo"] > 1.05
     mde = qs.minimum_detectable_or(planted, "ev_fever_39")
     assert 1.0 < mde["mde_or_per_sd"] < 1.6 and mde["design_effect"] >= 1
     inc = qs.incremental_value(planted, "ev_fever_39", folds=3, n_perm=9, seed=0)

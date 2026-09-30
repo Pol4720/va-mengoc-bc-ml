@@ -16,6 +16,24 @@ def _group_label(df: pd.DataFrame, target: str) -> pd.Series:
     return pd.Series(np.where(df["has_target"], target, "Other vaccines"), index=df.index)
 
 
+def dose_category(doses: pd.Series) -> pd.Series:
+    """Collapse dose codes to 1/2/3/R/U; several vaccines with doses (``"R|1"``) become ``multiple``.
+
+    Collapsing happens before disclosure control so that no released total can be differenced
+    against suppressed combination cells.
+    """
+
+    def cat(v: object) -> object:
+        if v is None or (isinstance(v, float) and np.isnan(v)):
+            return v
+        s = str(v)
+        if "|" in s:
+            return "multiple"
+        return s if s in {"1", "2", "3", "R", "U"} else "other"
+
+    return doses.map(cat)
+
+
 def characteristics_table(df: pd.DataFrame, target: str) -> pd.DataFrame:
     """Long table: variable, level, group, n, denominator, pct."""
     d = df.copy()
@@ -45,7 +63,7 @@ def characteristics_table(df: pd.DataFrame, target: str) -> pd.DataFrame:
     add("age_band", d["age_band"])
     add("region", d["region"])
     add("coadministered", d["coadministered"].map({True: "Yes", False: "No"}))
-    add("dose", d["target_dose"].where(d["has_target"], d["doses"]))
+    add("dose", dose_category(d["target_dose"].where(d["has_target"], d["doses"])))
     add("place", d["place"])
     add("hospitalized", d["hospitalized"].map({True: "Yes", False: "No"}))
     add("any_serious_event", d["any_serious_event"].map({True: "Yes", False: "No"}))

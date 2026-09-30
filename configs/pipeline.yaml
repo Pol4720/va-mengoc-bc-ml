@@ -60,6 +60,7 @@ analysis:
     prr_chi2_threshold: 4.0
     ic025_threshold: 0.0
     eb05_threshold: 2.0
+    primary_criterion: ic                # prespecified: BCPNN IC025 > 0 with a >= min_reports (READUS-PV item)
   lca:
     k_range: [1, 7]
     n_starts: 20
@@ -86,7 +87,7 @@ analysis:
     negative_control_exposures: [fill_volume]
     covariates: [age_months, sex, dose_number, coadministered, analytic_year]
     gee_cov_struct: exchangeable
-    permutation_tests: 500
+    permutation_tests: 200
     cv_folds: 5
     fdr_alpha: 0.05
   linkage:
