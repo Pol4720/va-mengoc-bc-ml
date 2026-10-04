@@ -1,0 +1,16 @@
+outcome,exposure,or_per_sd,cri_lo,cri_hi,lot_sd
+ev_fever_39,endotoxin,1.243458,1.14612,1.349063,0.113877
+ev_fever_39,aloh3_conc,1.122637,1.037116,1.215209,0.113877
+ev_fever_39,protein_conc,1.033716,0.952719,1.1216,0.113877
+ev_fever_39,protein_adsorption,0.93886,0.865692,1.018212,0.113877
+ev_fever_39,fill_volume,0.961648,0.888154,1.041225,0.113877
+ev_fever_40,endotoxin,0.949827,0.829617,1.087455,0.208457
+ev_fever_40,aloh3_conc,1.232248,1.079604,1.406473,0.208457
+ev_fever_40,protein_conc,0.966289,0.844655,1.105439,0.208457
+ev_fever_40,protein_adsorption,0.91061,0.795595,1.042253,0.208457
+ev_fever_40,fill_volume,0.965165,0.846956,1.099872,0.208457
+ev_severe_local_reaction,endotoxin,1.038621,0.951853,1.133299,0.132266
+ev_severe_local_reaction,aloh3_conc,0.935079,0.857614,1.019541,0.132266
+ev_severe_local_reaction,protein_conc,1.020599,0.935229,1.113762,0.132266
+ev_severe_local_reaction,protein_adsorption,1.030456,0.943741,1.125138,0.132266
+ev_severe_local_reaction,fill_volume,1.034289,0.94927,1.126923,0.132266

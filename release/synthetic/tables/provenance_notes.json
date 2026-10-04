@@ -1,0 +1,31 @@
+{
+  "coverage": [
+    "Cobertura de vacunación con VA-MENGOC-BC (SINTÉTICO)",
+    "MinisteriodeSaludPública.AnuarioEstadístico",
+    "MinisteriodeSaludPública.AnuarioEstadístico",
+    "MinisteriodeSaludPública.AnuarioEstadístico",
+    "Referencias: DirecciónNacionaldeEstadísticas (texto sintético)",
+    "MinisteriodeSaludPública.AnuarioEstadístico",
+    "MinisteriodeSaludPública.AnuarioEstadístico",
+    "MinisteriodeSaludPública.AnuarioEstadístico",
+    "MinisteriodeSaludPública.AnuarioEstadístico",
+    "MinisteriodeSaludPública.AnuarioEstadístico",
+    "Nota: la cobertura se calcula sobre la población diana (texto sintético)."
+  ],
+  "coverage_cumulative": [
+    "Total de dosis aplicadas desde 1988"
+  ],
+  "incidence": [
+    "Enfermedad meningocócica. Cuba 1970-2024 (SERIE SINTÉTICA)",
+    "Fuente: simulación",
+    "AnuarioEstadísticodeSaludSintético",
+    "AnuarioEstadísticodeSaludSintético",
+    "AnuarioEstadísticodeSaludSintético",
+    "AnuarioEstadísticodeSaludSintético",
+    "AnuarioEstadísticodeSaludSintético",
+    "AnuarioEstadísticodeSaludSintético",
+    "AnuarioEstadísticodeSaludSintético",
+    "AnuarioEstadísticodeSaludSintético",
+    "Fuente: MinisteriodeSaludPública. Anuarios (texto sintético)."
+  ]
+}

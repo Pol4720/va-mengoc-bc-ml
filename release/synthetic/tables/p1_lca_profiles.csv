@@ -1,0 +1,73 @@
+class,class_weight,item,probability,label_en,label_es
+1,0.582575,ev_sterile_abscess,0.000458,Sterile abscess,Absceso estéril
+1,0.582575,ev_lymphadenitis,0.000779,Lymphadenitis,Linfadenitis
+1,0.582575,ev_severe_local_reaction,0.000329,Severe local reaction,Reacción local severa
+1,0.582575,ev_allergic_reaction,0.000698,Allergic reaction,Reacción alérgica
+1,0.582575,ev_febrile_seizure,0.010918,Febrile seizure,Convulsión febril
+1,0.582575,ev_arthralgia,0.00056,Arthralgia,Artralgias
+1,0.582575,ev_fever_39,0.999938,Fever ≥39 °C,Fiebre ≥39 °C
+1,0.582575,ev_fever_40,0.121418,Fever ≥40 °C,Fiebre ≥40 °C
+1,0.582575,ev_collapse,0.000533,Collapse / hypotonic-hyporesponsive episode,Colapso / episodio hipotónico-hiporreactivo
+1,0.582575,ev_persistent_crying,0.047974,Persistent crying (≥3 h),Llanto persistente
+1,0.582575,ev_rash,0.000407,Rash,Exantema
+1,0.582575,ev_other,0.138961,Other event,Otro evento
+2,0.181082,ev_sterile_abscess,0.002042,Sterile abscess,Absceso estéril
+2,0.181082,ev_lymphadenitis,0.001303,Lymphadenitis,Linfadenitis
+2,0.181082,ev_severe_local_reaction,0.002376,Severe local reaction,Reacción local severa
+2,0.181082,ev_allergic_reaction,0.004138,Allergic reaction,Reacción alérgica
+2,0.181082,ev_febrile_seizure,0.000206,Febrile seizure,Convulsión febril
+2,0.181082,ev_arthralgia,0.058336,Arthralgia,Artralgias
+2,0.181082,ev_fever_39,0.222381,Fever ≥39 °C,Fiebre ≥39 °C
+2,0.181082,ev_fever_40,0.000189,Fever ≥40 °C,Fiebre ≥40 °C
+2,0.181082,ev_collapse,0.000148,Collapse / hypotonic-hyporesponsive episode,Colapso / episodio hipotónico-hiporreactivo
+2,0.181082,ev_persistent_crying,0.007885,Persistent crying (≥3 h),Llanto persistente
+2,0.181082,ev_rash,0.007225,Rash,Exantema
+2,0.181082,ev_other,0.999719,Other event,Otro evento
+3,0.164723,ev_sterile_abscess,0.026247,Sterile abscess,Absceso estéril
+3,0.164723,ev_lymphadenitis,0.061572,Lymphadenitis,Linfadenitis
+3,0.164723,ev_severe_local_reaction,0.999416,Severe local reaction,Reacción local severa
+3,0.164723,ev_allergic_reaction,0.000165,Allergic reaction,Reacción alérgica
+3,0.164723,ev_febrile_seizure,0.000168,Febrile seizure,Convulsión febril
+3,0.164723,ev_arthralgia,0.000163,Arthralgia,Artralgias
+3,0.164723,ev_fever_39,0.345804,Fever ≥39 °C,Fiebre ≥39 °C
+3,0.164723,ev_fever_40,0.000163,Fever ≥40 °C,Fiebre ≥40 °C
+3,0.164723,ev_collapse,0.000163,Collapse / hypotonic-hyporesponsive episode,Colapso / episodio hipotónico-hiporreactivo
+3,0.164723,ev_persistent_crying,0.00524,Persistent crying (≥3 h),Llanto persistente
+3,0.164723,ev_rash,0.000164,Rash,Exantema
+3,0.164723,ev_other,0.24795,Other event,Otro evento
+4,0.045563,ev_sterile_abscess,0.000759,Sterile abscess,Absceso estéril
+4,0.045563,ev_lymphadenitis,0.000761,Lymphadenitis,Linfadenitis
+4,0.045563,ev_severe_local_reaction,0.000654,Severe local reaction,Reacción local severa
+4,0.045563,ev_allergic_reaction,0.630388,Allergic reaction,Reacción alérgica
+4,0.045563,ev_febrile_seizure,0.000678,Febrile seizure,Convulsión febril
+4,0.045563,ev_arthralgia,0.000774,Arthralgia,Artralgias
+4,0.045563,ev_fever_39,0.229462,Fever ≥39 °C,Fiebre ≥39 °C
+4,0.045563,ev_fever_40,0.0006,Fever ≥40 °C,Fiebre ≥40 °C
+4,0.045563,ev_collapse,0.000661,Collapse / hypotonic-hyporesponsive episode,Colapso / episodio hipotónico-hiporreactivo
+4,0.045563,ev_persistent_crying,0.002491,Persistent crying (≥3 h),Llanto persistente
+4,0.045563,ev_rash,0.734921,Rash,Exantema
+4,0.045563,ev_other,0.293162,Other event,Otro evento
+5,0.017921,ev_sterile_abscess,0.002113,Sterile abscess,Absceso estéril
+5,0.017921,ev_lymphadenitis,0.002077,Lymphadenitis,Linfadenitis
+5,0.017921,ev_severe_local_reaction,0.002105,Severe local reaction,Reacción local severa
+5,0.017921,ev_allergic_reaction,0.00209,Allergic reaction,Reacción alérgica
+5,0.017921,ev_febrile_seizure,0.286813,Febrile seizure,Convulsión febril
+5,0.017921,ev_arthralgia,0.002024,Arthralgia,Artralgias
+5,0.017921,ev_fever_39,0.995922,Fever ≥39 °C,Fiebre ≥39 °C
+5,0.017921,ev_fever_40,0.351939,Fever ≥40 °C,Fiebre ≥40 °C
+5,0.017921,ev_collapse,0.267981,Collapse / hypotonic-hyporesponsive episode,Colapso / episodio hipotónico-hiporreactivo
+5,0.017921,ev_persistent_crying,0.289165,Persistent crying (≥3 h),Llanto persistente
+5,0.017921,ev_rash,0.002037,Rash,Exantema
+5,0.017921,ev_other,0.00608,Other event,Otro evento
+6,0.008137,ev_sterile_abscess,0.059877,Sterile abscess,Absceso estéril
+6,0.008137,ev_lymphadenitis,0.066131,Lymphadenitis,Linfadenitis
+6,0.008137,ev_severe_local_reaction,0.00694,Severe local reaction,Reacción local severa
+6,0.008137,ev_allergic_reaction,0.01239,Allergic reaction,Reacción alérgica
+6,0.008137,ev_febrile_seizure,0.300072,Febrile seizure,Convulsión febril
+6,0.008137,ev_arthralgia,0.081499,Arthralgia,Artralgias
+6,0.008137,ev_fever_39,0.051375,Fever ≥39 °C,Fiebre ≥39 °C
+6,0.008137,ev_fever_40,0.003407,Fever ≥40 °C,Fiebre ≥40 °C
+6,0.008137,ev_collapse,0.136651,Collapse / hypotonic-hyporesponsive episode,Colapso / episodio hipotónico-hiporreactivo
+6,0.008137,ev_persistent_crying,0.467863,Persistent crying (≥3 h),Llanto persistente
+6,0.008137,ev_rash,0.004922,Rash,Exantema
+6,0.008137,ev_other,0.007381,Other event,Otro evento

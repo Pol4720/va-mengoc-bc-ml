@@ -1,0 +1,12 @@
+attribute,n,rule1,rule2,rule3,rule5,ewma_signals
+ph,736,3,17,0,5,3
+protein_conc,736,0,1,0,2,0
+protein_adsorption,736,1,15,1,0,5
+ps_conc,736,3,4,1,2,0
+ps_adsorption,736,3,7,0,3,0
+aloh3_conc,736,1,4,2,2,1
+thiomersal_conc,736,0,0,1,3,2
+bactericidal_titer,736,0,12,0,1,0
+igg_elisa,736,0,0,2,0,0
+endotoxin,736,6,6,1,8,60
+fill_volume,736,0,3,0,0,0

@@ -1,0 +1,53 @@
+event,group,n,denominator,pct,label_en,label_es,class,domain
+ev_sterile_abscess,AM-BC,26,3221,0.8072027320707855,Sterile abscess,Absceso estéril,rare,local
+ev_sterile_abscess,Other vaccines,74,15404,0.48039470267462997,Sterile abscess,Absceso estéril,rare,local
+ev_bacterial_abscess,AM-BC,8,3219,0.24852438645542094,Bacterial abscess,Absceso bacteriano,rare,local
+ev_bacterial_abscess,Other vaccines,7,15407,0.04543389368468878,Bacterial abscess,Absceso bacteriano,rare,local
+ev_lymphadenitis,AM-BC,41,3210,1.277258566978193,Lymphadenitis,Linfadenitis,rare,local
+ev_lymphadenitis,Other vaccines,169,15404,1.0971176317839522,Lymphadenitis,Linfadenitis,rare,local
+ev_severe_local_reaction,AM-BC,732,3219,22.739981360671017,Severe local reaction,Reacción local severa,common,local
+ev_severe_local_reaction,Other vaccines,2347,15402,15.238280742760681,Severe local reaction,Reacción local severa,common,local
+ev_acute_paralysis,AM-BC,0,3217,0.0,Acute flaccid paralysis,Parálisis aguda,serious,neurologic
+ev_acute_paralysis,Other vaccines,<5,15386,,Acute flaccid paralysis,Parálisis aguda,serious,neurologic
+ev_encephalopathy,AM-BC,0,3221,0.0,Encephalopathy,Encefalopatía,serious,neurologic
+ev_encephalopathy,Other vaccines,6,15409,0.03893828282172756,Encephalopathy,Encefalopatía,serious,neurologic
+ev_behaviour_change,AM-BC,<5,3217,,Behavioural change,Cambio de conducta,rare,neurologic
+ev_behaviour_change,Other vaccines,14,15398,0.09092089881802831,Behavioural change,Cambio de conducta,rare,neurologic
+ev_brain_damage,AM-BC,0,3221,0.0,Brain damage,Daño cerebral,serious,neurologic
+ev_brain_damage,Other vaccines,<5,15414,,Brain damage,Daño cerebral,serious,neurologic
+ev_encephalitis,AM-BC,0,3223,0.0,Encephalitis,Encefalitis,serious,neurologic
+ev_encephalitis,Other vaccines,<5,15403,,Encephalitis,Encefalitis,serious,neurologic
+ev_meningitis,AM-BC,0,3222,0.0,Aseptic meningitis,Meningitis,serious,neurologic
+ev_meningitis,Other vaccines,<5,15390,,Aseptic meningitis,Meningitis,serious,neurologic
+ev_allergic_reaction,AM-BC,79,3217,2.455704072116879,Allergic reaction,Reacción alérgica,rare,allergic
+ev_allergic_reaction,Other vaccines,478,15398,3.1042992596441095,Allergic reaction,Reacción alérgica,rare,allergic
+ev_febrile_seizure,AM-BC,38,3213,1.1826953003423593,Febrile seizure,Convulsión febril,rare,neurologic
+ev_febrile_seizure,Other vaccines,221,15402,1.434878587196468,Febrile seizure,Convulsión febril,rare,neurologic
+ev_afebrile_seizure,AM-BC,6,3221,0.18627755355479664,Afebrile seizure,Convulsión afebril,rare,neurologic
+ev_afebrile_seizure,Other vaccines,27,15408,0.17523364485981308,Afebrile seizure,Convulsión afebril,rare,neurologic
+ev_anaphylactic_reaction,AM-BC,0,3216,0.0,Anaphylactic reaction,Reacción anafiláctica,serious,allergic
+ev_anaphylactic_reaction,Other vaccines,<5,15402,,Anaphylactic reaction,Reacción anafiláctica,serious,allergic
+ev_anaphylactic_shock,AM-BC,0,3219,0.0,Anaphylactic shock,Shock anafiláctico,serious,allergic
+ev_anaphylactic_shock,Other vaccines,<5,15414,,Anaphylactic shock,Shock anafiláctico,serious,allergic
+ev_arthralgia,AM-BC,18,3215,0.5598755832037325,Arthralgia,Artralgias,common,systemic
+ev_arthralgia,Other vaccines,196,15401,1.2726446334653594,Arthralgia,Artralgias,common,systemic
+ev_fever_39,AM-BC,2286,3218,71.03791174642635,Fever ≥39 °C,Fiebre ≥39 °C,common,systemic
+ev_fever_39,Other vaccines,10911,15407,70.81845914194847,Fever ≥39 °C,Fiebre ≥39 °C,common,systemic
+ev_fever_40,AM-BC,264,3219,8.201304753028891,Fever ≥40 °C,Fiebre ≥40 °C,rare,systemic
+ev_fever_40,Other vaccines,1171,15417,7.5955114484011155,Fever ≥40 °C,Fiebre ≥40 °C,rare,systemic
+ev_collapse,AM-BC,18,3218,0.5593536357986327,Collapse / hypotonic-hyporesponsive episode,Colapso / episodio hipotónico-hiporreactivo,rare,neurologic
+ev_collapse,Other vaccines,97,15417,0.6291755853927483,Collapse / hypotonic-hyporesponsive episode,Colapso / episodio hipotónico-hiporreactivo,rare,neurologic
+ev_osteitis,AM-BC,0,3214,0.0,Osteitis / osteomyelitis,Osteítis / osteomielitis,serious,local
+ev_osteitis,Other vaccines,<5,15405,,Osteitis / osteomyelitis,Osteítis / osteomielitis,serious,local
+ev_persistent_crying,AM-BC,124,3219,3.8521279900590244,Persistent crying (≥3 h),Llanto persistente,rare,systemic
+ev_persistent_crying,Other vaccines,606,15398,3.9355760488375116,Persistent crying (≥3 h),Llanto persistente,rare,systemic
+ev_sepsis,AM-BC,0,3219,0.0,Sepsis,Sepsis,serious,infectious
+ev_sepsis,Other vaccines,7,15403,0.045445692397584884,Sepsis,Sepsis,serious,infectious
+ev_toxic_shock,AM-BC,0,3216,0.0,Toxic shock syndrome,Shock tóxico,serious,infectious
+ev_toxic_shock,Other vaccines,<5,15394,,Toxic shock syndrome,Shock tóxico,serious,infectious
+ev_rash,AM-BC,84,3218,2.6103169670602857,Rash,Exantema,common,allergic
+ev_rash,Other vaccines,568,15404,3.687353934043106,Rash,Exantema,common,allergic
+ev_purpura,AM-BC,0,2830,0.0,Purpura / thrombocytopenia,Púrpura,serious,haematologic
+ev_purpura,Other vaccines,<5,13547,,Purpura / thrombocytopenia,Púrpura,serious,haematologic
+ev_other,AM-BC,905,3217,28.13179981349083,Other event,Otro evento,common,other
+ev_other,Other vaccines,4991,15413,32.381755660805815,Other event,Otro evento,common,other
