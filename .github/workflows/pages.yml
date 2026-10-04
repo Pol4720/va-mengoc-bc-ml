@@ -45,7 +45,7 @@ jobs:
           if find dist -type f ! -path 'dist/assets/*' ! -name index.html ! -path 'dist/data/bundle.json' | grep -q .; then
             echo "Unexpected file in the site"; exit 1
           fi
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v4
         with:
           path: web/dist
