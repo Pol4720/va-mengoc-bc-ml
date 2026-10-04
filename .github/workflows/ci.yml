@@ -18,7 +18,7 @@ jobs:
     name: Data guard (no restricted data or secrets)
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Check every tracked file
         run: python3 tools/check_no_data.py --all
 
@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs: data-guard
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
@@ -68,7 +68,7 @@ jobs:
       run:
         working-directory: web
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v5
         with:
           node-version: "22"
@@ -100,7 +100,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs: data-guard
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Install TeX Live (same distribution as the development environment)
         run: |
           sudo apt-get update -qq
