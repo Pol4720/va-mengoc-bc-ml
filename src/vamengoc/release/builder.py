@@ -24,8 +24,18 @@ from vamengoc import __version__
 from vamengoc.config import Project
 from vamengoc.provenance import git_state
 from vamengoc.release import figures as figs
+from vamengoc.release.latex_tables import TableSet
 from vamengoc.release.macros import MacroSet, join_words, lower_first
-from vamengoc.release.sdc import SDCLog, suppress_counts, suppress_linked, suppress_wide_secondary
+from vamengoc.release.sdc import (
+    SECONDARY_TOKEN,
+    SDCLog,
+    suppress_column_secondary,
+    suppress_counts,
+    suppress_implied_pct,
+    suppress_linked,
+    suppress_long_secondary,
+    suppress_wide_secondary,
+)
 
 if TYPE_CHECKING:
     from vamengoc.pipeline import PipelineOutputs
@@ -99,6 +109,78 @@ FEATURE_NAMES = {
 }
 
 
+def _protect_nested_designs(dp: pd.DataFrame, min_cell: int, measures: list[str]) -> pd.DataFrame:
+    """Withhold a design row whose counts differ from the primary design by a small count.
+
+    Sensitivity designs are subsets of the primary design, so ``a_primary - a_design`` is itself a
+    count of reports; when it is between 1 and ``min_cell - 1`` the design row is withheld.
+    """
+    out = dp.copy()
+    prim = out[out["design"] == "primary_all_other_vaccines"].set_index("event")
+    for c in ("a", *measures):
+        if c in out:
+            out[c] = out[c].astype(object)
+    for i, r in out.iterrows():
+        if r["design"] == "primary_all_other_vaccines" or r["event"] not in prim.index:
+            continue
+        for cnt in ("a", "b", "c", "d"):
+            diff = _num(prim.loc[r["event"], cnt]) - _num(r[cnt])
+            if 0 < diff < min_cell:
+                if not 0 < _num(r["a"]) < min_cell:  # small a is suppressed as a primary cell later
+                    out.loc[i, "a"] = SECONDARY_TOKEN
+                for m in measures:
+                    if m in out:
+                        out.loc[i, m] = None
+                break
+    return out
+
+
+def _protect_cumulative(cum: pd.DataFrame, min_cell: int, derived: list[str]) -> pd.DataFrame:
+    """Withhold cumulative rows whose increment over the last released row is a small count."""
+    out = cum.copy()
+    out["a"] = out["a"].astype(object)
+    for c in derived:
+        out[c] = out[c].astype(object)
+    for _, idx in out.groupby("event", sort=False).groups.items():
+        last = 0.0
+        for i in sorted(idx, key=lambda j: out.loc[j, "year"]):
+            a = _num(out.loc[i, "a"])
+            inc = a - last
+            if 0 < inc < min_cell and a >= min_cell:
+                out.loc[i, "a"] = SECONDARY_TOKEN
+                for c in derived:
+                    out.loc[i, c] = None
+            else:
+                last = a
+    return out
+
+
+def _protect_complement(df: pd.DataFrame, total: str, part: str, min_cell: int) -> pd.DataFrame:
+    """Withhold ``part`` when ``total - part`` is a small count."""
+    out = df.copy()
+    diff = pd.to_numeric(out[total], errors="coerce") - pd.to_numeric(out[part], errors="coerce")
+    risky = (diff > 0) & (diff < min_cell) & (pd.to_numeric(out[part], errors="coerce") >= min_cell)
+    if risky.any():
+        out[part] = out[part].astype(object)
+        out.loc[risky, part] = SECONDARY_TOKEN
+    return out
+
+
+def _protect_subset_events(sens: pd.DataFrame, primary: pd.DataFrame, min_cell: int) -> pd.DataFrame:
+    """Withhold event counts of sensitivity subsets that differ from the primary by a small count."""
+    if not len(sens) or "n_events" not in sens:
+        return sens
+    out = sens.copy()
+    ref = primary[primary["model"] == "single"].drop_duplicates("outcome").set_index("outcome")["n_events"]
+    out["n_events"] = out["n_events"].astype(object)
+    for i, r in out.iterrows():
+        if r["outcome"] in ref.index:
+            diff = _num(ref.loc[r["outcome"]]) - _num(r["n_events"])
+            if 0 < diff < min_cell and _num(r["n_events"]) >= min_cell:
+                out.loc[i, "n_events"] = SECONDARY_TOKEN
+    return out
+
+
 def _jsonable(o: Any) -> Any:
     if isinstance(o, dict):
         return {str(k): _jsonable(v) for k, v in o.items()}
@@ -142,7 +224,17 @@ class _Writer:
         derived: dict[str, list[str]] | None = None,
         linked: dict[str, list[str]] | None = None,
         description: str = "",
+        secondary: dict[str, Any] | None = None,
+        implied: tuple[str, list[str]] | None = None,
+        column_secondary: dict[str, Any] | None = None,
+        implied_scale: float = 100.0,
     ) -> pd.DataFrame:
+        """Write one released table after disclosure control.
+
+        ``secondary`` (keys ``block_cols``, ``row_col``, ``group_col``, ``count_col``,
+        ``derived``) adds complementary suppression; ``implied`` = (denominator column,
+        percentage columns) blanks percentages that imply a small count.
+        """
         pc = [c for c in (person_counts or []) if c in df.columns]
         out = df.copy()
         for trig, cols in (linked or {}).items():
@@ -157,6 +249,29 @@ class _Writer:
             table=name,
             log=self.log,
         )
+        if secondary is not None and self.cfg.secondary_suppression:
+            out = suppress_long_secondary(
+                out,
+                min_cell=self.cfg.min_cell,
+                token=self.cfg.suppression_token,
+                table=name,
+                log=self.log,
+                **secondary,
+            )
+        if column_secondary is not None and self.cfg.secondary_suppression:
+            out = suppress_column_secondary(
+                out, token=self.cfg.suppression_token, table=name, log=self.log, **column_secondary
+            )
+        if implied is not None:
+            out = suppress_implied_pct(
+                out,
+                implied[0],
+                implied[1],
+                min_cell=self.cfg.min_cell,
+                table=name,
+                log=self.log,
+                scale=implied_scale,
+            )
         for c in out.columns:
             if out[c].dtype.kind == "f":
                 out[c] = out[c].round(6)
@@ -191,12 +306,24 @@ def _num(v: Any) -> float:
 
 
 def _paper1_tables(w: _Writer, p1: dict[str, Any], labels: dict[str, Any], target: str) -> None:
+    # "All" (= target + other) is not released: it would let a suppressed cell be recovered by
+    # subtraction; tables recompute it only when both groups are visible. age_group is a coarsening
+    # of age_band and is dropped for the same reason.
+    chars = p1["characteristics"]
+    chars = chars[(chars["group"] != "All") & (chars["variable"] != "age_group")].reset_index(drop=True)
     w.table(
         "p1_characteristics",
-        p1["characteristics"],
+        chars,
         person_counts=["n", "denominator"],
         derived={"n": ["pct"]},
         description="Characteristics of AEFI reports, target vs other vaccines",
+        secondary={
+            "block_cols": ["variable"],
+            "row_col": "level",
+            "group_col": "group",
+            "count_col": "n",
+            "derived": ["pct"],
+        },
     )
     cont = p1["characteristics_continuous"]
     w.table(
@@ -206,18 +333,22 @@ def _paper1_tables(w: _Writer, p1: dict[str, Any], labels: dict[str, Any], targe
         derived={"n": ["median", "q1", "q3"]},
         description="Age and notification delay: median and IQR",
     )
+    ef = p1["event_frequency"]
     w.table(
         "p1_event_frequency",
-        p1["event_frequency"],
+        ef[ef["group"] != "All"].reset_index(drop=True),
         person_counts=["n", "denominator"],
         derived={"n": ["pct"]},
-        description="Event indicators among reports",
+        description="Event indicators among reports (target and other vaccines)",
     )
     w.table(
         "p1_reports_by_year",
         p1["reports_by_year"],
         person_counts=["n_reports", "n_target", "n_target_only", "n_hospitalized", "n_target_hospitalized"],
         description="Annual report counts (analytic year)",
+        column_secondary={
+            "cols": ["n_reports", "n_target", "n_target_only", "n_hospitalized", "n_target_hospitalized"]
+        },
     )
     rate_derived = {"count": ["rate_per_100k", "rate_lo", "rate_hi", "ratio_to_expected"]}
     w.table(
@@ -226,6 +357,7 @@ def _paper1_tables(w: _Writer, p1: dict[str, Any], labels: dict[str, Any], targe
         person_counts=["count"],
         derived=rate_derived,
         description="VA-MENGOC-BC reporting rate per 100 000 doses",
+        column_secondary={"cols": ["count"], "derived": rate_derived},
     )
     if len(p1["rates_by_event"]):
         w.table(
@@ -234,6 +366,7 @@ def _paper1_tables(w: _Writer, p1: dict[str, Any], labels: dict[str, Any], targe
             person_counts=["count"],
             derived=rate_derived,
             description="Event-specific reporting rates per 100 000 doses",
+            column_secondary={"cols": ["count"], "block_col": "event", "derived": rate_derived},
         )
     w.table(
         "p1_rates_hospitalized",
@@ -241,6 +374,7 @@ def _paper1_tables(w: _Writer, p1: dict[str, Any], labels: dict[str, Any], targe
         person_counts=["count"],
         derived=rate_derived,
         description="Reporting rate of hospitalised AEFI per 100 000 doses",
+        column_secondary={"cols": ["count"], "derived": rate_derived},
     )
     w.json("p1_rates_trend", p1["rates_trend"])
     measures = [
@@ -261,26 +395,51 @@ def _paper1_tables(w: _Writer, p1: dict[str, Any], labels: dict[str, Any], targe
         "eb05",
         "eb95",
     ]
-    dp = p1["disproportionality"].copy()
+    dp = _protect_nested_designs(p1["disproportionality"].copy(), w.cfg.min_cell, measures)
+    # Design sizes are released separately; b, c and d are not released (with the totals they
+    # would reveal a suppressed a by subtraction).
+    sizes = (
+        dp.assign(
+            n_target=pd.to_numeric(dp["a"], errors="coerce") + pd.to_numeric(dp["b"], errors="coerce"),
+            n_comparator=pd.to_numeric(dp["c"], errors="coerce") + pd.to_numeric(dp["d"], errors="coerce"),
+        )
+        .groupby("design", sort=False)[["n_target", "n_comparator"]]
+        .max()
+        .reset_index()
+    )
+    w.table(
+        "p1_design_sizes",
+        sizes,
+        person_counts=["n_target", "n_comparator"],
+        description="Reports in the target and comparator groups of each disproportionality design",
+    )
+    dp = dp.drop(columns=["b", "c", "d"])
     dp["label_en"] = dp["event"].map(lambda e: labels.get(e, {}).get("label_en", e))
     dp["label_es"] = dp["event"].map(lambda e: labels.get(e, {}).get("label_es", e))
     w.table(
         "p1_disproportionality",
         dp,
-        person_counts=["a", "b", "c", "d"],
-        linked={"a": measures, "c": measures},
-        description="Disproportionality by design (READUS-PV)",
+        person_counts=["a"],
+        linked={"a": measures},
+        description="Disproportionality by design (READUS-PV); b, c, d withheld (see p1_design_sizes)",
     )
     w.json("p1_mgps_prior", p1["mgps_prior"])
     if len(p1["cumulative_ic"]):
         w.table(
             "p1_cumulative_ic",
-            p1["cumulative_ic"],
+            _protect_cumulative(p1["cumulative_ic"], w.cfg.min_cell, ["expected", "ic", "ic025", "ic975"]),
             person_counts=["a"],
             linked={"a": ["expected", "ic", "ic025", "ic975"]},
             description="Cumulative IC by year",
         )
-    w.table("p1_lca_selection", p1["lca_selection"], description="LCA model selection")
+    sel = p1["lca_selection"].copy()
+    sel["n_reports"] = int(pd.to_numeric(p1["reports_by_year"]["n_reports"]).sum())
+    w.table(
+        "p1_lca_selection",
+        sel,
+        description="LCA model selection",
+        implied=("n_reports", ["smallest_class_pct"]),
+    )
     byg = p1["lca_by_group"]
     wide = byg.pivot(index="lca_class", columns="group", values="n").fillna(0).reset_index()
     groups = [c for c in wide.columns if c != "lca_class"]
@@ -347,6 +506,8 @@ def _paper1_tables(w: _Writer, p1: dict[str, Any], labels: dict[str, Any], targe
             person_counts=["n"],
             derived={"n": ["observed", "predicted"]},
             description="Calibration by decile (temporal test set)",
+            implied=("n", ["observed"]),
+            implied_scale=1.0,
         )
     nd = p1["notification_delay_by_year"].drop(columns=["min", "max"], errors="ignore")
     w.table(
@@ -356,10 +517,19 @@ def _paper1_tables(w: _Writer, p1: dict[str, Any], labels: dict[str, Any], targe
         derived={"count": ["mean", "std", "25%", "50%", "75%", "90%"]},
         description="Notification delay (days) by year",
     )
-    w.table("p1_monthly_all", p1["monthly_all"], person_counts=["count"], description="Monthly reports, all")
-    w.table(
-        "p1_monthly_target", p1["monthly_target"], person_counts=["count"], description="Monthly reports, VA-MENGOC-BC"
-    )
+    for name, key, desc in (
+        ("p1_monthly_all", "monthly_all", "Monthly reports, all"),
+        ("p1_monthly_target", "monthly_target", "Monthly reports, VA-MENGOC-BC"),
+    ):
+        monthly = p1[key].copy()
+        monthly["year"] = monthly["month"].astype(str).str[:4]
+        w.table(
+            name,
+            monthly,
+            person_counts=["count"],
+            description=desc,
+            column_secondary={"cols": ["count"], "block_col": "year"},
+        )
     w.json(
         "p1_monthly_changepoints", {"all": p1["monthly_changepoints_all"], "target": p1["monthly_changepoints_target"]}
     )
@@ -455,7 +625,7 @@ def _paper2_tables(w: _Writer, p2: dict[str, Any], project: Project, lot_values:
     if len(by_year):
         w.table(
             "p2_linkage_by_year",
-            by_year,
+            _protect_complement(by_year, "n_reports", "n_linked", w.cfg.min_cell),
             person_counts=["n_reports", "n_linked"],
             description="Linkage by analytic year",
         )
@@ -465,6 +635,7 @@ def _paper2_tables(w: _Writer, p2: dict[str, Any], project: Project, lot_values:
         person_counts=["n"],
         derived={"n": ["age_months_median", "female_pct", "fever39_pct", "hospitalized_pct", "coadministered_pct"]},
         description="Linked vs unlinked reports",
+        implied=("n", ["female_pct", "fever39_pct", "hospitalized_pct", "coadministered_pct"]),
     )
     fs = dict(p2["qc_frame_summary"])
     sd = fs.pop("exposure_sd")
@@ -496,7 +667,7 @@ def _paper2_tables(w: _Writer, p2: dict[str, Any], project: Project, lot_values:
     if len(p2["gee_sensitivity"]):
         w.table(
             "p2_gee_sensitivity",
-            p2["gee_sensitivity"],
+            _protect_subset_events(p2["gee_sensitivity"], p2["gee"], w.cfg.min_cell),
             person_counts=gee_counts,
             linked={"n_events": ["or_per_sd", "or_lo", "or_hi", "p_value", "p_bh"]},
             description="Sensitivity analyses",
@@ -594,10 +765,10 @@ def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, s
     token = w.cfg.suppression_token
     common = MacroSet("V", suppression_token=token)
     common.text("DataOrigin", "synthetic" if synthetic else "real")
-    common.number("StudyFirstYear", a.study_years[0])
-    common.number("StudyLastYear", a.study_years[1])
+    common.text("StudyFirstYear", str(a.study_years[0]))
+    common.text("StudyLastYear", str(a.study_years[1]))
     common.number("MinCell", w.cfg.min_cell)
-    common.number("Seed", a.seed)
+    common.text("Seed", str(a.seed))
     common.text("CodeVersion", __version__)
     dq = results["data_quality"]
     common.number("ReportsRaw", w.small(dq["dedup"]["rows_in"]))
@@ -607,6 +778,15 @@ def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, s
     common.number("ReportsInWindow", w.small(dq["window"]["n_in_window"]))
     common.number("ReportsOutsideWindow", w.small(dq["window"]["n_outside_window"]))
     common.number("NFiles", len(dq["schema_reports"]))
+    rel = project.config.release
+    for name, value, what in (
+        ("ExtractionDate", rel.data_extraction_date, ("date of data extraction", "fecha de extracción de los datos")),
+        ("Custodian", rel.database_custodian, ("database custodian", "custodio de la base de datos")),
+    ):
+        if value:
+            common.text(name, str(value))
+        else:
+            common.bilingual(name, f"[authors to complete: {what[0]}]", f"[a completar por los autores: {what[1]}]")
     paths = [common.write(root / "latex" / "macros_common.tex", "Common macros")]
 
     p1 = results["paper1"]
@@ -615,6 +795,13 @@ def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, s
     m1.number("NReports", w.small(int(pd.to_numeric(p1["reports_by_year"]["n_reports"]).sum())))
     m1.number("NTarget", w.small(int(pd.to_numeric(p1["reports_by_year"]["n_target"]).sum())))
     m1.number("NTargetOnly", w.small(int(pd.to_numeric(p1["reports_by_year"]["n_target_only"]).sum())))
+    m1.number(
+        "NOther",
+        w.small(
+            int(pd.to_numeric(p1["reports_by_year"]["n_reports"]).sum())
+            - int(pd.to_numeric(p1["reports_by_year"]["n_target"]).sum())
+        ),
+    )
     m1.number("NTargetHosp", w.small(int(pd.to_numeric(p1["reports_by_year"]["n_target_hospitalized"]).sum())))
     tot = pd.to_numeric(p1["reports_by_year"]["n_reports"]).sum()
     m1.percent("PctTarget", 100 * pd.to_numeric(p1["reports_by_year"]["n_target"]).sum() / tot if tot else None)
@@ -625,10 +812,10 @@ def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, s
         m1.interval("PooledRateCI", tr["pooled_rate_lo"], tr["pooled_rate_hi"], 1)
         m1.number("TrendRR", tr["rr_per_year"], 3)
         m1.interval("TrendRRCI", tr["rr_lo"], tr["rr_hi"], 3)
-        m1.number("TrendP", tr["p_value"], 3)
+        m1.pvalue("TrendP", tr["p_value"])
         m1.number("Dispersion", tr["dispersion"], 2)
-        m1.number("RateFirstYear", tr["first_year"])
-        m1.number("RateLastYear", tr["last_year"])
+        m1.text("RateFirstYear", str(int(tr["first_year"])))
+        m1.text("RateLastYear", str(int(tr["last_year"])))
     m1.number("ExpectedRate", a.expected_national_rate_per_100k)
     dp = w.tables["p1_disproportionality"]
     prim = dp[dp["design"] == "primary_all_other_vaccines"].set_index("event")
@@ -663,14 +850,36 @@ def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, s
     for d, g in dp.groupby("design"):
         m1.number(f"SignalsAny {d}", int(g["signal_any"].astype(bool).sum()))
     m1.number("NEventsScreened", int(prim.shape[0]))
+    # Analysis settings quoted in the Methods (from the versioned configuration).
+    sm_cfg, lc = a.seriousness_model, a.lca
+    m1.text("TrainYears", f"{sm_cfg.train_years[0]}--{sm_cfg.train_years[1]}")
+    m1.text("TestYears", f"{sm_cfg.test_years[0]}--{sm_cfg.test_years[1]}")
+    m1.number("LCAKMin", lc.k_range[0])
+    m1.number("LCAKMax", lc.k_range[1])
+    m1.number("LCAStarts", lc.n_starts)
+    m1.number("LCABootstrap", lc.bootstrap)
+    m1.number("InfantMonths", a.infant_comparator_max_age_months + 1)
+    m1.number("DispMinReports", a.disproportionality.min_reports)
+    fitted = p1["incidence_its"].get("fitted")
+    if fitted is not None and len(fitted):
+        m1.text("ITSFirstYear", str(int(fitted["year"].min())))
+        m1.text("ITSLastYear", str(int(fitted["year"].max())))
+    its_cfg = p1["incidence_its"]
+    m1.text("ITSTransition", f"{its_cfg['intervention_year']}--{its_cfg['end_transition']}")
+    m1.number("NVaccines", p1.get("n_vaccines"))
     _p1_words(m1, dp, sig_col, p1, project, a.expected_national_rate_per_100k)
     m1.number("LCABestK", p1["lca_best_k"])
     m1.number("LCAAri", p1["lca_bootstrap_ari_median"], 2)
     gt = p1.get("lca_group_test") or {}
     m1.number("LCAChi", gt.get("chi2"), 1)
     m1.number("LCADf", gt.get("dof"))
-    m1.number("LCAP", gt.get("p_value"), 3)
-    ser = p1["seriousness"].metrics
+    m1.pvalue("LCAP", gt.get("p_value"))
+    sres = p1["seriousness"]
+    m1.number("NTrain", w.small(sres.n_train))
+    m1.number("NTest", w.small(sres.n_test))
+    m1.number("EventsTrain", w.small(sres.events_train))
+    m1.number("EventsTest", w.small(sres.events_test))
+    ser = sres.metrics
     for k, v in ser.items():
         for mk in ("auroc", "auprc", "brier", "cal_intercept", "cal_slope"):
             m1.number(f"{k} {mk}", v.get(mk), 3)
@@ -683,6 +892,12 @@ def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, s
     m1.number("ITSRatePost", its["mean_rate_post"], 2)
     cp = p1["monthly_changepoints_all"]
     m1.number("NBreaksAll", len(cp.get("breaks", [])))
+    m1.counted(
+        "NBreaksAllPhrase",
+        len(cp.get("breaks", [])),
+        ("change point", "change points"),
+        ("punto de cambio", "puntos de cambio"),
+    )
     m1.text("BreaksAll", ", ".join(cp.get("breaks", [])) or "none")
     nd = p1["notification_delay_by_year"]
     m1.number("DelayMedian", float(pd.to_numeric(nd["50%"]).median()) if len(nd) else None, 1)
@@ -692,6 +907,22 @@ def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, s
     m2 = MacroSet("PT", suppression_token=token)  # "PT" = paper two
     m2.number("NLots", int(p2["mspc_summary"]["n_lots"]))
     m2.number("NNationalLots", int(p2["mspc_scores"]["national"].sum()))
+    m2.number("NExportLots", int(p2["mspc_summary"]["n_lots"]) - int(p2["mspc_scores"]["national"].sum()))
+    py = pd.to_numeric(p2["mspc_scores"]["production_year"], errors="coerce").dropna()
+    if len(py):
+        m2.text("LotFirstYear", str(int(py.min())))
+        m2.text("LotLastYear", str(int(py.max())))
+    cap_periods = [p for p in dict.fromkeys(p2["capability"]["period"].astype(str)) if p != "all"]
+    for i, per in enumerate(cap_periods[:2]):
+        m2.text(f"Period {('One', 'Two')[i]}", per.replace("-", "--"))
+    qcfg, scfg, lcfg = a.qc, a.qc_safety, a.linkage
+    m2.percent("EqMarginPct", 100 * qcfg.equivalence_margin_fraction, 0)
+    m2.number("EWMALambda", qcfg.ewma_lambda, 1)
+    m2.number("MSPCAlpha", qcfg.mspc_alpha, 2)
+    m2.number("CapBootstrap", qcfg.capability_bootstrap)
+    m2.number("CVFolds", scfg.cv_folds)
+    m2.number("FuzzyThreshold", lcfg.fuzzy_threshold)
+    m2.number("MaxYearsAfterProduction", lcfg.max_years_after_production)
     m2.number("NAttributes", len(p2["scales"]))
     m2.number("NComponents", p2["mspc_summary"]["n_components"])
     ev = p2["mspc_summary"]["explained_variance"]
@@ -706,16 +937,21 @@ def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, s
     m2.number("NChangepoints", len(p2["changepoints"]))
     eq = p2["equivalence"]
     m2.number("NEquivalent", int(eq["equivalent"].astype(bool).sum()))
-    m2.number("EnergyP", p2["energy_test"]["p_value"], 3)
+    m2.pvalue("EnergyP", p2["energy_test"]["p_value"])
     ls = p2["linkage_summary"]
     m2.number("NTargetReports", w.small(ls["n_target_reports"]))
     m2.number("NLinked", w.small(ls["n_linked"]))
     m2.percent("LinkRate", 100 * ls["link_rate"] if ls["link_rate"] is not None else None)
     m2.number("NLinkedLots", ls["n_distinct_lots_linked"])
-    for lvl in ("exact", "core", "fuzzy"):
+    for lvl in ("exact", "core", "fuzzy", "no_lot_recorded", "no_match"):
         m2.number(f"Link {lvl}", w.small(ls["by_level"].get(lvl, 0)))
+    m2.number("TemporalImplausible", w.small(ls.get("temporal_implausible", 0)))
     fs = p2["qc_frame_summary"]
     m2.number("NAnalysed", w.small(fs["n_reports"]))
+    m2.number(
+        "ExcludedOther",
+        w.small(max(int(ls["n_linked"]) - int(ls.get("temporal_implausible", 0)) - int(fs["n_reports"]), 0)),
+    )
     m2.number("NAnalysedLots", fs["n_lots"])
     m2.number("ReportsPerLot", fs["reports_per_lot"].get("50%"), 1)
     g = w.tables["p2_gee_primary"]
@@ -729,8 +965,8 @@ def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, s
             _num(r["or_hi"]) if r["or_hi"] is not None else None,
             2,
         )
-        m2.number(f"{key} P", r["p_value"], 3)
-        m2.number(f"{key} Q", r.get("p_bh"), 3)
+        m2.pvalue(f"{key} P", r["p_value"])
+        m2.pvalue(f"{key} Q", r.get("p_bh"))
     m2.number("NSignificantFDR", int((pd.to_numeric(single["p_bh"], errors="coerce") < a.qc_safety.fdr_alpha).sum()))
     for _, r in p2["mde"].iterrows():
         m2.number(f"{r['outcome']} MDE", r["mde_or_per_sd"], 2)
@@ -739,11 +975,91 @@ def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, s
     for _, r in p2["incremental_value"].iterrows():
         if r.get("estimable"):
             m2.number(f"{r['outcome']} DeltaAUC", r["delta_auc"], 3)
-            m2.number(f"{r['outcome']} PermP", r["perm_p"], 3)
+            m2.pvalue(f"{r['outcome']} PermP", r["perm_p"])
             m2.number(f"{r['outcome']} AUCBase", r["auc_base"], 3)
     m2.number("NPermutations", project.config.analysis.qc_safety.permutation_tests)
     _p2_words(m2, g, p2, a.qc_safety.fdr_alpha)
     paths.append(m2.write(root / "latex" / "macros_p2.tex", "Paper 2 macros"))
+    return paths
+
+
+def _term_label(labels: dict[str, Any], vaccines: dict[str, Any] | None = None) -> Any:
+    """Bilingual display name of a model term (features, vaccines, regions, events)."""
+    vac = vaccines or {}
+
+    def short(code: str, lang: str) -> str:
+        full = str(vac.get(code, {}).get(f"label_{lang}", code))
+        return full.split(" (", maxsplit=1)[0]
+
+    def f(term: str) -> tuple[str, str]:
+        if term in FEATURE_NAMES["en"]:
+            return FEATURE_NAMES["en"][term], FEATURE_NAMES["es"][term]
+        if term.startswith("vac_"):
+            v = term.removeprefix("vac_")
+            return f"Vaccine: {short(v, 'en')}", f"Vacuna: {short(v, 'es')}"
+        if term.startswith("region_"):
+            r = term.removeprefix("region_")
+            en = {"Centro": "Central", "Oriente": "Eastern"}.get(r, r)
+            return f"{en} region (vs western)", f"Región {r} (vs. Occidente)"
+        if term in labels:
+            return str(labels[term]["label_en"]), str(labels[term]["label_es"])
+        return term, term
+
+    return f
+
+
+def _latex_tables(w: _Writer, results: dict[str, Any], project: Project, root: Path) -> list[Path]:
+    """Full bilingual tabular environments built from the released (SDC) tables."""
+    token = w.cfg.suppression_token
+    labels = project.events["events"]
+    target = project.config.analysis.target_vaccine
+    t1 = TableSet("PO", token)
+    t1.characteristics(
+        w.tables["p1_characteristics"],
+        w.tables["p1_characteristics_continuous"],
+        target,
+        ("VA-MENGOC-BC", "VA-MENGOC-BC"),
+    )
+    dp = w.tables["p1_disproportionality"]
+    t1.disproportionality(dp, "primary_all_other_vaccines", "DispMain", min_a=w.cfg.min_cell)
+    for design in sorted(dp["design"].unique()):
+        t1.disproportionality(dp, design, f"Disp {design}", min_a=None)
+    t1.designs(dp, w.tables["p1_design_sizes"])
+    t1.model_metrics(results["paper1"]["seriousness"].metrics)
+    t1.rates(w.tables["p1_rates_target"])
+    t1.lca_selection(w.tables["p1_lca_selection"])
+    t1.completeness(w.tables["dq_completeness"])
+    t1.plausibility(w.tables["dq_plausibility"])
+    if "p1_cumulative_ic" in w.tables:
+        cum = w.tables["p1_cumulative_ic"]
+        t1.cumulative_ic(cum, list(dict.fromkeys(cum["event"])), labels)
+    t1.logistic(w.tables["p1_seriousness_logistic"], _term_label(labels, project.vaccines.get("vaccines", {})))
+    paths = [t1.write(root / "latex" / "tables_p1.tex", "Paper 1 tables")]
+
+    def attr(a: str) -> tuple[str, str]:
+        return ATTRIBUTE_NAMES["en"].get(a, a), ATTRIBUTE_NAMES["es"].get(a, a)
+
+    def outcome(o: str) -> tuple[str, str]:
+        return OUTCOME_NAMES["en"].get(o, o), OUTCOME_NAMES["es"].get(o, o)
+
+    t2 = TableSet("PT", token)
+    t2.capability(w.tables["p2_capability"], w.tables["p2_changepoints"], attr)
+    t2.gee(w.tables["p2_gee_primary"], attr, outcome)
+    t2.sensitivity(
+        w.tables["p2_gee_primary"],
+        w.tables["p2_gee_sensitivity"],
+        w.tables["p2_mixed_model"],
+        w.tables["p2_lot_level"],
+        attr,
+        outcome,
+    )
+    t2.power(w.tables["p2_mde"], w.tables["p2_incremental_value"], outcome)
+    t2.equivalence(w.tables["p2_equivalence"], attr)
+    t2.linkage(w.tables["p2_linkage_by_year"])
+    t2.linkage_bias(w.tables["p2_linkage_bias"])
+    t2.control_charts(w.tables["p2_control_chart_summary"], attr)
+    t2.gee(w.tables["p2_gee_exploratory"], attr, outcome, name="GEEExploratory", long=True)
+    paths.append(t2.write(root / "latex" / "tables_p2.tex", "Paper 2 tables"))
     return paths
 
 
@@ -782,7 +1098,26 @@ def _p1_words(
     ]
     m1.number("NDesigns", len(designs))
     m1.number("NSignalsRobust", len(robust))
-    for name, items in (("SignalList", flagged), ("SignalRobustList", robust)):
+    m1.counted("NSignalsRobustPhrase", len(robust), ("signal", "signals"), ("señal", "señales"))
+    freq = p1["event_frequency"]
+    tgt = freq[freq["group"] == project.config.analysis.target_vaccine].copy()
+    tgt["_n"] = pd.to_numeric(tgt["n"], errors="coerce")
+    ranked = [e for e in tgt.sort_values("_n", ascending=False)["event"] if e != "ev_other"]
+    top = ranked[:2]  # the residual "other event" category is not informative
+    en, es = _both(lambda lang: join_words([lower_first(_label(ev, e, lang)) for e in top], lang))
+    m1.bilingual("TopEvents", en, es)
+    exp_flag = [e for e in flagged if bool(ev.get(e, {}).get("expected", False))]
+    emerging = [e for e in flagged if e not in exp_flag]
+    m1.number("NSignalsExpected", len(exp_flag))
+    m1.number("NSignalsEmerging", len(emerging))
+    m1.counted("NSignalsExpectedPhrase", len(exp_flag), ("signal", "signals"), ("señal", "señales"))
+    m1.counted("NSignalsEmergingPhrase", len(emerging), ("signal", "signals"), ("señal", "señales"))
+    for name, items in (
+        ("SignalList", flagged),
+        ("SignalRobustList", robust),
+        ("SignalExpectedList", exp_flag),
+        ("SignalEmergingList", emerging),
+    ):
         en, es = _both(lambda lang, items=items: join_words([lower_first(_label(ev, e, lang)) for e in items], lang))
         m1.bilingual(name, en, es)
     gt = p1.get("lca_group_test") or {}
@@ -805,6 +1140,20 @@ def _p1_words(
         grade_en = "poor" if b < 0.6 else "modest" if b < 0.7 else "acceptable" if b < 0.8 else "good"
         grade_es = {"poor": "pobre", "modest": "modesta", "acceptable": "aceptable", "good": "buena"}[grade_en]
         m1.bilingual("DiscriminationWord", grade_en, grade_es)
+        limited = b < 0.7
+        m1.bilingual(
+            "HospInterpretation",
+            "Such limited discrimination is itself informative: the decision to hospitalise depends on "
+            "clinical and organisational factors absent from the form"
+            if limited
+            else "Even with this discrimination, the form omits clinical and organisational factors that "
+            "determine hospitalisation",
+            "Una discriminación tan limitada es informativa en sí misma: la decisión de hospitalizar "
+            "depende de factores clínicos y organizativos ausentes del formulario"
+            if limited
+            else "Aun con esta discriminación, el formulario omite factores clínicos y organizativos que "
+            "determinan la hospitalización",
+        )
     its = p1["incidence_its"]["level_change_rr"]
     lo, hi = _num(its["lo"]), _num(its["hi"])
     m1.bilingual(
@@ -816,6 +1165,59 @@ def _p1_words(
 
 def _p2_words(m2: MacroSet, gee: pd.DataFrame, p2: dict[str, Any], alpha: float) -> None:
     """Data-driven wording for paper 2 (directions, lists) in both languages."""
+    capall = p2["capability"][p2["capability"]["period"] == "all"]
+    all_conform = bool((pd.to_numeric(capall["pct_conforming"], errors="coerce") >= 100.0).all())
+    m2.bilingual(
+        "ConformitySentence",
+        "All lots met their release specifications"
+        if all_conform
+        else "Some lots had results outside their release specifications",
+        "Todos los lotes cumplieron sus especificaciones de liberación"
+        if all_conform
+        else "Algunos lotes tuvieron resultados fuera de sus especificaciones de liberación",
+    )
+    m2.bilingual(
+        "WithinSpecPhrase",
+        "within specification" if all_conform else "mostly within specification",
+        "dentro de especificación" if all_conform else "mayoritariamente dentro de especificación",
+    )
+    sens = p2.get("gee_sensitivity")
+    single = gee[(gee["model"] == "single") & ~gee["negative_control"].astype(bool)]
+    sig = single[pd.to_numeric(single["p_bh"], errors="coerce") < alpha]
+    agree = total = 0
+    for _, r in sig.iterrows():
+        up = _num(r["or_per_sd"]) > 1
+        others: list[float] = []
+        if sens is not None and len(sens):
+            ss = sens[(sens["outcome"] == r["outcome"]) & (sens["exposure"] == r["exposure"])]
+            others += [_num(v) for v in ss.loc[ss["model"] == "single", "or_per_sd"]]
+        for key in ("mixed_model", "lot_level"):
+            t = p2.get(key)
+            if t is not None and len(t):
+                tt = t[(t["outcome"] == r["outcome"]) & (t["exposure"] == r["exposure"])]
+                others += [_num(v) for v in tt["or_per_sd"]]
+        for v in others:
+            if not math.isnan(v):
+                total += 1
+                agree += int((v > 1) == up)
+    m2.number("SensAgree", agree)
+    m2.number("SensTotal", total)
+    if total:
+        m2.bilingual(
+            "SensSentence",
+            f"In the sensitivity analyses, {agree} of {total} estimates of the significant associations "
+            "had the same direction as the primary estimate",
+            f"En los análisis de sensibilidad, {agree} de {total} estimaciones de las asociaciones "
+            "significativas tuvieron la misma dirección que la estimación principal",
+        )
+    else:
+        m2.bilingual(
+            "SensSentence",
+            "No association was significant in the primary analysis, and the sensitivity analyses are "
+            "reported for completeness",
+            "Ninguna asociación fue significativa en el análisis principal, y los análisis de "
+            "sensibilidad se presentan para completar la información",
+        )
     single = gee[gee["model"] == "single"]
     primary = single[~single["negative_control"].astype(bool)]
     m2.number("NPrimaryTests", len(primary))
@@ -828,7 +1230,7 @@ def _p2_words(m2: MacroSet, gee: pd.DataFrame, p2: dict[str, Any], alpha: float)
         up = orr > 1
         if not math.isnan(crit) and crit < (0.05 if neg else alpha):
             en = "positively associated with" if up else "inversely associated with"
-            es = "asociado positivamente con" if up else "asociado inversamente con"
+            es = "mostró una asociación positiva con" if up else "mostró una asociación inversa con"
             if not neg:
                 for lang in ("en", "es"):
                     sig_items[lang].append(
@@ -837,9 +1239,9 @@ def _p2_words(m2: MacroSet, gee: pd.DataFrame, p2: dict[str, Any], alpha: float)
                         f"{lower_first(OUTCOME_NAMES[lang].get(r['outcome'], r['outcome']))}"
                     )
         elif not math.isnan(p) and p < 0.05:
-            en, es = "only nominally associated with", "asociado solo nominalmente con"
+            en, es = "only nominally associated with", "mostró solo una asociación nominal con"
         else:
-            en, es = "not associated with", "no asociado con"
+            en, es = "not associated with", "no mostró asociación con"
         m2.bilingual(f"{r['outcome']} {r['exposure']} Dir", en, es)
     m2.bilingual("SignificantList", join_words(sig_items["en"], "en"), join_words(sig_items["es"], "es"))
     neg = single[single["negative_control"].astype(bool)]
@@ -849,6 +1251,17 @@ def _p2_words(m2: MacroSet, gee: pd.DataFrame, p2: dict[str, Any], alpha: float)
         "NegControlWord",
         "was associated" if n_neg else "was not associated",
         "se asoció" if n_neg else "no se asoció",
+    )
+    m2.bilingual(
+        "NegControlSentence",
+        f"The negative-control exposure was nominally associated with {n_neg} "
+        f"{'outcome' if n_neg == 1 else 'outcomes'}, a warning of residual bias"
+        if n_neg
+        else "The negative-control exposure was not associated with any outcome",
+        f"La exposición de control negativo se asoció nominalmente con {n_neg} "
+        f"{'desenlace' if n_neg == 1 else 'desenlaces'}, una advertencia de sesgo residual"
+        if n_neg
+        else "La exposición de control negativo no se asoció con ningún desenlace",
     )
     inc = p2["incremental_value"]
     ok = inc[inc["estimable"].astype(bool)] if len(inc) else inc
@@ -927,17 +1340,8 @@ def _figures(
             )
         )
         if len(w.tables.get("p1_shap_importance", [])):
-            names = {**FEATURE_NAMES[lang], **{e: labels.get(e, {}).get(f"label_{lang}", e) for e in labels}}
-            names.update(
-                {c: c.replace("vac_", "") for c in w.tables["p1_shap_importance"]["feature"] if c.startswith("vac_")}
-            )
-            names.update(
-                {
-                    c: c.replace("region_", "")
-                    for c in w.tables["p1_shap_importance"]["feature"]
-                    if c.startswith("region_")
-                }
-            )
+            term = _term_label(labels, project.vaccines.get("vaccines", {}))
+            names = {f: term(f)[0 if lang == "en" else 1] for f in w.tables["p1_shap_importance"]["feature"]}
             out.append(
                 figs.fig_shap(
                     {"importance": w.tables["p1_shap_importance"], "names": names},
@@ -1054,6 +1458,7 @@ def build_release_from_results(project: Project, results: dict[str, Any], ctx: R
     _paper1_tables(w, results["paper1"], project.events["events"], target)
     extra = _paper2_tables(w, results["paper2"], project, project.config.sdc.release_lot_values)
     macro_paths = _macros(w, results, project, root, synthetic)
+    macro_paths += _latex_tables(w, results, project, root)
     fig_paths = _figures(w, results, project, root, synthetic, extra)
     git = git_state(project.root)
     meta = {
