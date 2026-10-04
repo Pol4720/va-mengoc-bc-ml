@@ -21,6 +21,12 @@ async function go(hash: string) {
     window.dispatchEvent(new HashChangeEvent("hashchange"));
     await new Promise((r) => setTimeout(r, 0));
   });
+  // lazily loaded pages: wait until the loading indicator has gone
+  for (let i = 0; i < 200 && host.querySelector('[role="status"]'); i++) {
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 10));
+    });
+  }
 }
 
 beforeAll(async () => {

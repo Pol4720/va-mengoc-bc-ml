@@ -1,17 +1,12 @@
 // Application shell: loads the bundle, hash routing, language and theme toggles, synthetic-data
 // banner and provenance footer.
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { Segmented } from "./components/ui";
 import { loadBundle, type Bundle } from "./data/bundle";
 import type { Lang } from "./data/format";
 import { LangContext, loadLang, makeLang, saveLang } from "./i18n";
-import { DataQuality } from "./pages/DataQuality";
 import { Home } from "./pages/Home";
-import { Lab } from "./pages/Lab";
-import { LotQuality } from "./pages/LotQuality";
-import { Pharmacovigilance } from "./pages/Pharmacovigilance";
-import { Slides } from "./pages/Slides";
 import { BundleContext, parseRoute, type Page } from "./state";
 import {
   applyThemeChoice,
@@ -33,6 +28,13 @@ const NAV: { page: Page; es: string; en: string; hash: string }[] = [
 ];
 
 const REPO = "https://github.com/Pol4720/va-mengoc-bc-ml";
+
+// Pages with charts load on demand, so the landing page does not download ECharts.
+const Pharmacovigilance = lazy(() => import("./pages/Pharmacovigilance").then((m) => ({ default: m.Pharmacovigilance })));
+const LotQuality = lazy(() => import("./pages/LotQuality").then((m) => ({ default: m.LotQuality })));
+const DataQuality = lazy(() => import("./pages/DataQuality").then((m) => ({ default: m.DataQuality })));
+const Lab = lazy(() => import("./pages/Lab").then((m) => ({ default: m.Lab })));
+const Slides = lazy(() => import("./pages/Slides").then((m) => ({ default: m.Slides })));
 
 function useHashRoute() {
   const [hash, setHash] = useState(() => window.location.hash);
@@ -86,6 +88,14 @@ function ThemeIcon({ choice }: { choice: ThemeChoice }) {
       <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" strokeWidth="1.4" />
       <path d="M8 2a6 6 0 0 1 0 12Z" fill="currentColor" />
     </svg>
+  );
+}
+
+function Loading({ text }: { text: string }) {
+  return (
+    <p style={{ color: "var(--muted)", display: "flex", gap: 8, alignItems: "center" }} role="status">
+      <span className="spinner" aria-hidden="true" /> {text}
+    </p>
   );
 }
 
@@ -143,11 +153,7 @@ export function App() {
       </div>
     );
   } else if (!state) {
-    content = (
-      <p style={{ color: "var(--muted)", display: "flex", gap: 8, alignItems: "center" }}>
-        <span className="spinner" aria-hidden="true" /> {tr("Cargando resultados…", "Loading results…")}
-      </p>
-    );
+    content = <Loading text={tr("Cargando resultados…", "Loading results…")} />;
   } else {
     const page = route.page;
     content =
@@ -233,7 +239,13 @@ export function App() {
                 </div>
               </div>
             ) : null}
-            {state ? <BundleContext.Provider value={state}>{content}</BundleContext.Provider> : content}
+            {state ? (
+              <BundleContext.Provider value={state}>
+                <Suspense fallback={<Loading text={tr("Cargando…", "Loading…")} />}>{content}</Suspense>
+              </BundleContext.Provider>
+            ) : (
+              content
+            )}
           </main>
           <footer className="footer">
             <div className="footer-inner">
