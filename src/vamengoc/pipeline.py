@@ -137,6 +137,7 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
         "excluding_pentavalent_masking": (is_t, ~is_t & ~vac.str.contains("PENTA-L", regex=False)),
     }
     counts = disproportionality.vaccine_event_counts(cur.administrations, cur.events, rep["record_id"])
+    out["n_vaccines"] = int(counts["vaccine"].nunique())
     prior = disproportionality.fit_mgps_prior(counts["n"].to_numpy(), counts["expected"].to_numpy())
     out["mgps_prior"] = {
         "alpha1": prior.alpha1,
@@ -170,6 +171,8 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
         .head(4)
         .tolist()
     )
+    prim_tab = out["disproportionality"].query("design == 'primary_all_other_vaccines'")
+    top += [e for e in prim_tab.loc[prim_tab["signal_primary"].astype(bool), "event"] if e not in top]
     out["cumulative_ic"] = (
         pd.concat([disproportionality.cumulative_ic(rep, is_t, ~is_t, e, years) for e in top], ignore_index=True)
         if top
@@ -241,6 +244,22 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
 # ---------------------------------------------------------------------------------------
 # Paper 2 — lot-release quality and post-marketing reactogenicity
 # ---------------------------------------------------------------------------------------
+def capability_periods(
+    configured: list[tuple[int, int]] | None, years: pd.Series, study_start: int
+) -> list[tuple[int, int]]:
+    """Production periods compared in the capability analysis.
+
+    Default: lots produced before the pharmacovigilance window and lots produced during it. The
+    split is fixed by the study design, never chosen from the quality-control data.
+    """
+    if configured:
+        return [(int(lo), int(hi)) for lo, hi in configured]
+    first, last = int(years.min()), int(years.max())
+    if first >= study_start or last < study_start:
+        return []
+    return [(first, study_start - 1), (study_start, last)]
+
+
 def analyze_paper2(
     project: Project, cur: CuratedAEFI, lots: LotsIngestResult, link: LinkageResult, ctx: RunContext
 ) -> dict[str, Any]:
@@ -266,8 +285,8 @@ def analyze_paper2(
     cap_rows = []
     periods = {"all": lot_df.index == lot_df.index}
     years = lot_df["production_year"].astype(int)
-    periods["2011-2017"] = years.between(2011, 2017).to_numpy()
-    periods["2018-2025"] = years.between(2018, 2025).to_numpy()
+    for lo, hi in capability_periods(qc.capability_periods, years, a.study_years[0]):
+        periods[f"{lo}-{hi}"] = years.between(lo, hi).to_numpy()
     for pname, mask in periods.items():
         for name, sc in scales.items():
             vals = lot_df.loc[mask, name].to_numpy(dtype=float)
@@ -389,6 +408,7 @@ def analyze_paper2(
         cov_struct=qs.gee_cov_struct,
         negative_controls=qs.negative_control_exposures,
         adjust_set=list(qs.primary_exposures),
+        crude=True,
     )
     # Exploratory family: every outcome x every attribute (and T2 atypicality),
     # independence working correlation with cluster-robust SEs; separate FDR.

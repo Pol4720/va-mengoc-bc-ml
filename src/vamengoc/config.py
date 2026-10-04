@@ -145,6 +145,9 @@ class QCConfig(_Frozen):
     mspc_alpha: float = Field(gt=0, lt=1)
     changepoint_penalty: str | float
     equivalence_margin_fraction: float = Field(gt=0, lt=1)
+    # Production-year periods for capability; null = lots produced before vs during the
+    # pharmacovigilance study window (fixed a priori, independent of the QC data).
+    capability_periods: list[tuple[int, int]] | None = None
 
 
 class QCSafetyConfig(_Frozen):
@@ -206,6 +209,8 @@ class ReleaseConfig(_Frozen):
     languages: list[str]
     figure_format: str
     figure_dpi: int
+    data_extraction_date: str | None = None  # ISO date of the extraction from the source database
+    database_custodian: str | None = None  # institution responsible for the AEFI database
 
 
 class PipelineConfig(_Frozen):

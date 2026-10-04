@@ -212,11 +212,14 @@ def gee_family(
     cov_struct: str = "exchangeable",
     negative_controls: list[str] | None = None,
     adjust_set: list[str] | None = None,
+    crude: bool = False,
 ) -> pd.DataFrame:
     """Single-exposure models for every exposure and a mutually adjusted model.
 
     The mutually adjusted model includes only ``adjust_set`` (the prespecified
-    primary exposures); by default every non-negative-control exposure.
+    primary exposures); by default every non-negative-control exposure. With
+    ``crude=True``, unadjusted single-exposure models (``model == "crude"``) are
+    added for reporting (STROBE item 16a); they are outside the FDR family.
     """
     d = frame.data.copy()
     rows: list[dict[str, Any]] = []
@@ -238,6 +241,8 @@ def gee_family(
             )
             continue
         specs = [(e, f"_y ~ {e} + {covs}", "single") for e in frame.exposures]
+        if crude:
+            specs += [(e, f"_y ~ {e}", "crude") for e in frame.exposures]
         primary = [
             e for e in frame.exposures if e not in neg and (adjust_set is None or e.removeprefix("z_") in adjust_set)
         ]
