@@ -1,11 +1,11 @@
 {
   "data_origin": "synthetic",
   "synthetic": true,
-  "generated_utc": "2026-10-04T02:23:08+00:00",
-  "run_id": "20261004T022257Z-0e5f3c",
+  "generated_utc": "2026-10-04T02:29:09+00:00",
+  "run_id": "20261004T022859Z-6fa620",
   "code_version": "0.1.0",
-  "git_commit": "e60ea8f353bc8108a688137f768acb5f994086d7",
-  "git_dirty": false,
+  "git_commit": "a24f5e3765e4b26e191bbf7799977e1717f0bf9f",
+  "git_dirty": true,
   "seed": 20260930,
   "study_years": [
     2017,
@@ -23,10 +23,10 @@
     "configs/dictionaries/geography.yaml": "2b9a6921741a61052d81972372911466609a8d2f9a6b602a83a90df78c4cff71",
     "configs/dictionaries/manufacturers.yaml": "4837f046666400951d766d12e2748e1c8e30e1468f101734521a8da8ac9e5a86",
     "configs/dictionaries/vaccines.yaml": "8535797d6fdd976519ac49170d2d091fe820066dcd44072b689c386311f18139",
-    "configs/pipeline.yaml": "33b743a88192945b4528acb8f9146f626c8d809daf1b65f7ab50a326a1c38192",
+    "configs/pipeline.yaml": "89c41ff4a50f2705877b5579a1028da494047c1a083659e0ed95804a2d5a0a63",
     "configs/schemas/aefi.yaml": "a0414c6e486b35753dad803431b2a9db83722ec20af164c8b9bd45bec45dda37",
     "configs/schemas/lots.yaml": "b29b366f28ac030233a29ca0ca493234aa2fcebfbc894c651ff5a14f4b5811f8",
-    "<merged pipeline config>": "80242920566a8ab0ad45b84799d99aaaf966a85dc4dd7b3c5bea6c7113b22aed"
+    "<merged pipeline config>": "c6745c04fbe3f3bca595a2693a3b481cc718b1d439078bf0ce6e7b2f77106806"
   },
   "inputs_sha256": {
     "BD_para_publicación_lotes_final.xlsx": "71c4692b788fa3773811461d44ddeab0fa5f869e6c04eef041a476014ffea412",
@@ -135,7 +135,7 @@
     }
   },
   "files": {
-    "README.md": "685f85d93407265a837018659dfaca1154ccb9405d984533bf1b47cfb67eb71b",
+    "README.md": "a220caffd3aa99258a2a28371d545aebb22f884b0b44e6e0ce91a67d4d214a06",
     "figures/en/p1_forest.pdf": "ea38e40f08225d1fc82394c8afb70eef691113a92f3c5fff28f0ed15a0448317",
     "figures/en/p1_incidence.pdf": "dd5c4ceb9c77272690d58624f95e0182a667975ada87477a10b2179604fdd0d4",
     "figures/en/p1_lca.pdf": "6de9d9523d366c653c478f3ea39971dd57c327f6898cd89b973d923a2f5756fe",
@@ -220,10 +220,10 @@
     "tables/p2_mspc_t2_quantiles.csv": "e2842556c11bf0eefd42232a8ac1806dd57743069206b8ebfbe1d3e88e4baf80",
     "tables/p2_qc_annual_quantiles.csv": "04cac04c884a838ba43cf50d3443f3343c83a8ffb5cb478b787e1dbfb750e296",
     "tables/p2_qc_frame_summary.json": "265bcf8177fe50a499f3a4e6d2e6d6a22f5df000068fc7b867d5fee90d97a697",
-    "tables/p2_scales.json": "b088b08efd87e6734be2e3cc35b7b7c298aa5be3d5f2cf9716f6b16ef9f22ee9",
-    "tables/p2_specifications.json": "a98e9ed0848ef40509eb45cfc516298443fc0143899f7dd97a68364d009992d3",
+    "tables/p2_scales.json": "ebda3122275ae311d22fd5d10d52e81940948ce560c985a187da8f989f30a8d8",
+    "tables/p2_specifications.json": "c30710c6cf52f394a8dac6d2652a5db7f37c9e8d5ec5e8a573c1ad5ed2596ec4",
     "tables/provenance_notes.json": "a165c528efae033529de386cac5a844d033dc6a56e9c1bd85d03f83171d705b1",
-    "web/bundle.json": "54237c405d1a567baa7c57d012aa118cc628cb3940f7de67719ecb278f0b8d82"
+    "web/bundle.json": "33a93dfca6adbb4202491e7db8c99ac21cea868adea7b444373d0bf0383ee1ca"
   },
   "n_tables": 45,
   "n_figures": 22,

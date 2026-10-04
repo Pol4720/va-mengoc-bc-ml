@@ -1,79 +1,35 @@
 {
   "aloh3_conc": {
-    "high": 5.0,
-    "low": 3.0,
-    "op": "range",
-    "raw": "(3 - 5) mg/mL",
-    "unit": "mg/mL"
+    "op": "range"
   },
   "bactericidal_titer": {
-    "high": null,
-    "low": 4.0,
-    "op": "gt",
-    "raw": "> 4",
-    "unit": ""
+    "op": "gt"
   },
   "endotoxin": {
-    "high": 20000.0,
-    "low": null,
-    "op": "le",
-    "raw": "≤ 20000 UE/mL",
-    "unit": "UE/mL"
+    "op": "le"
   },
   "fill_volume": {
-    "high": null,
-    "low": 0.5,
-    "op": "ge",
-    "raw": "≥ 0,5 mL",
-    "unit": "mL"
+    "op": "ge"
   },
   "igg_elisa": {
-    "high": null,
-    "low": 7000.0,
-    "op": "ge",
-    "raw": "≥ 7000 UIgG/mL",
-    "unit": "UIgG/mL"
+    "op": "ge"
   },
   "ph": {
-    "high": 7.2,
-    "low": 6.0,
-    "op": "range",
-    "raw": "6,0 - 7,2",
-    "unit": ""
+    "op": "range"
   },
   "protein_adsorption": {
-    "high": null,
-    "low": 80.0,
-    "op": "ge",
-    "raw": "≥ 80 %",
-    "unit": "%"
+    "op": "ge"
   },
   "protein_conc": {
-    "high": 130.0,
-    "low": 70.0,
-    "op": "range",
-    "raw": "(70 -130) μg/mL",
-    "unit": "µg/mL"
+    "op": "range"
   },
   "ps_adsorption": {
-    "high": null,
-    "low": 80.0,
-    "op": "ge",
-    "raw": "≥ 80 %",
-    "unit": "%"
+    "op": "ge"
   },
   "ps_conc": {
-    "high": 130.0,
-    "low": 70.0,
-    "op": "range",
-    "raw": "(70 -130) μg/mL",
-    "unit": "µg/mL"
+    "op": "range"
   },
   "thiomersal_conc": {
-    "high": 0.13,
-    "low": 0.07,
-    "op": "range",
-    "raw": "(0,07 - 0,13) mg/mL",
-    "unit": "mg/mL"
+    "op": "range"
   }
 }
