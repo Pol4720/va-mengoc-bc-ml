@@ -63,6 +63,25 @@ uv run ruff check src tests && uv run ruff format --check src tests && uv run my
 uv run pre-commit install          # guardas locales en cada commit
 ```
 
+## Aplicación web y presentaciones
+
+Sitio público (tras activar Pages): <https://pol4720.github.io/va-mengoc-bc-ml/>. Incluye la historia
+guiada del pipeline, los resultados interactivos de ambos artículos (con cambio de regla de señal,
+diseño comparador y atributo de calidad), la calidad de datos, las presentaciones para las reuniones
+de expertos (teclado, pantalla completa, notas del orador, folleto en PDF) y un laboratorio que lanza
+el pipeline **en el propio equipo** con parámetros personalizados. Modo claro y oscuro, español e
+inglés.
+
+```bash
+cd web && npm ci
+npm run dev                         # http://localhost:5173 (usa release/public o, si no existe, el sintético)
+uv run vamengoc serve               # en otra terminal: API local del laboratorio (127.0.0.1:8765)
+npm run lint && npm run typecheck && npm test && npm run build && npx playwright test
+```
+
+Activación única de Pages: *Settings → Pages → Build and deployment → Source: GitHub Actions*; el flujo
+`.github/workflows/pages.yml` publica en cada push a `main` (o a mano con *Run workflow*).
+
 ## Autores
 
 - Richard Alejandro Matos Arderí — Instituto Finlay de Vacunas, DICEI ·
