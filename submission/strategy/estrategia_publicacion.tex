@@ -1,0 +1,137 @@
+% Estrategia de publicación de los artículos VA-MENGOC-BC (documento interno, español).
+\documentclass[11pt]{article}
+\newcommand{\DocLang}{es}
+\input{papers/shared/preamble.tex}
+\input{papers/shared/authors.tex}
+\usepackage{tabularx}
+\hypersetup{pdftitle={Estrategia de publicacion: articulos VA-MENGOC-BC}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+\begin{document}
+\begin{center}
+{\Large\bfseries Estrategia de publicación sin cargos para los artículos sobre VA-MENGOC-BC\par}
+\medskip
+{\small DICEI, Instituto Finlay de Vacunas \textperiodcentered{} documento de trabajo, versión del
+código \VCodeVersion\par}
+\end{center}
+
+\section{Principios}
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Ningún cargo para los autores.} Desde Cuba no es posible pagar cargos por procesamiento
+  de artículos (APC). Se eligen revistas \emph{híbridas}, en las que la ruta de suscripción no tiene
+  coste para los autores y el acceso abierto es opcional, o revistas de acceso abierto
+  \emph{diamante}, sin cargos para autores ni lectores.
+\item \textbf{Visibilidad sin pagar.} La ruta de suscripción se complementa con un preprint (por
+  ejemplo, en medRxiv) y con el depósito del manuscrito aceptado según la política de cada editorial,
+  además del repositorio público del código y del release con control de divulgación.
+\item \textbf{Ajuste revista--artículo.} El artículo~1 es un análisis de desproporcionalidad que
+  sigue READUS-PV, guía publicada en \emph{Drug Safety}; el artículo~2 vincula calidad de lotes y
+  reactogenicidad, tema de \emph{Vaccine} y \emph{Biologicals}.
+\item \textbf{Un artículo por revista y envío secuencial.} No se envía el mismo trabajo a dos revistas
+  a la vez. El artículo~2 cita el~1 como análisis complementario (``enviado'' o ``en prensa'').
+\end{enumerate}
+
+\section{Revistas seleccionadas}
+Los cargos se verificaron en las páginas de las editoriales en septiembre de 2026 y deben
+comprobarse de nuevo en el momento del envío.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Revistas candidatas, modelo de publicación y coste para los autores.}
+\label{tab:journals}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.4cm}>{\raggedright\arraybackslash}p{1.8cm}Y@{}}
+\toprule
+Revista (editorial) & Modelo & Coste para los autores y observaciones \\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Artículo 1 --- farmacovigilancia nacional}}\\
+\emph{Drug Safety} (Springer Nature, Adis) & Híbrida & Ruta de suscripción sin cargos; APC
+opcional de \$5190. Artículo original hasta 6000 palabras; resumen estructurado de 150--250 palabras
+(ampliable hasta 450 para cumplir guías de informe); \emph{Key Points} obligatorios. Revista oficial
+de la International Society of Pharmacovigilance, donde se publicó READUS-PV. \textbf{Primera opción.} \\
+\emph{Vaccine} (Elsevier) & Híbrida & Ruta de suscripción sin cargos; APC opcional de \$3680. Resumen
+de hasta 250 palabras; 3--5 \emph{highlights} de hasta 85 caracteres. \textbf{Segunda opción.} \\
+\emph{Pharmaco\-epidemiology and Drug Safety} (Wiley) & Híbrida & Ruta de suscripción sin cargos; APC
+opcional de \$5120. \textbf{Tercera opción.} \\
+\addlinespace
+\multicolumn{3}{@{}l}{\emph{Artículo 2 --- calidad de los lotes y reactogenicidad}}\\
+\emph{Vaccine} (Elsevier) & Híbrida & Como arriba. Publica vigilancia de seguridad y calidad de
+vacunas. \textbf{Primera opción.} \\
+\emph{Biologicals} (Elsevier, IABS) & Híbrida & Ruta de suscripción sin cargos; APC opcional de
+\$3000. Revista de la International Alliance for Biological Standardization: liberación de lotes y
+estandarización. \textbf{Segunda opción.} \\
+\emph{Drug Safety} (Springer Nature, Adis) & Híbrida & Si el artículo~1 se publica en otra revista.
+\textbf{Tercera opción.} \\
+\addlinespace
+\multicolumn{3}{@{}l}{\emph{Alternativas de acceso abierto diamante (ambos artículos)}}\\
+\emph{Revista Panamericana de Salud Pública} (OPS) & Diamante & Sin cargos para autores ni
+lectores; factor de impacto 2,2 (2024). Publica en español, inglés y portugués. \\
+\emph{MEDICC Review} (MEDICC) & Diamante & Sin cargos para autores ni lectores; indizada en MEDLINE,
+Science Citation Index Expanded y Scopus; especializada en investigación cubana. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\paragraph{Revistas excluidas.} Se descartan las revistas exclusivamente de acceso abierto con APC
+(por ejemplo, \emph{Expert Review of Vaccines}, de acceso abierto completo desde el volumen 22,
+2023) salvo que se obtenga una exención total por escrito antes del envío. Cuba figura en el
+Grupo~B de la lista de elegibilidad de Research4Life de 2025 (acceso de bajo costo; verificar en el momento del envío), lo que no garantiza exenciones totales de APC.
+
+\section{Secuencia y calendario}
+Los plazos son estimaciones para planificar; los tiempos editoriales reales varían.
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Fase 1 (local).} Ejecución del flujo con los datos reales en la estación controlada
+  (\texttt{vamengoc run}), revisión del informe de calidad de datos y del registro de auditoría.
+\item \textbf{Fase 2 (publicación).} Verificación del release con control de divulgación
+  (\texttt{vamengoc release verify public}), revisión por el responsable de datos y \emph{commit}
+  de \nolinkurl{release/public}. Todos los documentos se recompilan automáticamente con los datos reales.
+\item \textbf{Auditoría final.} Repetir la auditoría de los manuscritos sobre los números reales,
+  completar los campos marcados ``a completar por los autores'' y obtener la aprobación ética.
+\item \textbf{Envío del artículo~1} a \emph{Drug Safety} y depósito simultáneo del preprint.
+\item \textbf{Envío del artículo~2} a \emph{Vaccine} cuando el~1 esté en revisión.
+\item \textbf{Revisión por pares.} Responder punto por punto; cualquier análisis nuevo se ejecuta
+  en el flujo para que las cifras sigan generándose automáticamente.
+\item \textbf{Tras la aceptación.} Elegir la ruta de suscripción (sin cargos) y depositar el
+  manuscrito aceptado según la política de la editorial.
+\end{enumerate}
+
+\section{Paquete de envío}
+\begin{itemize}[leftmargin=*]
+\item Manuscrito con página de título, resumen, palabras clave, declaraciones y referencias
+  (\nolinkurl{papers/*/en/manuscript.pdf}).
+\item Material suplementario (\nolinkurl{supplement.pdf}) y lista de verificación (READUS-PV para el
+  artículo~1; RECORD-PE para el~2).
+\item Carta de presentación (\nolinkurl{submission/*/cover_letter.pdf}).
+\item \emph{Highlights} para \emph{Vaccine} (\nolinkurl{submission/p2-lot-quality/highlights.pdf});
+  \emph{Key Points} para \emph{Drug Safety} (incluidos en el manuscrito).
+\item Figuras en PDF vectorial (\nolinkurl{release/public/figures/en}).
+\end{itemize}
+
+\section{Pendiente de los autores}
+\begin{itemize}[leftmargin=*]
+\item Aprobación del comité de ética (nombre, número y fecha) y del responsable de datos.
+\item Fuente de financiación o declaración de ausencia de financiación específica.
+\item Funciones CRediT de cada autor y correo del autor para la correspondencia.
+\item Fecha de extracción de los datos y custodio de la base (en \nolinkurl{configs/pipeline.yaml}).
+\item Confirmación del acceso a las plataformas de envío (Editorial Manager, ScholarOne) desde la red
+  institucional.
+\end{itemize}
+
+\section{Fuentes}
+\begin{itemize}[leftmargin=*]\small
+\item Drug Safety, ``How to publish with us'' y normas para autores:
+  \url{https://link.springer.com/journal/40264/how-to-publish-with-us},
+  \url{https://link.springer.com/journal/40264/submission-guidelines}.
+\item Vaccine, opciones de acceso abierto y guía para autores:
+  \url{https://www.sciencedirect.com/journal/vaccine/publish/open-access-options},
+  \url{https://www.sciencedirect.com/journal/vaccine/publish/guide-for-authors}.
+\item Pharmacoepidemiology and Drug Safety, acceso abierto:
+  \url{https://onlinelibrary.wiley.com/page/journal/10991557/homepage/fundedaccess.html}.
+\item Biologicals, opciones de acceso abierto:
+  \url{https://www.sciencedirect.com/journal/biologicals/publish/open-access-options}.
+\item Revista Panamericana de Salud Pública: \url{https://www.paho.org/journal/en/about-journal}.
+\item MEDICC Review: \url{https://scielosp.org/journal/medicc/about/}.
+\item Expert Review of Vaccines: \url{https://www.tandfonline.com/journals/ierv20/about-this-journal}.
+\item Research4Life, elegibilidad: \url{https://www.research4life.org/access/eligibility/}.
+\end{itemize}
+
+\end{document}
