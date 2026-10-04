@@ -1,0 +1,13 @@
+{
+  "by_level": {
+    "core": 168,
+    "exact": 2896,
+    "no_lot_recorded": 12,
+    "no_match": 155
+  },
+  "link_rate": 0.9483132157226865,
+  "n_distinct_lots_linked": 158,
+  "n_linked": 3064,
+  "n_target_reports": 3231,
+  "temporal_implausible": 22
+}

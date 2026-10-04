@@ -1,0 +1,35 @@
+{
+  "explained_variance": [
+    0.19645261324708094,
+    0.12173615888002351,
+    0.10247328202550987,
+    0.09472966503039833,
+    0.09378351624108928,
+    0.08840676133996778,
+    0.084291224819997,
+    0.0810643015310022,
+    0.06604309621142103,
+    0.05332012248225192,
+    0.01769925819125811
+  ],
+  "n_components": 8,
+  "n_flagged": 15,
+  "n_lots": 736,
+  "spe_flagged": 8,
+  "spe_limit": 6.445718495377885,
+  "t2_flagged": 7,
+  "t2_limit": 19.92520014079793,
+  "top_contributor_counts": {
+    "aloh3_conc": 4,
+    "bactericidal_titer": 3,
+    "endotoxin": 8,
+    "fill_volume": 1,
+    "igg_elisa": 4,
+    "ph": 8,
+    "protein_adsorption": 4,
+    "protein_conc": 1,
+    "ps_adsorption": 1,
+    "ps_conc": 7,
+    "thiomersal_conc": 4
+  }
+}

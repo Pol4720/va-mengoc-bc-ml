@@ -1,0 +1,4 @@
+outcome,estimable,auc_base,auc_with_qc,delta_auc,perm_p,n_perm,null_q95,n_reports,n_lots,folds
+ev_fever_39,True,0.51098,0.536187,0.025207,0.0199,200,0.017293,3042,146,5
+ev_fever_40,True,0.477899,0.471148,-0.006752,0.537313,200,0.034538,3042,146,5
+ev_severe_local_reaction,True,0.493898,0.48755,-0.006348,0.686567,200,0.019956,3042,146,5

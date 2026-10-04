@@ -1,0 +1,407 @@
+{
+  "dedup": {
+    "exact_duplicates_by_file": {
+      "EA_2017_TOTAL.xlsx": 36,
+      "EA_2018_TOTAL.xlsx": 36,
+      "EA_2019_TOTAL.xlsx": 34,
+      "EA_2020_TOTAL.xlsx": 26,
+      "EA_2021_TOTAL.xlsx": 24,
+      "EA_2022_TOTAL.xlsx": 36,
+      "EA_2023_TOTAL.xlsx": 35,
+      "EA_2024_TOTAL.xlsx": 34,
+      "EA_2025_TOTAL.xlsx": 23
+    },
+    "exact_duplicates_removed": 284,
+    "key_duplicate_groups": 74,
+    "key_duplicate_rows_merged": 74,
+    "rows_in": 19140,
+    "rows_out": 18782,
+    "rule_exact": "identical keyed digest of all mapped source cells",
+    "rule_key": "same pseudonymous person + vaccination date + vaccine set + lot set; indicators merged with OR, earliest notification date kept",
+    "weak_person_keys": 36
+  },
+  "files": {
+    "EA_2017_TOTAL.xlsx": {
+      "file_year": 2017,
+      "fuzzy_matches": [],
+      "header_row": 1,
+      "junk_columns": [
+        {
+          "column": 60,
+          "n_nonnull": "<5"
+        }
+      ],
+      "missing_optional": [],
+      "missing_required": [],
+      "n_columns": 61,
+      "n_data_rows": 2463,
+      "n_matched": 60,
+      "sheet": "TOTAL",
+      "unmatched_columns": []
+    },
+    "EA_2018_TOTAL.xlsx": {
+      "file_year": 2018,
+      "fuzzy_matches": [],
+      "header_row": 1,
+      "junk_columns": [
+        {
+          "column": 60,
+          "n_nonnull": "<5"
+        }
+      ],
+      "missing_optional": [],
+      "missing_required": [],
+      "n_columns": 61,
+      "n_data_rows": 2420,
+      "n_matched": 60,
+      "sheet": "TOTAL",
+      "unmatched_columns": []
+    },
+    "EA_2019_TOTAL.xlsx": {
+      "file_year": 2019,
+      "fuzzy_matches": [],
+      "header_row": 1,
+      "junk_columns": [
+        {
+          "column": 60,
+          "n_nonnull": "<5"
+        }
+      ],
+      "missing_optional": [],
+      "missing_required": [],
+      "n_columns": 61,
+      "n_data_rows": 2252,
+      "n_matched": 60,
+      "sheet": "TOTAL",
+      "unmatched_columns": []
+    },
+    "EA_2020_TOTAL.xlsx": {
+      "file_year": 2020,
+      "fuzzy_matches": [],
+      "header_row": 2,
+      "junk_columns": [],
+      "missing_optional": [],
+      "missing_required": [],
+      "n_columns": 60,
+      "n_data_rows": 1759,
+      "n_matched": 60,
+      "sheet": "TOTAL",
+      "unmatched_columns": []
+    },
+    "EA_2021_TOTAL.xlsx": {
+      "file_year": 2021,
+      "fuzzy_matches": [],
+      "header_row": 1,
+      "junk_columns": [
+        {
+          "column": 60,
+          "n_nonnull": "<5"
+        },
+        {
+          "column": 61,
+          "n_nonnull": 0
+        }
+      ],
+      "missing_optional": [],
+      "missing_required": [],
+      "n_columns": 62,
+      "n_data_rows": 1650,
+      "n_matched": 60,
+      "sheet": "TOTAL",
+      "unmatched_columns": [
+        {
+          "column": 61,
+          "header": "OBSERVACIONES"
+        }
+      ]
+    },
+    "EA_2022_TOTAL.xlsx": {
+      "file_year": 2022,
+      "fuzzy_matches": [],
+      "header_row": 1,
+      "junk_columns": [
+        {
+          "column": 60,
+          "n_nonnull": "<5"
+        }
+      ],
+      "missing_optional": [],
+      "missing_required": [],
+      "n_columns": 61,
+      "n_data_rows": 2459,
+      "n_matched": 60,
+      "sheet": "TOTAL",
+      "unmatched_columns": []
+    },
+    "EA_2023_TOTAL.xlsx": {
+      "file_year": 2023,
+      "fuzzy_matches": [],
+      "header_row": 1,
+      "junk_columns": [
+        {
+          "column": 59,
+          "n_nonnull": "<5"
+        }
+      ],
+      "missing_optional": [
+        "ev_purpura"
+      ],
+      "missing_required": [],
+      "n_columns": 60,
+      "n_data_rows": 2282,
+      "n_matched": 59,
+      "sheet": "TOTAL",
+      "unmatched_columns": []
+    },
+    "EA_2024_TOTAL.xlsx": {
+      "file_year": 2024,
+      "fuzzy_matches": [],
+      "header_row": 1,
+      "junk_columns": [
+        {
+          "column": 60,
+          "n_nonnull": "<5"
+        }
+      ],
+      "missing_optional": [],
+      "missing_required": [],
+      "n_columns": 61,
+      "n_data_rows": 2303,
+      "n_matched": 60,
+      "sheet": "TOTAL",
+      "unmatched_columns": []
+    },
+    "EA_2025_TOTAL.xlsx": {
+      "file_year": 2025,
+      "fuzzy_matches": [],
+      "header_row": 1,
+      "junk_columns": [
+        {
+          "column": 60,
+          "n_nonnull": "<5"
+        }
+      ],
+      "missing_optional": [],
+      "missing_required": [],
+      "n_columns": 61,
+      "n_data_rows": 1552,
+      "n_matched": 60,
+      "sheet": "TOTAL",
+      "unmatched_columns": []
+    }
+  },
+  "lots_sheet": {
+    "header_row": 1,
+    "n_duplicate_lot_ids": 22,
+    "n_lots": 736,
+    "n_rows_with_duplicate_ids": 44,
+    "parse_status": {
+      "aloh3_conc": {
+        "ok": 736
+      },
+      "bactericidal_titer": {
+        "ok": 736
+      },
+      "endotoxin": {
+        "ok": 735,
+        "recovered": 1
+      },
+      "fill_volume": {
+        "ok": 736
+      },
+      "igg_elisa": {
+        "ok": 736
+      },
+      "ph": {
+        "ok": 736
+      },
+      "production_year": {
+        "ok": 736
+      },
+      "protein_adsorption": {
+        "ok": 736
+      },
+      "protein_conc": {
+        "ok": 736
+      },
+      "ps_adsorption": {
+        "ok": 736
+      },
+      "ps_conc": {
+        "ok": 736
+      },
+      "thiomersal_conc": {
+        "ok": 736
+      }
+    },
+    "sheet": "Lotes 2009-2025",
+    "spec_drift": {},
+    "spec_row_detected": true
+  },
+  "normalisation": {
+    "destination": {
+      "by_rule": {
+        "pattern": 754
+      },
+      "n_distinct_inputs": 10,
+      "n_values": 754
+    },
+    "manufacturer": {
+      "by_rule": {
+        "pattern": 20791
+      },
+      "n_distinct_inputs": 12,
+      "n_values": 20791
+    },
+    "place": {
+      "by_rule": {
+        "pattern": 19140
+      },
+      "n_distinct_inputs": 5,
+      "n_values": 19140
+    },
+    "province": {
+      "by_rule": {
+        "pattern": 19140
+      },
+      "n_distinct_inputs": 16,
+      "n_values": 19140
+    },
+    "vaccine": {
+      "by_rule": {
+        "pattern": 20955
+      },
+      "n_distinct_inputs": 17,
+      "n_values": 20955
+    }
+  },
+  "schema_drift": {
+    "fields_in_all_files": [
+      "address",
+      "admission_date",
+      "age_group_raw",
+      "age_raw",
+      "birth_date",
+      "clinic",
+      "died",
+      "discharge_date",
+      "dose_raw",
+      "ev_acute_paralysis",
+      "ev_afebrile_seizure",
+      "ev_allergic_reaction",
+      "ev_anaphylactic_reaction",
+      "ev_anaphylactic_shock",
+      "ev_arthralgia",
+      "ev_bacterial_abscess",
+      "ev_behaviour_change",
+      "ev_brain_damage",
+      "ev_collapse",
+      "ev_encephalitis",
+      "ev_encephalopathy",
+      "ev_febrile_seizure",
+      "ev_fever_39",
+      "ev_fever_40",
+      "ev_lymphadenitis",
+      "ev_meningitis",
+      "ev_osteitis",
+      "ev_other",
+      "ev_persistent_crying",
+      "ev_rash",
+      "ev_sepsis",
+      "ev_severe_local_reaction",
+      "ev_sterile_abscess",
+      "ev_toxic_shock",
+      "full_name",
+      "health_area",
+      "hist_family_allergy",
+      "hist_family_asthma",
+      "hist_family_seizure",
+      "hist_personal_allergy",
+      "hist_personal_asthma",
+      "hist_personal_seizure",
+      "hospitalized",
+      "lot_raw",
+      "manufacturer_raw",
+      "month",
+      "municipality",
+      "notification_date",
+      "other_text",
+      "place_raw",
+      "pregnant",
+      "province",
+      "recovered",
+      "route_raw",
+      "sequelae",
+      "sex",
+      "site_raw",
+      "vaccination_date",
+      "vaccine_raw"
+    ],
+    "fields_not_in_all_files": {
+      "ev_purpura": [
+        "EA_2023_TOTAL.xlsx"
+      ]
+    },
+    "fuzzy_matches": {},
+    "unmatched_headers": {
+      "EA_2021_TOTAL.xlsx": [
+        {
+          "column": 61,
+          "header": "OBSERVACIONES"
+        }
+      ]
+    }
+  },
+  "series": {
+    "coverage": {
+      "header_row": 2,
+      "n_years": 40,
+      "parse_status": {
+        "coverage_pct": {
+          "missing": 8,
+          "ok": 32
+        },
+        "doses_administered": {
+          "missing": 25,
+          "ok": 15
+        }
+      },
+      "sheet": "Cobertura de vacunación",
+      "year_range": [
+        1986,
+        2025
+      ]
+    },
+    "incidence": {
+      "header_row": 5,
+      "n_years": 55,
+      "parse_status": {
+        "cases": {
+          "ok": 55
+        },
+        "deaths": {
+          "missing": 11,
+          "ok": 44
+        },
+        "incidence_rate": {
+          "ok": 55
+        },
+        "mortality_rate": {
+          "missing": 11,
+          "ok": 44
+        }
+      },
+      "sheet": "Incidencia en Cuba",
+      "year_range": [
+        1970,
+        2024
+      ]
+    }
+  },
+  "window": {
+    "n_in_window": 18696,
+    "n_outside_window": 86,
+    "n_reports_total": 18782,
+    "n_year_differs_from_file": 100
+  }
+}

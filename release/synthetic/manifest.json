@@ -1,0 +1,232 @@
+{
+  "data_origin": "synthetic",
+  "synthetic": true,
+  "generated_utc": "2026-10-04T02:23:08+00:00",
+  "run_id": "20261004T022257Z-0e5f3c",
+  "code_version": "0.1.0",
+  "git_commit": "e60ea8f353bc8108a688137f768acb5f994086d7",
+  "git_dirty": false,
+  "seed": 20260930,
+  "study_years": [
+    2017,
+    2025
+  ],
+  "target_vaccine": "AM-BC",
+  "sdc": {
+    "min_cell": 5,
+    "token": "<5",
+    "secondary_suppression": true,
+    "release_lot_values": "normalized"
+  },
+  "config_sha256": {
+    "configs/dictionaries/events.yaml": "53084c9399aed3c5a6912c98c6eb02d93569f6d58faf4e169e1bb3ac61e66b4c",
+    "configs/dictionaries/geography.yaml": "2b9a6921741a61052d81972372911466609a8d2f9a6b602a83a90df78c4cff71",
+    "configs/dictionaries/manufacturers.yaml": "4837f046666400951d766d12e2748e1c8e30e1468f101734521a8da8ac9e5a86",
+    "configs/dictionaries/vaccines.yaml": "8535797d6fdd976519ac49170d2d091fe820066dcd44072b689c386311f18139",
+    "configs/pipeline.yaml": "33b743a88192945b4528acb8f9146f626c8d809daf1b65f7ab50a326a1c38192",
+    "configs/schemas/aefi.yaml": "a0414c6e486b35753dad803431b2a9db83722ec20af164c8b9bd45bec45dda37",
+    "configs/schemas/lots.yaml": "b29b366f28ac030233a29ca0ca493234aa2fcebfbc894c651ff5a14f4b5811f8",
+    "<merged pipeline config>": "80242920566a8ab0ad45b84799d99aaaf966a85dc4dd7b3c5bea6c7113b22aed"
+  },
+  "inputs_sha256": {
+    "BD_para_publicación_lotes_final.xlsx": "71c4692b788fa3773811461d44ddeab0fa5f869e6c04eef041a476014ffea412",
+    "EA_2017_TOTAL.xlsx": "5c25e4cd3013e97586a0bb83e39abd42f6355d615d483d46e741fbf85109ff1c",
+    "EA_2018_TOTAL.xlsx": "75ef7b34f4991275918d1ce18e0d89e4a8b0c076dfeb0d3c71f18045bf35e676",
+    "EA_2019_TOTAL.xlsx": "fb12ba847805c1c15b642ce5a843aadb04416e48d00ebc2c0b9ee56e235c2401",
+    "EA_2020_TOTAL.xlsx": "12c5ada169023a5fff4956a3f3d62bd65f9dd882a9df17b610f23763d4733a5a",
+    "EA_2021_TOTAL.xlsx": "b7e45a2deafe92c5cfee3cf71b2259b6866b50703a6a06db14ce72ba935a4544",
+    "EA_2022_TOTAL.xlsx": "23d8f782663dd218ef0f7d75faf6ba1d003981d1a0208ffffa32ac50ba06e500",
+    "EA_2023_TOTAL.xlsx": "a4cc6c13473e6bdae239105349d5f8b7b70a6a66fef701ff345ced4224d8884a",
+    "EA_2024_TOTAL.xlsx": "f3f015b4c398a3ccd41d0f3f12ebf2887ffa707aeb76fc9faf778f887d7d97cd",
+    "EA_2025_TOTAL.xlsx": "813c0743a4912fbcd9444339f40d9edfbec6f23dd54b5aa6a5373613dcf6b627"
+  },
+  "sdc_log": {
+    "tables": {
+      "dq_plausibility": {
+        "primary": 19,
+        "derived": 19,
+        "secondary": 0
+      },
+      "dq_conformance": {
+        "primary": 55,
+        "derived": 0,
+        "secondary": 0
+      },
+      "p1_characteristics": {
+        "primary": 1,
+        "derived": 1,
+        "secondary": 3
+      },
+      "p1_event_frequency": {
+        "primary": 10,
+        "derived": 10,
+        "secondary": 0
+      },
+      "p1_reports_by_year": {
+        "primary": 9,
+        "derived": 0,
+        "secondary": 0
+      },
+      "p1_rates_by_event": {
+        "primary": 15,
+        "derived": 39,
+        "secondary": 1
+      },
+      "p1_rates_hospitalized": {
+        "primary": 9,
+        "derived": 24,
+        "secondary": 0
+      },
+      "p1_disproportionality": {
+        "primary": 4,
+        "derived": 42,
+        "secondary": 0
+      },
+      "p1_cumulative_ic": {
+        "primary": 5,
+        "derived": 20,
+        "secondary": 0
+      },
+      "p1_lca_by_group": {
+        "primary": 0,
+        "derived": 0,
+        "secondary": 0
+      },
+      "p1_cooccurrence_target": {
+        "primary": 3,
+        "derived": 9,
+        "secondary": 0
+      },
+      "p1_seriousness_logistic": {
+        "primary": 0,
+        "derived": 0,
+        "secondary": 0
+      },
+      "p1_calibration": {
+        "primary": 0,
+        "derived": 6,
+        "secondary": 0
+      },
+      "p2_linkage_bias": {
+        "primary": 0,
+        "derived": 1,
+        "secondary": 0
+      },
+      "p2_gee_primary": {
+        "primary": 0,
+        "derived": 0,
+        "secondary": 0
+      },
+      "p2_gee_exploratory": {
+        "primary": 0,
+        "derived": 0,
+        "secondary": 0
+      },
+      "p2_gee_sensitivity": {
+        "primary": 0,
+        "derived": 0,
+        "secondary": 0
+      }
+    },
+    "total": {
+      "primary": 130,
+      "derived": 171,
+      "secondary": 4
+    }
+  },
+  "files": {
+    "README.md": "685f85d93407265a837018659dfaca1154ccb9405d984533bf1b47cfb67eb71b",
+    "figures/en/p1_forest.pdf": "ea38e40f08225d1fc82394c8afb70eef691113a92f3c5fff28f0ed15a0448317",
+    "figures/en/p1_incidence.pdf": "dd5c4ceb9c77272690d58624f95e0182a667975ada87477a10b2179604fdd0d4",
+    "figures/en/p1_lca.pdf": "6de9d9523d366c653c478f3ea39971dd57c327f6898cd89b973d923a2f5756fe",
+    "figures/en/p1_rates.pdf": "322838ed24694c26253a9d3f4cb934ed017b7911e2cdb4602d39555973ea13a6",
+    "figures/en/p1_shap.pdf": "ca9fca13041a9fad937b4b006ae315197a7d80e4fd7d34faa20ea41c504598e2",
+    "figures/en/p2_capability.pdf": "392959d8ffc958eeaab4bb61f87424c7cf441c964288254833625596cfdbf475",
+    "figures/en/p2_equivalence.pdf": "b36505ceab71623edf3e1c900e3e7450a0da053480440cd4172d4bfa58357d58",
+    "figures/en/p2_forest.pdf": "0bd94cf14f396aef9e1263b2361fc7809a0210cdd4766504f8cebc92c987de73",
+    "figures/en/p2_incremental.pdf": "f53009db845dc2a6e4e43ce4ac2b650e3056ff18200b0ea4d6aa2d9fdb2598bc",
+    "figures/en/p2_qc_annual.pdf": "78f571ab2afafa807c4769c2c8d93c19b9a2fdaf077c082dc5a01d68316250b2",
+    "figures/en/p2_t2.pdf": "126aa5e349a7d2bf1daa3f59d8e6fc5374877010cb0ab138a5bdb475024c1822",
+    "figures/es/p1_forest.pdf": "cb96a9a4547541de20568f9008018e827b02f1cabd13cf98001e409ab33241aa",
+    "figures/es/p1_incidence.pdf": "18d5833e6120fa10c09100ce40c1e32a2c768f8e903cb371612c5d356690aea7",
+    "figures/es/p1_lca.pdf": "3e97cc67b154227915d001f2fa563d778695af185dfd4e0645aa62473c93d1f3",
+    "figures/es/p1_rates.pdf": "2abf90849096bab669a74d32dc24b53e15f1ae6e439235d28eb6399942b73c5b",
+    "figures/es/p1_shap.pdf": "f6a53c77d59fa646bf57976125dc4d4314f6917b29e742b8bfc745505c44e756",
+    "figures/es/p2_capability.pdf": "d2cdd6477fef8eb489ee35891b8e919d84c6a7cff195c1c85b78bdcd53287abd",
+    "figures/es/p2_equivalence.pdf": "918e7aaafb6cffe8780379082c8c8781dfc7b31fcb1e20a455fd435ce63c9eed",
+    "figures/es/p2_forest.pdf": "d4468beba3f7d89cf70c1bf15466bb8a14162766e07555430ecec372874c42ec",
+    "figures/es/p2_incremental.pdf": "3ecffcefc7be13ca78aef50176280350913b14a8e4a8457cfc3593a7bb058ca2",
+    "figures/es/p2_qc_annual.pdf": "f997c3321959f7a245e10f616f6c12145cc3fc7d651726254a25bed1f34eb8e6",
+    "figures/es/p2_t2.pdf": "b0fc2472f203bbefef106895f10f5649093a881a2a3236f99f42b7717e343354",
+    "latex/macros_common.tex": "0299ce6285cae93c72c98fb144228f07afad5d081e8437821c76693be624750a",
+    "latex/macros_p1.tex": "7813fec53c1882cff37d69066f5ed8bd03eb22d160dc148e5061cc892c20f482",
+    "latex/macros_p2.tex": "7ca72981d945f262d4b9c68ee30e99521c542ba46e315302caf42e28465dab79",
+    "latex/tables_p1.tex": "3228ca74bbb64b6b78637e091e705a67da4fb05cce761287187f0a4ae034953b",
+    "latex/tables_p2.tex": "dd3486db303e418eccd30db9e8ae4a72f798943b8a286abdbd14cb647dbb5876",
+    "tables/_schema.json": "a651819fd2b134c23988c563a5e1f9a8c4e1936c578ef151fb7e76c88f8c05d8",
+    "tables/context_coverage.csv": "2dc4ffe37028cdaaa1924f92f4cc495f351d8587c20ede314055dd87f7292f56",
+    "tables/context_incidence.csv": "7f8e5509739e5b3d43d37fa1ade3ce2cbc4793b6c3de47a653d134b2f5da65db",
+    "tables/context_incidence_fitted.csv": "15da568c497dc5f9b6f8217b686fba978845a7bc733da471e1bee6eebe8b839a",
+    "tables/context_incidence_its.json": "fb848256caa3979aba8797fa0bf84c4ed956bc06f94c68c7e282f253c2686a72",
+    "tables/dq_completeness.csv": "a4d08d39cef741d00039ddd7e8a8009c034b21010f8c2623116c80c5e5f9f788",
+    "tables/dq_conformance.csv": "bb0a145d0823a9347534a0027d251df1979fb6e04a3789baebf87c2df8020cc7",
+    "tables/dq_plausibility.csv": "a1af14ce619264d7bc162b48bf64299efb24f198e68b18c3013c3461840e78e7",
+    "tables/dq_summary.json": "5070d2399519349fdcdefdf1a8a4f24b3eff44c9f3da031c826bcbd034b46abf",
+    "tables/p1_calibration.csv": "45f1b14253b0ea893861955b9668c69c8fc8cf1bd0d48e1f36f093ee1631238e",
+    "tables/p1_characteristics.csv": "a9c03231b403acf6fe8013fe058f801eb217a1f4d04bc6c0406d8b9693fe39b5",
+    "tables/p1_characteristics_continuous.csv": "4dfc9ad937ae177b505373e78d0714f543e63ece0039533acd5a6cc32700ee15",
+    "tables/p1_cooccurrence_target.csv": "efedd731a89ea2b51eb82eb86845400ef8ffed8a709d765738edde0944c68459",
+    "tables/p1_cumulative_ic.csv": "a7d73867f831178ebc36de5be542717c86c9dd9216ad88e13fec932362819986",
+    "tables/p1_design_sizes.csv": "735d38af8fa8dd58f4218d6eed29e6703d22ddfbdceb4ceb5957394b07e4acad",
+    "tables/p1_disproportionality.csv": "9a4648087cb67eac03d2b2d3558240fa951e3aa85827f9972d0ee63cf1ac31b6",
+    "tables/p1_event_frequency.csv": "2e41bbe5b285c641fe3b00a3b69d9c4ae6e0c109dff396df4c71ca906c2cce24",
+    "tables/p1_lca_by_group.csv": "b72c22c00c906ddd1fccac94821d60e5bcd0706d01a8931b17f2e64bbcd3710c",
+    "tables/p1_lca_profiles.csv": "31a4f6e4c9b51a828cce79cf32bce43141159e6bf041075e09f5d7cb731557e8",
+    "tables/p1_lca_selection.csv": "e3c2c712f451314fb7086221401a5ed9db394570985ba04c0fcdbb871f728490",
+    "tables/p1_lca_summary.json": "1f45446ec22582480e7efc867ef8bd18a9d956ba6c183c8cc901fd0cf28893f1",
+    "tables/p1_mgps_prior.json": "5c055d4e3779af694b068e5bb3e32356d1581efca8fd45ccef16714f98a896ce",
+    "tables/p1_monthly_all.csv": "072854333d9dc8a62a3ce07398b301bc03e7f040189a7e4f8d9421fead36d815",
+    "tables/p1_monthly_changepoints.json": "d890c8783f0c9fabe42bac2c0e2c7f0411f5eded3ee04889691f75517c032466",
+    "tables/p1_monthly_target.csv": "ab6e9da3fb97b232d0b9a5877a037a0eec657c3a5516853eff3814fdcf70d766",
+    "tables/p1_notification_delay.csv": "7fb176e40a8bd2848e31ffea2d6c0e31bfc1f0a53a5847ca4c0f9050b8a2c27f",
+    "tables/p1_rates_by_event.csv": "e614204123fd69928bb0f7004ea3e9321f5c4b8078296a434e8e301dda60ee80",
+    "tables/p1_rates_hospitalized.csv": "6e4ac246bbdc2bc086db08437c41dd264447d806499d64c12281609ff95dd730",
+    "tables/p1_rates_target.csv": "b9ca85c9250f5a38350c907ef7036c05bee7e36184008edac8dc06709a9cafb9",
+    "tables/p1_rates_trend.json": "5e2f1427d5f79baa28ade3db4b104d653c452ddb02a3d0186f1c8c179eab6355",
+    "tables/p1_reports_by_year.csv": "abe65de788c4b599d498785f6a895dcda1e09faf71fa91be7475c000dc76bd03",
+    "tables/p1_seriousness_logistic.csv": "911fe4b318b3a0e8e22fb4bb63b651c404cb765b965ad8c94d7cf6a27452e8e7",
+    "tables/p1_seriousness_metrics.json": "1a92d996187487c564433fea049994c073b3d10703206af04fc095a648625b3c",
+    "tables/p1_shap_dependence.csv": "7112204a41dcdf5e547a344d84a87c0fb085a6fa97f5a4b6b990c65423823d56",
+    "tables/p1_shap_importance.csv": "d2b69bc527dae3ff256c73d645f823bf95f136bda73332f6b43727e3dc191414",
+    "tables/p2_attribute_correlation.csv": "6ad291957ce78e1667804854b7f16a6e82211c47837e8cb72dffbeafb918139e",
+    "tables/p2_capability.csv": "55ab4f5ec014be083f29a01f053f893cdfb520560ccf752fc0b639d682b0b01f",
+    "tables/p2_changepoints.csv": "4ad884171d85867db26f1abc404f29db4e0fcae117c65ce21ff374fe65bbed47",
+    "tables/p2_control_chart_summary.csv": "660e71768d76ac2ae1595d559e2d516e2c7fedc2fe51ff015f7b64d27a27da99",
+    "tables/p2_energy_test.json": "9f5a9af8888940df9ab956dbbc260997f3a123fb2254bfb59297c86317e7ef30",
+    "tables/p2_equivalence.csv": "37d00b6506ba3d91e0e07ade34e2729ff7d50158643367ce439995421ba5f486",
+    "tables/p2_gee_exploratory.csv": "96a8d3f7880b039b5b120c9c8b48f6457b05028d758f724e26161e76265d7e14",
+    "tables/p2_gee_primary.csv": "ea13354d812994982d8d2f97df4a1ffbb7bd6fbcf15da960877fbc971823687d",
+    "tables/p2_gee_sensitivity.csv": "6d73175d88004b737a1b71807e654f406cedc4531e61643bcd95224cfa43d49c",
+    "tables/p2_incremental_value.csv": "88ccf0631f1d769f3c2c3915121318a834c07310e329f13acc17da9deaa315c2",
+    "tables/p2_linkage_bias.csv": "bfafadf3b86fd5b9994962cfc2982477e20af36ec7c0215680214f9ceb2c04da",
+    "tables/p2_linkage_by_year.csv": "5fc82b977896b43ded49cc015bbf3509d3303973028fdda22047e93478c70c45",
+    "tables/p2_linkage_summary.json": "b7b1a02777fb0c343cfb828d2ec38ad423ef6afe82ba41521041023e452e1936",
+    "tables/p2_lot_level.csv": "f2cc6a9b21621224ce4c832d6095155ab815bacc395a6960844313ff03314f76",
+    "tables/p2_lot_series.csv": "6f87773a76534c824d17d81a1920db45515245108e811a1800d6aa23521d224d",
+    "tables/p2_mde.csv": "67a085aebaee89b19733a2c34a7dac8264139419b08161f269d6cb812cc30a7c",
+    "tables/p2_mixed_model.csv": "5ad032214ea40f2172a2289c7d2f53656adfb363b7f05525972e76563659b6b4",
+    "tables/p2_mspc_loadings.csv": "9d61eddcc7749e14e60e41864390ac6df7c80e6581b2b3aff44ebf4f82c1b961",
+    "tables/p2_mspc_summary.json": "8e92c23422416cf966bb97c5e1af6302ef4d3a552e99ce947af4f25ec6c7b92b",
+    "tables/p2_mspc_t2_quantiles.csv": "e2842556c11bf0eefd42232a8ac1806dd57743069206b8ebfbe1d3e88e4baf80",
+    "tables/p2_qc_annual_quantiles.csv": "04cac04c884a838ba43cf50d3443f3343c83a8ffb5cb478b787e1dbfb750e296",
+    "tables/p2_qc_frame_summary.json": "265bcf8177fe50a499f3a4e6d2e6d6a22f5df000068fc7b867d5fee90d97a697",
+    "tables/p2_scales.json": "b088b08efd87e6734be2e3cc35b7b7c298aa5be3d5f2cf9716f6b16ef9f22ee9",
+    "tables/p2_specifications.json": "a98e9ed0848ef40509eb45cfc516298443fc0143899f7dd97a68364d009992d3",
+    "tables/provenance_notes.json": "a165c528efae033529de386cac5a844d033dc6a56e9c1bd85d03f83171d705b1",
+    "web/bundle.json": "54237c405d1a567baa7c57d012aa118cc628cb3940f7de67719ecb278f0b8d82"
+  },
+  "n_tables": 45,
+  "n_figures": 22,
+  "n_macro_files": 5,
+  "web_bundle": "web/bundle.json"
+}

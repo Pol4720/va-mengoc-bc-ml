@@ -1,0 +1,7 @@
+variable,group,n,median,q1,q3
+age_months,AM-BC,3231,3.351129,3.055441,5.125257
+notification_delay_days,AM-BC,3217,3.0,2.0,6.0
+age_months,Other vaccines,15465,5.848049,2.332649,17.971253
+notification_delay_days,Other vaccines,15380,3.0,2.0,6.0
+age_months,All,18696,4.928131,3.022587,17.774127
+notification_delay_days,All,18597,3.0,2.0,6.0

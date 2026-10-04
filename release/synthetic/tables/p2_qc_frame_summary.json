@@ -1,0 +1,45 @@
+{
+  "covariates": [
+    "log_age_months",
+    "female",
+    "dose2",
+    "C(year_f)",
+    "coadm"
+  ],
+  "exposure_sd_window": {
+    "aloh3_conc": 0.14622678709474848,
+    "bactericidal_titer": 0.13779895645691043,
+    "endotoxin": 0.05239074145147434,
+    "fill_volume": 0.29017692060657757,
+    "igg_elisa": 0.20256717238474825,
+    "ph": 0.11259716495392104,
+    "protein_adsorption": 0.18482332075817534,
+    "protein_conc": 0.16784999538898127,
+    "ps_adsorption": 0.17350243226233092,
+    "ps_conc": 0.13522245590395093,
+    "thiomersal_conc": 0.15562178992681663
+  },
+  "exposures": [
+    "z_endotoxin",
+    "z_aloh3_conc",
+    "z_protein_conc",
+    "z_protein_adsorption",
+    "z_ph",
+    "z_ps_conc",
+    "z_ps_adsorption",
+    "z_thiomersal_conc",
+    "z_bactericidal_titer",
+    "z_igg_elisa",
+    "z_fill_volume",
+    "z_atypicality_t2"
+  ],
+  "n_lots": 146,
+  "n_reports": 3042,
+  "notes": [],
+  "reports_per_lot": {
+    "25%": 2.0,
+    "50%": 18.0,
+    "75%": 37.0,
+    "mean": 20.835616438356166
+  }
+}

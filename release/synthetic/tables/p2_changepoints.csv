@@ -1,0 +1,3 @@
+attribute,index,production_year,mean_before_window,mean_after_window
+protein_adsorption,338,2017,0.489497,0.592965
+endotoxin,361,2018,0.825661,0.775387

@@ -1,0 +1,299 @@
+{
+  "dq_plausibility": {
+    "person_count_columns": [
+      "n_records",
+      "n_flagged"
+    ],
+    "description": "Plausibility checks by source-file year",
+    "rows": 162
+  },
+  "dq_conformance": {
+    "person_count_columns": [
+      "n",
+      "n_ok",
+      "n_recovered",
+      "n_missing",
+      "n_not_applicable",
+      "n_absent_column"
+    ],
+    "description": "Parse outcomes by file and field",
+    "rows": 432
+  },
+  "dq_completeness": {
+    "person_count_columns": [
+      "n",
+      "n_present"
+    ],
+    "description": "Completeness by file year",
+    "rows": 81
+  },
+  "p1_characteristics": {
+    "person_count_columns": [
+      "n",
+      "denominator"
+    ],
+    "description": "Characteristics of AEFI reports, target vs other vaccines",
+    "rows": 60
+  },
+  "p1_characteristics_continuous": {
+    "person_count_columns": [
+      "n"
+    ],
+    "description": "Age and notification delay: median and IQR",
+    "rows": 6
+  },
+  "p1_event_frequency": {
+    "person_count_columns": [
+      "n",
+      "denominator"
+    ],
+    "description": "Event indicators among reports (target and other vaccines)",
+    "rows": 52
+  },
+  "p1_reports_by_year": {
+    "person_count_columns": [
+      "n_reports",
+      "n_target",
+      "n_target_only",
+      "n_hospitalized",
+      "n_target_hospitalized"
+    ],
+    "description": "Annual report counts (analytic year)",
+    "rows": 9
+  },
+  "p1_rates_target": {
+    "person_count_columns": [
+      "count"
+    ],
+    "description": "VA-MENGOC-BC reporting rate per 100 000 doses",
+    "rows": 9
+  },
+  "p1_rates_by_event": {
+    "person_count_columns": [
+      "count"
+    ],
+    "description": "Event-specific reporting rates per 100 000 doses",
+    "rows": 63
+  },
+  "p1_rates_hospitalized": {
+    "person_count_columns": [
+      "count"
+    ],
+    "description": "Reporting rate of hospitalised AEFI per 100 000 doses",
+    "rows": 9
+  },
+  "p1_design_sizes": {
+    "person_count_columns": [
+      "n_target",
+      "n_comparator"
+    ],
+    "description": "Reports in the target and comparator groups of each disproportionality design",
+    "rows": 4
+  },
+  "p1_disproportionality": {
+    "person_count_columns": [
+      "a"
+    ],
+    "description": "Disproportionality by design (READUS-PV); b, c, d withheld (see p1_design_sizes)",
+    "rows": 104
+  },
+  "p1_cumulative_ic": {
+    "person_count_columns": [
+      "a"
+    ],
+    "description": "Cumulative IC by year",
+    "rows": 45
+  },
+  "p1_lca_selection": {
+    "person_count_columns": [],
+    "description": "LCA model selection",
+    "rows": 7
+  },
+  "p1_lca_by_group": {
+    "person_count_columns": [
+      "n"
+    ],
+    "description": "Latent class membership by vaccine group (secondary SDC)",
+    "rows": 12
+  },
+  "p1_lca_profiles": {
+    "person_count_columns": [],
+    "description": "Item-response probabilities of the selected LCA model",
+    "rows": 72
+  },
+  "p1_cooccurrence_target": {
+    "person_count_columns": [
+      "n_both"
+    ],
+    "description": "Pairwise co-reporting (log OR)",
+    "rows": 36
+  },
+  "p1_seriousness_logistic": {
+    "person_count_columns": [
+      "n_with_term"
+    ],
+    "description": "Adjusted odds ratios of hospitalisation (Firth logistic regression)",
+    "rows": 30
+  },
+  "p1_shap_importance": {
+    "person_count_columns": [],
+    "description": "Mean |SHAP| (temporal test set)",
+    "rows": 31
+  },
+  "p1_shap_dependence": {
+    "person_count_columns": [
+      "n"
+    ],
+    "description": "Binned SHAP dependence",
+    "rows": 25
+  },
+  "p1_calibration": {
+    "person_count_columns": [
+      "n"
+    ],
+    "description": "Calibration by decile (temporal test set)",
+    "rows": 10
+  },
+  "p1_notification_delay": {
+    "person_count_columns": [
+      "count"
+    ],
+    "description": "Notification delay (days) by year",
+    "rows": 9
+  },
+  "p1_monthly_all": {
+    "person_count_columns": [
+      "count"
+    ],
+    "description": "Monthly reports, all",
+    "rows": 104
+  },
+  "p1_monthly_target": {
+    "person_count_columns": [
+      "count"
+    ],
+    "description": "Monthly reports, VA-MENGOC-BC",
+    "rows": 104
+  },
+  "context_incidence_fitted": {
+    "person_count_columns": [],
+    "description": "Annual cases and segmented NB fit (public series)",
+    "rows": 55
+  },
+  "context_incidence": {
+    "person_count_columns": [],
+    "description": "National meningococcal disease series (public)",
+    "rows": 55
+  },
+  "context_coverage": {
+    "person_count_columns": [],
+    "description": "VA-MENGOC-BC doses and coverage (public)",
+    "rows": 40
+  },
+  "p2_capability": {
+    "person_count_columns": [],
+    "description": "Process capability (Ppk) by period",
+    "rows": 33
+  },
+  "p2_qc_annual_quantiles": {
+    "person_count_columns": [],
+    "description": "Annual quantiles of the window position (lot level)",
+    "rows": 165
+  },
+  "p2_lot_series": {
+    "person_count_columns": [],
+    "description": "Per-lot series on the specification-window scale (pseudonymous sequence number)",
+    "rows": 8096
+  },
+  "p2_control_chart_summary": {
+    "person_count_columns": [],
+    "description": "Run-rule signals per attribute",
+    "rows": 11
+  },
+  "p2_changepoints": {
+    "person_count_columns": [],
+    "description": "PELT change points in the production sequence",
+    "rows": 2
+  },
+  "p2_mspc_t2_quantiles": {
+    "person_count_columns": [],
+    "description": "Hotelling T2 by production year",
+    "rows": 15
+  },
+  "p2_mspc_loadings": {
+    "person_count_columns": [],
+    "description": "PCA loadings (robust correlation)",
+    "rows": 11
+  },
+  "p2_attribute_correlation": {
+    "person_count_columns": [],
+    "description": "Spearman correlation",
+    "rows": 11
+  },
+  "p2_equivalence": {
+    "person_count_columns": [],
+    "description": "National vs export lots: TOST and HL shift",
+    "rows": 11
+  },
+  "p2_linkage_by_year": {
+    "person_count_columns": [
+      "n_reports",
+      "n_linked"
+    ],
+    "description": "Linkage by analytic year",
+    "rows": 9
+  },
+  "p2_linkage_bias": {
+    "person_count_columns": [
+      "n"
+    ],
+    "description": "Linked vs unlinked reports",
+    "rows": 2
+  },
+  "p2_gee_primary": {
+    "person_count_columns": [
+      "n",
+      "n_events"
+    ],
+    "description": "Prespecified GEE family (exchangeable)",
+    "rows": 42
+  },
+  "p2_gee_exploratory": {
+    "person_count_columns": [
+      "n",
+      "n_events"
+    ],
+    "description": "Exploratory GEE family (independence, cluster-robust)",
+    "rows": 96
+  },
+  "p2_gee_sensitivity": {
+    "person_count_columns": [
+      "n",
+      "n_events"
+    ],
+    "description": "Sensitivity analyses",
+    "rows": 36
+  },
+  "p2_mixed_model": {
+    "person_count_columns": [],
+    "description": "Bayesian random-intercept model (VB)",
+    "rows": 15
+  },
+  "p2_lot_level": {
+    "person_count_columns": [],
+    "description": "Lot-level quasi-binomial models",
+    "rows": 15
+  },
+  "p2_mde": {
+    "person_count_columns": [],
+    "description": "Minimum detectable OR per SD (80% power)",
+    "rows": 3
+  },
+  "p2_incremental_value": {
+    "person_count_columns": [
+      "n_reports"
+    ],
+    "description": "Incremental information of QC attributes (lot-grouped CV)",
+    "rows": 3
+  }
+}

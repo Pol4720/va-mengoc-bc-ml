@@ -1,0 +1,4 @@
+outcome,outcome_prevalence,icc,mean_cluster_size,design_effect,n_effective,mde_or_per_sd,n_lots
+ev_fever_39,0.708744,0.00452,35.136095,1.154283,2635.4016,1.143728,146.0
+ev_fever_40,0.081197,0.00571,35.136095,1.1949,2545.819539,1.255184,146.0
+ev_severe_local_reaction,0.225838,0.0,35.136095,1.0,3042.0,1.145476,146.0

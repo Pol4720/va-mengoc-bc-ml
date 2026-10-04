@@ -1,0 +1,252 @@
+% Paper 2 tables
+% GENERATED FILE — do not edit by hand (vamengoc release builder).
+
+\newcommand{\PTTableCapability}{%
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{4.2cm}rrrrc@{}}
+\toprule
+\makecell{\VLang{Attribute}{Atributo}} & \makecell{\VLang{Lots}{Lotes}} & \makecell{$P_{pk}$ \VLang{(95\% CI),}{(IC 95 \%),}\\\VLang{all lots}{todos los lotes}} & \makecell{$P_{pk}$\\2011--2016} & \makecell{$P_{pk}$\\2017--2025} & \makecell{\VLang{Change\\point}{Punto de\\cambio}} \\
+\midrule
+\VLang{pH}{pH} & \num{736} & \num{1.29} (\num{1.23}--\num{1.36}) & \num{1.24} & \num{1.33} & \textemdash{} \\
+\VLang{Protein concentration}{Concentración de proteínas} & \num{736} & \num{1.00} (\num{0.95}--\num{1.05}) & \num{0.99} & \num{1.00} & \textemdash{} \\
+\VLang{Protein adsorption}{Adsorción de proteínas} & \num{736} & \num{0.99} (\num{0.94}--\num{1.05}) & \num{0.90} & \num{1.10} & 2017 \\
+\VLang{Polysaccharide concentration}{Concentración de polisacárido} & \num{736} & \num{1.15} (\num{1.09}--\num{1.22}) & \num{1.11} & \num{1.18} & \textemdash{} \\
+\VLang{Polysaccharide adsorption}{Adsorción de polisacárido} & \num{736} & \num{1.03} (\num{0.98}--\num{1.09}) & \num{1.04} & \num{1.02} & \textemdash{} \\
+\VLang{Al(OH)\textsubscript{3} concentration}{Concentración de Al(OH)\textsubscript{3}} & \num{736} & \num{1.18} (\num{1.12}--\num{1.24}) & \num{1.18} & \num{1.17} & \textemdash{} \\
+\VLang{Thiomersal concentration}{Concentración de tiomersal} & \num{736} & \num{1.13} (\num{1.07}--\num{1.18}) & \num{1.10} & \num{1.14} & \textemdash{} \\
+\VLang{Bactericidal titre (log\textsubscript{2})}{Título bactericida (log\textsubscript{2})} & \num{736} & \num{1.20} (\num{1.14}--\num{1.28}) & \num{1.20} & \num{1.21} & \textemdash{} \\
+\VLang{Anti-OMV IgG (log\textsubscript{10})}{IgG anti-VME (log\textsubscript{10})} & \num{736} & \num{0.73} (\num{0.69}--\num{0.77}) & \num{0.73} & \num{0.72} & \textemdash{} \\
+\VLang{Endotoxin content (log\textsubscript{10})}{Contenido de endotoxinas (log\textsubscript{10})} & \num{736} & \num{1.17} (\num{1.11}--\num{1.24}) & \num{1.07} & \num{1.45} & 2018 \\
+\VLang{Mean fill volume}{Volumen medio del bulbo} & \num{736} & \num{0.56} (\num{0.53}--\num{0.59}) & \num{0.56} & \num{0.56} & \textemdash{} \\
+\bottomrule
+\end{tabular}%
+}
+
+\newcommand{\PTTableGEE}{%
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.3cm}>{\raggedright\arraybackslash}p{3.9cm}rrrr@{}}
+\toprule
+\makecell{\VLang{Outcome}{Desenlace}} & \makecell{\VLang{Lot attribute\\(per SD)}{Atributo del lote\\(por DE)}} & \makecell{\VLang{Crude OR\\(95\% CI)}{OR cruda\\(IC 95 \%)}} & \makecell{\VLang{Adjusted OR\\(95\% CI)}{OR ajustada\\(IC 95 \%)}} & $p$ & $q$ (FDR) \\
+\midrule
+\VLang{Fever \ensuremath{\geq}39\,°C}{Fiebre \ensuremath{\geq}39\,°C} & \VLang{Endotoxin content (log\textsubscript{10})}{Contenido de endotoxinas (log\textsubscript{10})} & \num{1.26} (\num{1.16}--\num{1.36}) & \num{1.27} (\num{1.17}--\num{1.38}) & \ensuremath{<}\num{0.001} & \ensuremath{<}\num{0.001} \\
+ & \VLang{Al(OH)\textsubscript{3} concentration}{Concentración de Al(OH)\textsubscript{3}} & \num{1.12} (\num{1.02}--\num{1.23}) & \num{1.12} (\num{1.02}--\num{1.24}) & \num{0.017} & \num{0.101} \\
+ & \VLang{Protein concentration}{Concentración de proteínas} & \num{1.08} (\num{0.99}--\num{1.17}) & \num{1.08} (\num{0.99}--\num{1.17}) & \num{0.082} & \num{0.197} \\
+ & \VLang{Protein adsorption}{Adsorción de proteínas} & \num{1.08} (\num{0.99}--\num{1.18}) & \num{1.09} (\num{1.00}--\num{1.19}) & \num{0.063} & \num{0.188} \\
+ & \VLang{Mean fill volume (negative control)}{Volumen medio del bulbo (control negativo)} & \num{0.93} (\num{0.85}--\num{1.02}) & \num{0.93} (\num{0.85}--\num{1.02}) & \num{0.126} & \textemdash{} \\
+\addlinespace
+\VLang{Fever \ensuremath{\geq}40\,°C}{Fiebre \ensuremath{\geq}40\,°C} & \VLang{Endotoxin content (log\textsubscript{10})}{Contenido de endotoxinas (log\textsubscript{10})} & \num{0.96} (\num{0.84}--\num{1.10}) & \num{0.97} (\num{0.84}--\num{1.12}) & \num{0.691} & \num{0.921} \\
+ & \VLang{Al(OH)\textsubscript{3} concentration}{Concentración de Al(OH)\textsubscript{3}} & \num{1.11} (\num{0.99}--\num{1.26}) & \num{1.12} (\num{1.00}--\num{1.26}) & \num{0.045} & \num{0.181} \\
+ & \VLang{Protein concentration}{Concentración de proteínas} & \num{0.99} (\num{0.87}--\num{1.13}) & \num{1.00} (\num{0.88}--\num{1.14}) & \num{0.982} & \num{0.982} \\
+ & \VLang{Protein adsorption}{Adsorción de proteínas} & \num{1.08} (\num{0.96}--\num{1.21}) & \num{1.08} (\num{0.97}--\num{1.21}) & \num{0.172} & \num{0.344} \\
+ & \VLang{Mean fill volume (negative control)}{Volumen medio del bulbo (control negativo)} & \num{0.97} (\num{0.86}--\num{1.10}) & \num{0.95} (\num{0.85}--\num{1.08}) & \num{0.449} & \textemdash{} \\
+\addlinespace
+\VLang{Severe local reaction}{Reacción local severa} & \VLang{Endotoxin content (log\textsubscript{10})}{Contenido de endotoxinas (log\textsubscript{10})} & \num{1.03} (\num{0.96}--\num{1.12}) & \num{1.02} (\num{0.94}--\num{1.10}) & \num{0.681} & \num{0.921} \\
+ & \VLang{Al(OH)\textsubscript{3} concentration}{Concentración de Al(OH)\textsubscript{3}} & \num{0.98} (\num{0.90}--\num{1.06}) & \num{0.98} (\num{0.91}--\num{1.06}) & \num{0.658} & \num{0.921} \\
+ & \VLang{Protein concentration}{Concentración de proteínas} & \num{1.01} (\num{0.92}--\num{1.10}) & \num{1.01} (\num{0.92}--\num{1.11}) & \num{0.843} & \num{0.982} \\
+ & \VLang{Protein adsorption}{Adsorción de proteínas} & \num{0.99} (\num{0.91}--\num{1.07}) & \num{1.00} (\num{0.93}--\num{1.09}) & \num{0.915} & \num{0.982} \\
+ & \VLang{Mean fill volume (negative control)}{Volumen medio del bulbo (control negativo)} & \num{1.03} (\num{0.94}--\num{1.12}) & \num{1.01} (\num{0.93}--\num{1.10}) & \num{0.784} & \textemdash{} \\
+\bottomrule
+\end{tabular}%
+}
+
+\newcommand{\PTTableSensitivity}{%
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{5.2cm}rrrrrr@{}}
+\toprule
+\makecell{\VLang{Outcome / attribute}{Desenlace / atributo}} & \makecell{\VLang{Primary}{Principal}} & \makecell{\VLang{Exact lot\\links only}{Solo enlaces\\exactos}} & \makecell{\VLang{Excluding co-\\administration}{Excluyendo\\coadministración}} & \makecell{\VLang{Keeping implausible\\dates}{Conservando fechas\\inverosímiles}} & \makecell{\VLang{Random-\\intercept}{Intercepto\\aleatorio}} & \makecell{\VLang{Lot-level\\model}{Modelo\\por lote}} \\
+\midrule
+\VLang{Fever \ensuremath{\geq}39\,°C / Endotoxin content (log\textsubscript{10})}{Fiebre \ensuremath{\geq}39\,°C / Contenido de endotoxinas (log\textsubscript{10})} & \num{1.27} (\num{1.17}--\num{1.38}) & \num{1.27} (\num{1.16}--\num{1.38}) & \num{1.26} (\num{1.16}--\num{1.37}) & \num{1.27} (\num{1.17}--\num{1.38}) & \num{1.24} (\num{1.15}--\num{1.35}) & \num{1.29} (\num{1.18}--\num{1.40}) \\
+\VLang{Fever \ensuremath{\geq}39\,°C / Al(OH)\textsubscript{3} concentration}{Fiebre \ensuremath{\geq}39\,°C / Concentración de Al(OH)\textsubscript{3}} & \num{1.12} (\num{1.02}--\num{1.24}) & \num{1.13} (\num{1.02}--\num{1.25}) & \num{1.12} (\num{1.02}--\num{1.22}) & \num{1.12} (\num{1.02}--\num{1.23}) & \num{1.12} (\num{1.04}--\num{1.22}) & \num{1.13} (\num{1.04}--\num{1.23}) \\
+\VLang{Fever \ensuremath{\geq}39\,°C / Protein concentration}{Fiebre \ensuremath{\geq}39\,°C / Concentración de proteínas} & \num{1.08} (\num{0.99}--\num{1.17}) & \num{1.07} (\num{0.98}--\num{1.16}) & \num{1.08} (\num{1.00}--\num{1.18}) & \num{1.07} (\num{0.99}--\num{1.17}) & \num{1.03} (\num{0.95}--\num{1.12}) & \num{1.07} (\num{0.98}--\num{1.17}) \\
+\VLang{Fever \ensuremath{\geq}39\,°C / Protein adsorption}{Fiebre \ensuremath{\geq}39\,°C / Adsorción de proteínas} & \num{1.09} (\num{1.00}--\num{1.19}) & \num{1.09} (\num{0.99}--\num{1.20}) & \num{1.09} (\num{0.99}--\num{1.19}) & \num{1.10} (\num{1.00}--\num{1.20}) & \num{0.94} (\num{0.87}--\num{1.02}) & \num{1.10} (\num{1.00}--\num{1.20}) \\
+\VLang{Fever \ensuremath{\geq}40\,°C / Endotoxin content (log\textsubscript{10})}{Fiebre \ensuremath{\geq}40\,°C / Contenido de endotoxinas (log\textsubscript{10})} & \num{0.97} (\num{0.84}--\num{1.12}) & \num{0.95} (\num{0.83}--\num{1.09}) & \num{0.96} (\num{0.83}--\num{1.11}) & \num{0.97} (\num{0.84}--\num{1.12}) & \num{0.95} (\num{0.83}--\num{1.09}) & \num{0.97} (\num{0.84}--\num{1.11}) \\
+\VLang{Fever \ensuremath{\geq}40\,°C / Al(OH)\textsubscript{3} concentration}{Fiebre \ensuremath{\geq}40\,°C / Concentración de Al(OH)\textsubscript{3}} & \num{1.12} (\num{1.00}--\num{1.26}) & \num{1.11} (\num{0.99}--\num{1.24}) & \num{1.12} (\num{0.99}--\num{1.25}) & \num{1.11} (\num{0.99}--\num{1.24}) & \num{1.23} (\num{1.08}--\num{1.41}) & \num{1.11} (\num{0.97}--\num{1.26}) \\
+\VLang{Fever \ensuremath{\geq}40\,°C / Protein concentration}{Fiebre \ensuremath{\geq}40\,°C / Concentración de proteínas} & \num{1.00} (\num{0.88}--\num{1.14}) & \num{1.00} (\num{0.88}--\num{1.14}) & \num{1.01} (\num{0.88}--\num{1.15}) & \num{1.00} (\num{0.88}--\num{1.14}) & \num{0.97} (\num{0.84}--\num{1.11}) & \num{0.97} (\num{0.84}--\num{1.11}) \\
+\VLang{Fever \ensuremath{\geq}40\,°C / Protein adsorption}{Fiebre \ensuremath{\geq}40\,°C / Adsorción de proteínas} & \num{1.08} (\num{0.97}--\num{1.21}) & \num{1.08} (\num{0.96}--\num{1.21}) & \num{1.08} (\num{0.96}--\num{1.21}) & \num{1.08} (\num{0.96}--\num{1.21}) & \num{0.91} (\num{0.80}--\num{1.04}) & \num{1.06} (\num{0.93}--\num{1.22}) \\
+\VLang{Severe local reaction / Endotoxin content (log\textsubscript{10})}{Reacción local severa / Contenido de endotoxinas (log\textsubscript{10})} & \num{1.02} (\num{0.94}--\num{1.10}) & \num{1.02} (\num{0.94}--\num{1.10}) & \num{1.01} (\num{0.93}--\num{1.09}) & \num{1.02} (\num{0.94}--\num{1.10}) & \num{1.04} (\num{0.95}--\num{1.13}) & \num{1.03} (\num{0.95}--\num{1.12}) \\
+\VLang{Severe local reaction / Al(OH)\textsubscript{3} concentration}{Reacción local severa / Concentración de Al(OH)\textsubscript{3}} & \num{0.98} (\num{0.91}--\num{1.06}) & \num{0.97} (\num{0.90}--\num{1.05}) & \num{0.98} (\num{0.91}--\num{1.05}) & \num{0.99} (\num{0.92}--\num{1.06}) & \num{0.94} (\num{0.86}--\num{1.02}) & \num{0.97} (\num{0.90}--\num{1.06}) \\
+\VLang{Severe local reaction / Protein concentration}{Reacción local severa / Concentración de proteínas} & \num{1.01} (\num{0.92}--\num{1.11}) & \num{1.02} (\num{0.93}--\num{1.12}) & \num{1.00} (\num{0.91}--\num{1.11}) & \num{1.01} (\num{0.92}--\num{1.11}) & \num{1.02} (\num{0.94}--\num{1.11}) & \num{1.00} (\num{0.93}--\num{1.09}) \\
+\VLang{Severe local reaction / Protein adsorption}{Reacción local severa / Adsorción de proteínas} & \num{1.00} (\num{0.93}--\num{1.09}) & \num{1.00} (\num{0.92}--\num{1.08}) & \num{1.00} (\num{0.92}--\num{1.08}) & \num{1.01} (\num{0.93}--\num{1.09}) & \num{1.03} (\num{0.94}--\num{1.13}) & \num{0.99} (\num{0.91}--\num{1.08}) \\
+\bottomrule
+\end{tabular}%
+}
+
+\newcommand{\PTTablePower}{%
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.2cm}rrrrrrr@{}}
+\toprule
+\makecell{\VLang{Outcome}{Desenlace}} & \makecell{\VLang{Prevalence,\\\%}{Prevalencia,\\\%}} & ICC & \makecell{\VLang{Design\\effect}{Efecto de\\diseño}} & \makecell{\VLang{MDE,\\OR per SD}{EMD,\\OR por DE}} & \makecell{\VLang{AUC,\\covariates}{AUC,\\covariables}} & $\Delta$AUC & \makecell{\VLang{Permutation\\$p$}{$p$ de\\permutación}} \\
+\midrule
+\VLang{Fever \ensuremath{\geq}39\,°C}{Fiebre \ensuremath{\geq}39\,°C} & \num{70.9} & \num{0.005} & \num{1.15} & \num{1.14} & \num{0.511} & \num{0.025} & \num{0.020} \\
+\VLang{Fever \ensuremath{\geq}40\,°C}{Fiebre \ensuremath{\geq}40\,°C} & \num{8.1} & \num{0.006} & \num{1.19} & \num{1.26} & \num{0.478} & \num{-0.007} & \num{0.537} \\
+\VLang{Severe local reaction}{Reacción local severa} & \num{22.6} & \num{0.000} & \num{1.00} & \num{1.15} & \num{0.494} & \num{-0.006} & \num{0.687} \\
+\bottomrule
+\end{tabular}%
+}
+
+\newcommand{\PTTableEquivalence}{%
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{4.2cm}rcr@{}}
+\toprule
+\makecell{\VLang{Attribute}{Atributo}} & \makecell{\VLang{Difference\\(90\% CI)}{Diferencia\\(IC 90 \%)}} & \makecell{\VLang{Equivalent}{Equivalente}} & \makecell{\VLang{Hodges--Lehmann shift\\(95\% CI)}{Desplazamiento de\\Hodges--Lehmann\\(IC 95 \%)}} \\
+\midrule
+\VLang{pH}{pH} & \num{-0.005} (\num{-0.022} \VLang{to}{a} \num{0.013}) & \VLang{Yes}{Sí} & \num{0.000} (\num{0.000} \VLang{to}{a} \num{0.000}) \\
+\VLang{Protein concentration}{Concentración de proteínas} & \num{0.006} (\num{-0.021} \VLang{to}{a} \num{0.033}) & \VLang{Yes}{Sí} & \num{0.000} (\num{-0.033} \VLang{to}{a} \num{0.033}) \\
+\VLang{Protein adsorption}{Adsorción de proteínas} & \num{-0.027} (\num{-0.056} \VLang{to}{a} \num{0.003}) & \VLang{Yes}{Sí} & \num{-0.050} (\num{-0.050} \VLang{to}{a} \num{0.000}) \\
+\VLang{Polysaccharide concentration}{Concentración de polisacárido} & \num{-0.008} (\num{-0.028} \VLang{to}{a} \num{0.013}) & \VLang{Yes}{Sí} & \num{-0.017} (\num{-0.033} \VLang{to}{a} \num{0.017}) \\
+\VLang{Polysaccharide adsorption}{Adsorción de polisacárido} & \num{-0.012} (\num{-0.040} \VLang{to}{a} \num{0.015}) & \VLang{Yes}{Sí} & \num{0.000} (\num{-0.050} \VLang{to}{a} \num{0.000}) \\
+\VLang{Al(OH)\textsubscript{3} concentration}{Concentración de Al(OH)\textsubscript{3}} & \num{-0.012} (\num{-0.035} \VLang{to}{a} \num{0.011}) & \VLang{Yes}{Sí} & \num{-0.010} (\num{-0.040} \VLang{to}{a} \num{0.020}) \\
+\VLang{Thiomersal concentration}{Concentración de tiomersal} & \num{-0.011} (\num{-0.037} \VLang{to}{a} \num{0.015}) & \VLang{Yes}{Sí} & \num{0.000} (\num{-0.033} \VLang{to}{a} \num{0.033}) \\
+\VLang{Bactericidal titre (log\textsubscript{2})}{Título bactericida (log\textsubscript{2})} & \num{0.008} (\num{-0.015} \VLang{to}{a} \num{0.032}) & \VLang{Yes}{Sí} & \num{0.000} (\num{0.000} \VLang{to}{a} \num{0.000}) \\
+\VLang{Anti-OMV IgG (log\textsubscript{10})}{IgG anti-VME (log\textsubscript{10})} & \num{-0.005} (\num{-0.037} \VLang{to}{a} \num{0.028}) & \VLang{Yes}{Sí} & \num{-0.003} (\num{-0.044} \VLang{to}{a} \num{0.039}) \\
+\VLang{Endotoxin content (log\textsubscript{10})}{Contenido de endotoxinas (log\textsubscript{10})} & \num{0.001} (\num{-0.007} \VLang{to}{a} \num{0.010}) & \VLang{Yes}{Sí} & \num{0.002} (\num{-0.009} \VLang{to}{a} \num{0.013}) \\
+\VLang{Mean fill volume}{Volumen medio del bulbo} & \num{0.019} (\num{-0.027} \VLang{to}{a} \num{0.066}) & \VLang{Yes}{Sí} & \num{0.000} (\num{0.000} \VLang{to}{a} \num{0.100}) \\
+\bottomrule
+\end{tabular}%
+}
+
+\newcommand{\PTTableLinkage}{%
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+\makecell{\VLang{Year}{Año}} & \makecell{\VLang{Reports}{Notificaciones}} & \makecell{\VLang{Linked to\\a lot}{Enlazadas\\a un lote}} & \% \\
+\midrule
+2017 & \num{411} & \num{386} & \num{93.9} \\
+2018 & \num{410} & \num{390} & \num{95.1} \\
+2019 & \num{374} & \num{361} & \num{96.5} \\
+2020 & \num{282} & \num{270} & \num{95.7} \\
+2021 & \num{274} & \num{262} & \num{95.6} \\
+2022 & \num{424} & \num{402} & \num{94.8} \\
+2023 & \num{392} & \num{371} & \num{94.6} \\
+2024 & \num{405} & \num{377} & \num{93.1} \\
+2025 & \num{259} & \num{245} & \num{94.6} \\
+\bottomrule
+\end{tabular}%
+}
+
+\newcommand{\PTTableLinkBias}{%
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+\makecell{\VLang{Reports}{Notificaciones}} & $n$ & \makecell{\VLang{Age, months,\\median}{Edad, meses,\\mediana}} & \makecell{\VLang{Female,\\\%}{Femenino,\\\%}} & \makecell{\VLang{Fever\\\ensuremath{\geq}39\,°C, \%}{Fiebre\\\ensuremath{\geq}39\,°C, \%}} & \makecell{\VLang{Hospitalised,\\\%}{Hospitalizado,\\\%}} & \makecell{\VLang{Co-administered,\\\%}{Coadministrada,\\\%}} \\
+\midrule
+\VLang{Not linked}{No enlazadas} & \num{167} & \num{4.8} & \num{49.1} & \num{68.9} & \num{0.0} & \textemdash{} \\
+\VLang{Linked to a lot}{Enlazadas a un lote} & \num{3064} & \num{3.4} & \num{49.6} & \num{70.9} & \num{0.8} & \num{2.8} \\
+\bottomrule
+\end{tabular}%
+}
+
+\newcommand{\PTTableControlCharts}{%
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{4.2cm}rrrrrr@{}}
+\toprule
+\makecell{\VLang{Attribute}{Atributo}} & \makecell{\VLang{Lots}{Lotes}} & \makecell{\VLang{Rule 1\\(>3\ensuremath{\sigma})}{Regla 1\\(>3\ensuremath{\sigma})}} & \makecell{\VLang{Rule 2\\(9 on one\\side)}{Regla 2\\(9 de un\\lado)}} & \makecell{\VLang{Rule 3\\(6 in a\\trend)}{Regla 3\\(6 en\\tendencia)}} & \makecell{\VLang{Rule 5\\(2 of 3\\>2\ensuremath{\sigma})}{Regla 5\\(2 de 3\\>2\ensuremath{\sigma})}} & \makecell{\VLang{EWMA\\signals}{Señales\\EWMA}} \\
+\midrule
+\VLang{pH}{pH} & \num{736} & \num{3} & \num{17} & \num{0} & \num{5} & \num{3} \\
+\VLang{Protein concentration}{Concentración de proteínas} & \num{736} & \num{0} & \num{1} & \num{0} & \num{2} & \num{0} \\
+\VLang{Protein adsorption}{Adsorción de proteínas} & \num{736} & \num{1} & \num{15} & \num{1} & \num{0} & \num{5} \\
+\VLang{Polysaccharide concentration}{Concentración de polisacárido} & \num{736} & \num{3} & \num{4} & \num{1} & \num{2} & \num{0} \\
+\VLang{Polysaccharide adsorption}{Adsorción de polisacárido} & \num{736} & \num{3} & \num{7} & \num{0} & \num{3} & \num{0} \\
+\VLang{Al(OH)\textsubscript{3} concentration}{Concentración de Al(OH)\textsubscript{3}} & \num{736} & \num{1} & \num{4} & \num{2} & \num{2} & \num{1} \\
+\VLang{Thiomersal concentration}{Concentración de tiomersal} & \num{736} & \num{0} & \num{0} & \num{1} & \num{3} & \num{2} \\
+\VLang{Bactericidal titre (log\textsubscript{2})}{Título bactericida (log\textsubscript{2})} & \num{736} & \num{0} & \num{12} & \num{0} & \num{1} & \num{0} \\
+\VLang{Anti-OMV IgG (log\textsubscript{10})}{IgG anti-VME (log\textsubscript{10})} & \num{736} & \num{0} & \num{0} & \num{2} & \num{0} & \num{0} \\
+\VLang{Endotoxin content (log\textsubscript{10})}{Contenido de endotoxinas (log\textsubscript{10})} & \num{736} & \num{6} & \num{6} & \num{1} & \num{8} & \num{60} \\
+\VLang{Mean fill volume}{Volumen medio del bulbo} & \num{736} & \num{0} & \num{3} & \num{0} & \num{0} & \num{0} \\
+\bottomrule
+\end{tabular}%
+}
+
+\newcommand{\PTTableGEEExploratory}[1]{%
+\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.3cm}>{\raggedright\arraybackslash}p{3.9cm}rrr@{}}
+\caption{#1}\\
+\toprule
+\makecell{\VLang{Outcome}{Desenlace}} & \makecell{\VLang{Lot attribute\\(per SD)}{Atributo del lote\\(por DE)}} & \makecell{\VLang{Adjusted OR\\(95\% CI)}{OR ajustada\\(IC 95 \%)}} & $p$ & $q$ (FDR) \\
+\midrule
+\endfirsthead
+\toprule
+\makecell{\VLang{Outcome}{Desenlace}} & \makecell{\VLang{Lot attribute\\(per SD)}{Atributo del lote\\(por DE)}} & \makecell{\VLang{Adjusted OR\\(95\% CI)}{OR ajustada\\(IC 95 \%)}} & $p$ & $q$ (FDR) \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\VLang{Fever \ensuremath{\geq}39\,°C}{Fiebre \ensuremath{\geq}39\,°C} & \VLang{Endotoxin content (log\textsubscript{10})}{Contenido de endotoxinas (log\textsubscript{10})} & \num{1.27} (\num{1.16}--\num{1.38}) & \ensuremath{<}\num{0.001} & \ensuremath{<}\num{0.001} \\
+ & \VLang{Al(OH)\textsubscript{3} concentration}{Concentración de Al(OH)\textsubscript{3}} & \num{1.12} (\num{1.02}--\num{1.24}) & \num{0.017} & \num{0.242} \\
+ & \VLang{Protein concentration}{Concentración de proteínas} & \num{1.08} (\num{0.99}--\num{1.17}) & \num{0.085} & \num{0.430} \\
+ & \VLang{Protein adsorption}{Adsorción de proteínas} & \num{1.09} (\num{1.00}--\num{1.19}) & \num{0.058} & \num{0.380} \\
+ & \VLang{pH}{pH} & \num{1.00} (\num{0.92}--\num{1.09}) & \num{0.962} & \num{0.996} \\
+ & \VLang{Polysaccharide concentration}{Concentración de polisacárido} & \num{0.96} (\num{0.89}--\num{1.05}) & \num{0.395} & \num{0.865} \\
+ & \VLang{Polysaccharide adsorption}{Adsorción de polisacárido} & \num{1.06} (\num{0.98}--\num{1.14}) & \num{0.134} & \num{0.490} \\
+ & \VLang{Thiomersal concentration}{Concentración de tiomersal} & \num{0.97} (\num{0.88}--\num{1.07}) & \num{0.568} & \num{0.892} \\
+ & \VLang{Bactericidal titre (log\textsubscript{2})}{Título bactericida (log\textsubscript{2})} & \num{1.09} (\num{1.00}--\num{1.18}) & \num{0.040} & \num{0.375} \\
+ & \VLang{Anti-OMV IgG (log\textsubscript{10})}{IgG anti-VME (log\textsubscript{10})} & \num{1.03} (\num{0.94}--\num{1.12}) & \num{0.538} & \num{0.881} \\
+ & \VLang{Mean fill volume (negative control)}{Volumen medio del bulbo (control negativo)} & \num{0.93} (\num{0.85}--\num{1.02}) & \num{0.125} & \textemdash{} \\
+ & \VLang{Multivariate atypicality (T\textsuperscript{2})}{Atipicidad multivariante (T\textsuperscript{2})} & \num{0.94} (\num{0.86}--\num{1.03}) & \num{0.161} & \num{0.559} \\
+\addlinespace
+\VLang{Fever \ensuremath{\geq}40\,°C}{Fiebre \ensuremath{\geq}40\,°C} & \VLang{Endotoxin content (log\textsubscript{10})}{Contenido de endotoxinas (log\textsubscript{10})} & \num{0.97} (\num{0.84}--\num{1.12}) & \num{0.671} & \num{0.940} \\
+ & \VLang{Al(OH)\textsubscript{3} concentration}{Concentración de Al(OH)\textsubscript{3}} & \num{1.12} (\num{1.00}--\num{1.26}) & \num{0.041} & \num{0.375} \\
+ & \VLang{Protein concentration}{Concentración de proteínas} & \num{1.00} (\num{0.88}--\num{1.14}) & \num{0.976} & \num{0.996} \\
+ & \VLang{Protein adsorption}{Adsorción de proteínas} & \num{1.08} (\num{0.97}--\num{1.21}) & \num{0.170} & \num{0.560} \\
+ & \VLang{pH}{pH} & \num{0.95} (\num{0.85}--\num{1.07}) & \num{0.412} & \num{0.865} \\
+ & \VLang{Polysaccharide concentration}{Concentración de polisacárido} & \num{0.95} (\num{0.83}--\num{1.09}) & \num{0.491} & \num{0.876} \\
+ & \VLang{Polysaccharide adsorption}{Adsorción de polisacárido} & \num{1.13} (\num{0.99}--\num{1.29}) & \num{0.075} & \num{0.411} \\
+ & \VLang{Thiomersal concentration}{Concentración de tiomersal} & \num{1.00} (\num{0.88}--\num{1.13}) & \num{0.996} & \num{0.996} \\
+ & \VLang{Bactericidal titre (log\textsubscript{2})}{Título bactericida (log\textsubscript{2})} & \num{1.05} (\num{0.91}--\num{1.21}) & \num{0.481} & \num{0.876} \\
+ & \VLang{Anti-OMV IgG (log\textsubscript{10})}{IgG anti-VME (log\textsubscript{10})} & \num{1.09} (\num{0.94}--\num{1.25}) & \num{0.249} & \num{0.746} \\
+ & \VLang{Mean fill volume (negative control)}{Volumen medio del bulbo (control negativo)} & \num{0.96} (\num{0.85}--\num{1.08}) & \num{0.468} & \textemdash{} \\
+ & \VLang{Multivariate atypicality (T\textsuperscript{2})}{Atipicidad multivariante (T\textsuperscript{2})} & \num{1.00} (\num{0.88}--\num{1.13}) & \num{0.990} & \num{0.996} \\
+\addlinespace
+\VLang{Severe local reaction}{Reacción local severa} & \VLang{Endotoxin content (log\textsubscript{10})}{Contenido de endotoxinas (log\textsubscript{10})} & \num{1.01} (\num{0.94}--\num{1.10}) & \num{0.715} & \num{0.957} \\
+ & \VLang{Al(OH)\textsubscript{3} concentration}{Concentración de Al(OH)\textsubscript{3}} & \num{0.98} (\num{0.91}--\num{1.05}) & \num{0.537} & \num{0.881} \\
+ & \VLang{Protein concentration}{Concentración de proteínas} & \num{1.01} (\num{0.92}--\num{1.11}) & \num{0.862} & \num{0.976} \\
+ & \VLang{Protein adsorption}{Adsorción de proteínas} & \num{1.00} (\num{0.92}--\num{1.08}) & \num{0.917} & \num{0.981} \\
+ & \VLang{pH}{pH} & \num{1.05} (\num{0.99}--\num{1.12}) & \num{0.092} & \num{0.430} \\
+ & \VLang{Polysaccharide concentration}{Concentración de polisacárido} & \num{1.01} (\num{0.94}--\num{1.08}) & \num{0.845} & \num{0.976} \\
+ & \VLang{Polysaccharide adsorption}{Adsorción de polisacárido} & \num{0.97} (\num{0.90}--\num{1.05}) & \num{0.480} & \num{0.876} \\
+ & \VLang{Thiomersal concentration}{Concentración de tiomersal} & \num{1.02} (\num{0.93}--\num{1.11}) & \num{0.683} & \num{0.940} \\
+ & \VLang{Bactericidal titre (log\textsubscript{2})}{Título bactericida (log\textsubscript{2})} & \num{0.91} (\num{0.84}--\num{0.98}) & \num{0.018} & \num{0.242} \\
+ & \VLang{Anti-OMV IgG (log\textsubscript{10})}{IgG anti-VME (log\textsubscript{10})} & \num{1.05} (\num{0.94}--\num{1.17}) & \num{0.420} & \num{0.865} \\
+ & \VLang{Mean fill volume (negative control)}{Volumen medio del bulbo (control negativo)} & \num{1.01} (\num{0.93}--\num{1.10}) & \num{0.757} & \textemdash{} \\
+ & \VLang{Multivariate atypicality (T\textsuperscript{2})}{Atipicidad multivariante (T\textsuperscript{2})} & \num{1.01} (\num{0.95}--\num{1.08}) & \num{0.682} & \num{0.940} \\
+\addlinespace
+\VLang{Persistent crying}{Llanto persistente} & \VLang{Endotoxin content (log\textsubscript{10})}{Contenido de endotoxinas (log\textsubscript{10})} & \num{1.04} (\num{0.87}--\num{1.23}) & \num{0.669} & \num{0.940} \\
+ & \VLang{Al(OH)\textsubscript{3} concentration}{Concentración de Al(OH)\textsubscript{3}} & \num{0.94} (\num{0.80}--\num{1.11}) & \num{0.445} & \num{0.865} \\
+ & \VLang{Protein concentration}{Concentración de proteínas} & \num{1.14} (\num{0.97}--\num{1.33}) & \num{0.111} & \num{0.452} \\
+ & \VLang{Protein adsorption}{Adsorción de proteínas} & \num{0.97} (\num{0.83}--\num{1.14}) & \num{0.748} & \num{0.957} \\
+ & \VLang{pH}{pH} & \num{1.08} (\num{0.93}--\num{1.27}) & \num{0.314} & \num{0.828} \\
+ & \VLang{Polysaccharide concentration}{Concentración de polisacárido} & \num{1.07} (\num{0.91}--\num{1.26}) & \num{0.389} & \num{0.865} \\
+ & \VLang{Polysaccharide adsorption}{Adsorción de polisacárido} & \num{1.07} (\num{0.91}--\num{1.26}) & \num{0.412} & \num{0.865} \\
+ & \VLang{Thiomersal concentration}{Concentración de tiomersal} & \num{0.85} (\num{0.73}--\num{1.00}) & \num{0.045} & \num{0.375} \\
+ & \VLang{Bactericidal titre (log\textsubscript{2})}{Título bactericida (log\textsubscript{2})} & \num{1.01} (\num{0.86}--\num{1.20}) & \num{0.873} & \num{0.976} \\
+ & \VLang{Anti-OMV IgG (log\textsubscript{10})}{IgG anti-VME (log\textsubscript{10})} & \num{1.03} (\num{0.86}--\num{1.23}) & \num{0.738} & \num{0.957} \\
+ & \VLang{Mean fill volume (negative control)}{Volumen medio del bulbo (control negativo)} & \num{0.99} (\num{0.84}--\num{1.17}) & \num{0.892} & \textemdash{} \\
+ & \VLang{Multivariate atypicality (T\textsuperscript{2})}{Atipicidad multivariante (T\textsuperscript{2})} & \num{1.02} (\num{0.88}--\num{1.18}) & \num{0.815} & \num{0.964} \\
+\addlinespace
+\VLang{Other event}{Otro evento} & \VLang{Endotoxin content (log\textsubscript{10})}{Contenido de endotoxinas (log\textsubscript{10})} & \num{0.86} (\num{0.79}--\num{0.94}) & \ensuremath{<}\num{0.001} & \num{0.019} \\
+ & \VLang{Al(OH)\textsubscript{3} concentration}{Concentración de Al(OH)\textsubscript{3}} & \num{0.96} (\num{0.89}--\num{1.04}) & \num{0.304} & \num{0.828} \\
+ & \VLang{Protein concentration}{Concentración de proteínas} & \num{0.99} (\num{0.90}--\num{1.09}) & \num{0.816} & \num{0.964} \\
+ & \VLang{Protein adsorption}{Adsorción de proteínas} & \num{0.95} (\num{0.87}--\num{1.03}) & \num{0.194} & \num{0.609} \\
+ & \VLang{pH}{pH} & \num{0.92} (\num{0.84}--\num{1.00}) & \num{0.063} & \num{0.380} \\
+ & \VLang{Polysaccharide concentration}{Concentración de polisacárido} & \num{0.99} (\num{0.92}--\num{1.07}) & \num{0.893} & \num{0.981} \\
+ & \VLang{Polysaccharide adsorption}{Adsorción de polisacárido} & \num{0.97} (\num{0.88}--\num{1.08}) & \num{0.581} & \num{0.892} \\
+ & \VLang{Thiomersal concentration}{Concentración de tiomersal} & \num{0.96} (\num{0.88}--\num{1.05}) & \num{0.374} & \num{0.865} \\
+ & \VLang{Bactericidal titre (log\textsubscript{2})}{Título bactericida (log\textsubscript{2})} & \num{0.89} (\num{0.83}--\num{0.96}) & \num{0.003} & \num{0.071} \\
+ & \VLang{Anti-OMV IgG (log\textsubscript{10})}{IgG anti-VME (log\textsubscript{10})} & \num{1.08} (\num{0.99}--\num{1.19}) & \num{0.098} & \num{0.430} \\
+ & \VLang{Mean fill volume (negative control)}{Volumen medio del bulbo (control negativo)} & \num{1.02} (\num{0.94}--\num{1.12}) & \num{0.589} & \textemdash{} \\
+ & \VLang{Multivariate atypicality (T\textsuperscript{2})}{Atipicidad multivariante (T\textsuperscript{2})} & \num{1.05} (\num{0.96}--\num{1.15}) & \num{0.266} & \num{0.763} \\
+\addlinespace
+\VLang{Hospitalisation}{Hospitalización} & \VLang{Endotoxin content (log\textsubscript{10})}{Contenido de endotoxinas (log\textsubscript{10})} & \num{0.93} (\num{0.61}--\num{1.44}) & \num{0.754} & \num{0.957} \\
+ & \VLang{Al(OH)\textsubscript{3} concentration}{Concentración de Al(OH)\textsubscript{3}} & \num{0.82} (\num{0.56}--\num{1.22}) & \num{0.332} & \num{0.842} \\
+ & \VLang{Protein concentration}{Concentración de proteínas} & \num{0.98} (\num{0.62}--\num{1.54}) & \num{0.921} & \num{0.981} \\
+ & \VLang{Protein adsorption}{Adsorción de proteínas} & \num{0.86} (\num{0.58}--\num{1.27}) & \num{0.443} & \num{0.865} \\
+ & \VLang{pH}{pH} & \num{1.33} (\num{0.93}--\num{1.90}) & \num{0.116} & \num{0.452} \\
+ & \VLang{Polysaccharide concentration}{Concentración de polisacárido} & \num{0.70} (\num{0.48}--\num{1.01}) & \num{0.055} & \num{0.380} \\
+ & \VLang{Polysaccharide adsorption}{Adsorción de polisacárido} & \num{1.05} (\num{0.68}--\num{1.63}) & \num{0.818} & \num{0.964} \\
+ & \VLang{Thiomersal concentration}{Concentración de tiomersal} & \num{1.04} (\num{0.76}--\num{1.42}) & \num{0.800} & \num{0.964} \\
+ & \VLang{Bactericidal titre (log\textsubscript{2})}{Título bactericida (log\textsubscript{2})} & \num{1.13} (\num{0.76}--\num{1.70}) & \num{0.547} & \num{0.881} \\
+ & \VLang{Anti-OMV IgG (log\textsubscript{10})}{IgG anti-VME (log\textsubscript{10})} & \num{1.10} (\num{0.76}--\num{1.59}) & \num{0.620} & \num{0.930} \\
+ & \VLang{Mean fill volume (negative control)}{Volumen medio del bulbo (control negativo)} & \num{1.18} (\num{0.84}--\num{1.65}) & \num{0.329} & \textemdash{} \\
+ & \VLang{Multivariate atypicality (T\textsuperscript{2})}{Atipicidad multivariante (T\textsuperscript{2})} & \num{1.13} (\num{0.78}--\num{1.63}) & \num{0.520} & \num{0.881} \\
+\end{longtable}%
+}
