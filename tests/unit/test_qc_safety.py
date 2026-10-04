@@ -152,3 +152,24 @@ def test_restrictions_and_exclusions() -> None:
     f_const = qs.build_qc_safety_frame(reports, links, lots, attribute_scales(SPECS, lots, SCHEMA), ["aloh3_conc"])
     assert any("no between-lot variation" in n for n in f_const.notes)
     assert qs.incremental_value(f_const, "ev_fever_39")["estimable"] is False
+
+
+def test_capability_periods_are_design_based() -> None:
+    from vamengoc.pipeline import capability_periods
+
+    years = pd.Series([2009, 2012, 2016, 2017, 2020, 2025])
+    assert capability_periods(None, years, 2017) == [(2009, 2016), (2017, 2025)]
+    assert capability_periods([(2010, 2014)], years, 2017) == [(2010, 2014)]
+    assert capability_periods(None, pd.Series([2018, 2020]), 2017) == []
+    assert capability_periods(None, pd.Series([2010, 2012]), 2017) == []
+
+
+def test_gee_crude_models_outside_fdr_family(planted: qs.QCSafetyFrame) -> None:
+    out = qs.gee_family(planted, ["ev_fever_39"], negative_controls=["fill_volume"], crude=True)
+    crude = out[out.model == "crude"]
+    assert len(crude) == len(planted.exposures)
+    assert crude["p_bh"].isna().all()
+    endo = crude[crude.exposure == "endotoxin"].iloc[0]
+    assert endo["or_per_sd"] > 1.2
+    single = out[out.model == "single"]
+    assert single.loc[~single["negative_control"].astype(bool), "p_bh"].notna().all()

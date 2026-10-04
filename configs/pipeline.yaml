@@ -80,6 +80,7 @@ analysis:
     mspc_alpha: 0.01
     changepoint_penalty: bic             # bic | aic | numeric
     equivalence_margin_fraction: 0.10    # TOST margin as a fraction of the spec window
+    capability_periods: null             # null = [first, study start - 1] and [study start, last]
   qc_safety:
     primary_outcomes: [ev_fever_39, ev_fever_40, ev_severe_local_reaction]
     secondary_outcomes: [ev_persistent_crying, ev_other, hospitalized]
@@ -123,3 +124,7 @@ release:
   languages: [en, es]
   figure_format: pdf
   figure_dpi: 300
+  # Metadata quoted by the manuscripts (READUS-PV items 5a-5b); set by the data owner before the
+  # real-data run. Left empty, the manuscripts print a visible "authors to complete" marker.
+  data_extraction_date: null             # e.g. "2026-03-31"
+  database_custodian: null               # e.g. institution that administers the AEFI database

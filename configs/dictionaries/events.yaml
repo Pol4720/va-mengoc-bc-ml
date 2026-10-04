@@ -4,37 +4,41 @@
 #  by the Cuban surveillance system (common-minor, rare, serious). `domain`
 #  groups events for the reactogenicity analyses. `brighton` cites the
 #  Brighton Collaboration case definition when one exists (keys in the papers'
-#  bibliography). Serious/rare events with small counts are always subject to
-#  disclosure control in releases.
+#  bibliography). `expected` marks reactions documented for aluminium-adsorbed
+#  outer membrane vesicle vaccines (fever, local reactions, injection-site abscess:
+#  Nokleby2007, Holst2009, Jefferson2004); disproportionality signals for these
+#  events are reported as expected reactions, all others as emerging (READUS-PV 11).
+#  Serious/rare events with small counts are always subject to disclosure control
+#  in releases.
 # =============================================================================
 schema_version: 1
 events:
-  ev_fever_39:              {label_en: "Fever ≥39 °C",                    label_es: "Fiebre ≥39 °C",                  domain: systemic,     class: common,  brighton: Marcy2004}
-  ev_fever_40:              {label_en: "Fever ≥40 °C",                    label_es: "Fiebre ≥40 °C",                  domain: systemic,     class: rare,    brighton: Marcy2004}
-  ev_severe_local_reaction: {label_en: "Severe local reaction",           label_es: "Reacción local severa",          domain: local,        class: common,  brighton: Gidudu2008}
-  ev_persistent_crying:     {label_en: "Persistent crying (≥3 h)",        label_es: "Llanto persistente",             domain: systemic,     class: rare,    brighton: Bonhoeffer2004Crying}
-  ev_sterile_abscess:       {label_en: "Sterile abscess",                 label_es: "Absceso estéril",                domain: local,        class: rare,    brighton: Kohl2007}
-  ev_bacterial_abscess:     {label_en: "Bacterial abscess",               label_es: "Absceso bacteriano",             domain: local,        class: rare,    brighton: Kohl2007}
-  ev_lymphadenitis:         {label_en: "Lymphadenitis",                   label_es: "Linfadenitis",                   domain: local,        class: rare,    brighton: null}
-  ev_osteitis:              {label_en: "Osteitis / osteomyelitis",        label_es: "Osteítis / osteomielitis",       domain: local,        class: serious, brighton: null}
-  ev_allergic_reaction:     {label_en: "Allergic reaction",               label_es: "Reacción alérgica",              domain: allergic,     class: rare,    brighton: null}
-  ev_rash:                  {label_en: "Rash",                            label_es: "Exantema",                       domain: allergic,     class: common,  brighton: null}
-  ev_anaphylactic_reaction: {label_en: "Anaphylactic reaction",           label_es: "Reacción anafiláctica",          domain: allergic,     class: serious, brighton: Ruggeberg2007}
-  ev_anaphylactic_shock:    {label_en: "Anaphylactic shock",              label_es: "Shock anafiláctico",             domain: allergic,     class: serious, brighton: Ruggeberg2007}
-  ev_purpura:               {label_en: "Purpura / thrombocytopenia",      label_es: "Púrpura",                        domain: haematologic, class: serious, brighton: Wise2007}
-  ev_febrile_seizure:       {label_en: "Febrile seizure",                 label_es: "Convulsión febril",              domain: neurologic,   class: rare,    brighton: Bonhoeffer2004Seizure}
-  ev_afebrile_seizure:      {label_en: "Afebrile seizure",                label_es: "Convulsión afebril",             domain: neurologic,   class: rare,    brighton: Bonhoeffer2004Seizure}
-  ev_collapse:              {label_en: "Collapse / hypotonic-hyporesponsive episode", label_es: "Colapso / episodio hipotónico-hiporreactivo", domain: neurologic, class: rare, brighton: Buettcher2007}
-  ev_behaviour_change:      {label_en: "Behavioural change",              label_es: "Cambio de conducta",             domain: neurologic,   class: rare,    brighton: null}
-  ev_encephalopathy:        {label_en: "Encephalopathy",                  label_es: "Encefalopatía",                  domain: neurologic,   class: serious, brighton: Sejvar2007}
-  ev_encephalitis:          {label_en: "Encephalitis",                    label_es: "Encefalitis",                    domain: neurologic,   class: serious, brighton: Sejvar2007}
-  ev_meningitis:            {label_en: "Aseptic meningitis",              label_es: "Meningitis",                     domain: neurologic,   class: serious, brighton: Tapiainen2007}
-  ev_brain_damage:          {label_en: "Brain damage",                    label_es: "Daño cerebral",                  domain: neurologic,   class: serious, brighton: null}
-  ev_acute_paralysis:       {label_en: "Acute flaccid paralysis",         label_es: "Parálisis aguda",                domain: neurologic,   class: serious, brighton: null}
-  ev_arthralgia:            {label_en: "Arthralgia",                      label_es: "Artralgias",                     domain: systemic,     class: common,  brighton: null}
-  ev_sepsis:                {label_en: "Sepsis",                          label_es: "Sepsis",                         domain: infectious,   class: serious, brighton: null}
-  ev_toxic_shock:           {label_en: "Toxic shock syndrome",            label_es: "Shock tóxico",                   domain: infectious,   class: serious, brighton: null}
-  ev_other:                 {label_en: "Other event",                     label_es: "Otro evento",                    domain: other,        class: common,  brighton: null}
+  ev_fever_39:              {label_en: "Fever ≥39 °C",                    label_es: "Fiebre ≥39 °C",                  domain: systemic,     class: common,  brighton: Marcy2004, expected: true}
+  ev_fever_40:              {label_en: "Fever ≥40 °C",                    label_es: "Fiebre ≥40 °C",                  domain: systemic,     class: rare,    brighton: Marcy2004, expected: true}
+  ev_severe_local_reaction: {label_en: "Severe local reaction",           label_es: "Reacción local severa",          domain: local,        class: common,  brighton: Gidudu2008, expected: true}
+  ev_persistent_crying:     {label_en: "Persistent crying (≥3 h)",        label_es: "Llanto persistente",             domain: systemic,     class: rare,    brighton: Bonhoeffer2004Crying, expected: false}
+  ev_sterile_abscess:       {label_en: "Sterile abscess",                 label_es: "Absceso estéril",                domain: local,        class: rare,    brighton: Kohl2007, expected: true}
+  ev_bacterial_abscess:     {label_en: "Bacterial abscess",               label_es: "Absceso bacteriano",             domain: local,        class: rare,    brighton: Kohl2007, expected: false}
+  ev_lymphadenitis:         {label_en: "Lymphadenitis",                   label_es: "Linfadenitis",                   domain: local,        class: rare,    brighton: null, expected: false}
+  ev_osteitis:              {label_en: "Osteitis / osteomyelitis",        label_es: "Osteítis / osteomielitis",       domain: local,        class: serious, brighton: null, expected: false}
+  ev_allergic_reaction:     {label_en: "Allergic reaction",               label_es: "Reacción alérgica",              domain: allergic,     class: rare,    brighton: null, expected: false}
+  ev_rash:                  {label_en: "Rash",                            label_es: "Exantema",                       domain: allergic,     class: common,  brighton: null, expected: false}
+  ev_anaphylactic_reaction: {label_en: "Anaphylactic reaction",           label_es: "Reacción anafiláctica",          domain: allergic,     class: serious, brighton: Ruggeberg2007, expected: false}
+  ev_anaphylactic_shock:    {label_en: "Anaphylactic shock",              label_es: "Shock anafiláctico",             domain: allergic,     class: serious, brighton: Ruggeberg2007, expected: false}
+  ev_purpura:               {label_en: "Purpura / thrombocytopenia",      label_es: "Púrpura",                        domain: haematologic, class: serious, brighton: Wise2007, expected: false}
+  ev_febrile_seizure:       {label_en: "Febrile seizure",                 label_es: "Convulsión febril",              domain: neurologic,   class: rare,    brighton: Bonhoeffer2004Seizure, expected: false}
+  ev_afebrile_seizure:      {label_en: "Afebrile seizure",                label_es: "Convulsión afebril",             domain: neurologic,   class: rare,    brighton: Bonhoeffer2004Seizure, expected: false}
+  ev_collapse:              {label_en: "Collapse / hypotonic-hyporesponsive episode", label_es: "Colapso / episodio hipotónico-hiporreactivo", domain: neurologic, class: rare, brighton: Buettcher2007, expected: false}
+  ev_behaviour_change:      {label_en: "Behavioural change",              label_es: "Cambio de conducta",             domain: neurologic,   class: rare,    brighton: null, expected: false}
+  ev_encephalopathy:        {label_en: "Encephalopathy",                  label_es: "Encefalopatía",                  domain: neurologic,   class: serious, brighton: Sejvar2007, expected: false}
+  ev_encephalitis:          {label_en: "Encephalitis",                    label_es: "Encefalitis",                    domain: neurologic,   class: serious, brighton: Sejvar2007, expected: false}
+  ev_meningitis:            {label_en: "Aseptic meningitis",              label_es: "Meningitis",                     domain: neurologic,   class: serious, brighton: Tapiainen2007, expected: false}
+  ev_brain_damage:          {label_en: "Brain damage",                    label_es: "Daño cerebral",                  domain: neurologic,   class: serious, brighton: null, expected: false}
+  ev_acute_paralysis:       {label_en: "Acute flaccid paralysis",         label_es: "Parálisis aguda",                domain: neurologic,   class: serious, brighton: null, expected: false}
+  ev_arthralgia:            {label_en: "Arthralgia",                      label_es: "Artralgias",                     domain: systemic,     class: common,  brighton: null, expected: false}
+  ev_sepsis:                {label_en: "Sepsis",                          label_es: "Sepsis",                         domain: infectious,   class: serious, brighton: null, expected: false}
+  ev_toxic_shock:           {label_en: "Toxic shock syndrome",            label_es: "Shock tóxico",                   domain: infectious,   class: serious, brighton: null, expected: false}
+  ev_other:                 {label_en: "Other event",                     label_es: "Otro evento",                    domain: other,        class: common,  brighton: null, expected: false}
 
 # Keyword taxonomy for the free-text "other" field (CUAL). Processed locally;
 # only category counts (after disclosure control) ever leave the local machine.
