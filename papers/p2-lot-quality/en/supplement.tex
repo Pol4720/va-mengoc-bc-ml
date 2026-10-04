@@ -1,0 +1,87 @@
+% Supplementary Material — Paper 2 (English). Built before manuscript.tex (cross-references).
+\documentclass[11pt]{article}
+\newcommand{\DocLang}{en}
+\input{papers/shared/preamble.tex}
+\input{papers/shared/authors.tex}
+\usepackage{pdflscape}
+\hypersetup{pdftitle={Supplementary Material: Lot release attributes and reactogenicity of VA-MENGOC-BC}}
+
+\begin{document}
+\SupplementaryNumbering
+\SyntheticNotice
+\begin{center}
+{\Large\bfseries Supplementary Material\par}
+\medskip
+{\large Lot release attributes and reactogenicity of an outer membrane vesicle vaccine: linkage of
+quality-control data from \PTNLots{} VA-MENGOC-BC lots with national adverse event reports\par}
+\medskip
+{\small \AuthorOne{} and \AuthorTwo\par}
+\end{center}
+
+\tableofcontents
+
+\section{Control charts}\label{sec:S-charts}
+\begin{table}[htbp]
+\centering\small
+\caption{Signals in the individuals chart (Nelson rules) and in the exponentially weighted moving
+average chart ($\lambda=\PTEWMALambda$) of each attribute, in production order. Signals indicate
+departures from a stable process, not non-conformity.}
+\label{tab:S-charts}
+\PTTableControlCharts
+\end{table}
+
+\section{National and export lots}\label{sec:S-equivalence}
+\begin{table}[htbp]
+\centering\small
+\caption{Equivalence of national and export lots by two one-sided tests on the specification-window
+scale (margin $\pm$\PTEqMarginPct{} of the window): difference in means with 90\% confidence
+interval, and Hodges--Lehmann shift with 95\% confidence interval.}
+\label{tab:S-equivalence}
+\PTTableEquivalence
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{p2_equivalence}
+\caption{Difference between national and export lots (90\% confidence interval) relative to the
+equivalence margin (shaded).}
+\label{fig:S-equivalence}
+\end{figure}
+
+\section{Linkage}\label{sec:S-linkage}
+\begin{table}[htbp]
+\centering\small
+\caption{Reports involving VA-MENGOC-BC linked to a released lot, by year of vaccination.}
+\label{tab:S-linkage}
+\PTTableLinkage
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Characteristics of reports linked and not linked to a released lot (assessment of linkage
+bias).}
+\label{tab:S-linkbias}
+\PTTableLinkBias
+\end{table}
+
+\section{Sensitivity analyses}\label{sec:S-sensitivity}
+\begin{landscape}
+\begin{table}[htbp]
+\centering\small
+\caption{Odds ratios per SD (95\% CI) of the prespecified associations under alternative analyses:
+primary GEE; restriction to exact lot links; exclusion of co-administered vaccines; retention of
+temporally implausible links; Bayesian random-intercept logistic model (95\% credible interval);
+lot-level quasi-binomial model of the proportion of reports with the reaction.}
+\label{tab:S-sensitivity}
+\PTTableSensitivity
+\end{table}
+\end{landscape}
+
+\section{Exploratory associations}\label{sec:S-exploratory}
+{\small
+\PTTableGEEExploratory{Exploratory associations between every lot attribute (including multivariate
+atypicality) and the primary and secondary reactions: logistic models with cluster-robust standard
+errors by lot (independence working correlation), adjusted as in the primary analysis. $q$,
+Benjamini--Hochberg adjusted $p$ within the exploratory family.\label{tab:S-exploratory}}}
+
+\end{document}

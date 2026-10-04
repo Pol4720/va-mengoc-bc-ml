@@ -41,6 +41,8 @@ jobs:
         run: uv run mypy
       - name: Tests with coverage
         run: uv run pytest -p no:cacheprovider --cov --cov-report=xml --cov-report=term
+      - name: Bibliography is in sync with PubMed records (offline cache)
+        run: python3 tools/bib_pubmed.py --check
       - name: Verify committed releases (disclosure control)
         run: uv run python tools/verify_releases.py
       - name: Synthetic end-to-end run from the CLI
@@ -73,6 +75,8 @@ jobs:
             latexmk biber lmodern cm-super poppler-utils > /dev/null
       - name: Build every document
         run: python3 tools/latex_build.py --json build/latex-report.json
+      - name: Journal limits (abstract length, highlights)
+        run: python3 tools/check_submission.py
       - name: Check fonts are embedded
         run: |
           for f in $(find build/pdf -name '*.pdf'); do

@@ -1,0 +1,485 @@
+% Paper 1 — national post-marketing surveillance of VA-MENGOC-BC, 2017-2025 (English).
+% Target journal: Drug Safety (original research article). Build: python tools/latex_build.py
+\documentclass[11pt]{article}
+\newcommand{\DocLang}{en}
+\input{papers/shared/preamble.tex}
+\input{papers/shared/authors.tex}
+\input{papers/shared/pending.tex}
+\input{papers/p1-pharmacovigilance/shared/flow.tex}
+\externaldocument{supplement}
+\usepackage{lineno}
+\onehalfspacing
+
+\hypersetup{pdftitle={Post-marketing safety of the VA-MENGOC-BC meningococcal B and C vaccine in Cuba, 2017-2025},
+  pdfauthor={Richard Alejandro Matos Arderi; Abel Ponce Gonzalez}}
+
+\begin{document}
+
+\begin{titlepage}
+\SyntheticNotice
+\begin{center}
+{\LARGE\bfseries Post-marketing safety of the VA-MENGOC-BC meningococcal B and~C vaccine in Cuba,
+\VStudyFirstYear--\VStudyLastYear: a nationwide analysis of spontaneous reports with
+disproportionality, latent class and machine-learning methods\par}
+\bigskip
+\AuthorBlock
+\end{center}
+\bigskip
+\noindent\textbf{Running title:} Post-marketing safety of VA-MENGOC-BC in Cuba\par
+\noindent\textbf{Keywords:} adverse events following immunization; pharmacovigilance;
+disproportionality analysis; meningococcal vaccines; outer membrane vesicle; latent class
+analysis; machine learning; Cuba\par
+\bigskip
+\noindent\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{%
+\textbf{Key Points}
+\begin{itemize}[leftmargin=*,itemsep=2pt,topsep=2pt]
+\item Across \PONReports{} deduplicated reports of adverse events following immunization received
+  by the Cuban national surveillance system in \VStudyFirstYear--\VStudyLastYear, \PONTarget{}
+  (\POPctTarget) involved VA-MENGOC-BC, with a pooled reporting rate of \POPooledRate{} per
+  \num{100000} doses, \PORateVsExpected{} the programme's reference rate for all childhood vaccines.
+\item Under a prespecified Bayesian criterion, \POSignalsPrimaryAllOtherVaccines{} of
+  \PONEventsScreened{} screened event types were disproportionately reported with
+  VA-MENGOC-BC (\POSignalList); \PONSignalsRobustPhrase{} persisted under all
+  \PONDesigns{} comparator designs.
+\item Co-reported events formed \POLCABestK{} latent phenotypes; hospitalisation was predicted
+  with \PODiscriminationWord{} discrimination in later years, so report-based models should
+  describe rather than triage.
+\end{itemize}}}
+\end{titlepage}
+
+\linenumbers
+
+\section*{Abstract}
+\noindent\textbf{Introduction:} VA-MENGOC-BC, an outer membrane vesicle vaccine against
+serogroup~B and~C meningococcal disease, has been part of the Cuban childhood schedule since
+1991, but its post-marketing safety has not been analysed nationally with contemporary
+pharmacovigilance methods.\par
+\noindent\textbf{Objective:} To describe reporting rates, disproportionality and the structure of
+co-reported adverse events following immunization (AEFI) with VA-MENGOC-BC in
+\VStudyFirstYear--\VStudyLastYear, and the correlates of hospitalisation.\par
+\noindent\textbf{Methods:} Disproportionality analysis of individual case safety reports in the
+Cuban national AEFI surveillance database (institutional access), covering
+\VStudyFirstYear--\VStudyLastYear{} and all provinces. Reports from \VNFiles{} annual files were
+harmonised, pseudonymised and deduplicated. Reporting rates used doses administered as
+denominator. VA-MENGOC-BC was compared with all other vaccines using the reporting odds ratio,
+proportional reporting ratio, Bayesian information component (IC) and empirical Bayes geometric
+mean, with a prespecified signal criterion (lower 95\% credibility bound IC\textsubscript{025}${}>0$
+with at least \PODispMinReports{} reports) and three sensitivity comparators; no case-by-case
+analysis was performed. Latent class analysis summarised co-reported events; Firth logistic
+regression and gradient boosting with temporal validation described hospitalisation. Reporting
+followed READUS-PV.\par
+\noindent\textbf{Results:} Of \PONReports{} reports, \PONTarget{} (\POPctTarget) involved
+VA-MENGOC-BC. The pooled reporting rate was \POPooledRate{} per \num{100000} doses
+(\CI{} \POPooledRateCI) and \POTrendWord{} over time (rate ratio per year \POTrendRR; \CI{}
+\POTrendRRCI). \POSignalsPrimaryAllOtherVaccines{} of \PONEventsScreened{} event types met the
+signal criterion (\POSignalList), \PONSignalsRobust{} of them under every comparator. A
+\POLCABestK-class model described co-reporting (bootstrap adjusted Rand index \POLCAAri). The
+best model for hospitalisation (\POBestModel) reached an area under the ROC curve of
+\POBestAuroc{} in the test years.\par
+\noindent\textbf{Conclusions:} This nationwide, reproducible analysis describes the post-marketing
+reporting profile of VA-MENGOC-BC. Disproportionality generates hypotheses rather than measuring
+risk: signals that persist across comparators warrant clinical review and causality assessment,
+and the disclosure-controlled framework supports continuous annual surveillance.
+
+\clearpage
+\section{Introduction}\label{sec:intro}
+
+Invasive meningococcal disease remains a cause of death and lifelong sequelae worldwide, with more
+than half a million cases and about \num{85000} deaths estimated every year
+\cite{SierraGonzalez2019}. In Cuba, the incidence reached 5.9 cases per \num{100000} population in
+1980, about 80\% of them caused by serogroup~B, and meningococcal disease was declared the
+country's main public health problem \cite{SierraGonzalez2019}. VA-MENGOC-BC, developed at the
+Finlay Institute, combines outer membrane vesicles (OMV, proteoliposomes) of a serogroup~B strain
+with serogroup~C capsular polysaccharide adsorbed onto aluminium hydroxide
+\cite{Sotolongo2007,Uli2006,Masforrol2017}. Its efficacy of 83\% was shown in a randomised,
+double-blind, placebo-controlled trial \cite{Sierra1991}; after mass vaccination the vaccine
+entered the national immunization programme, and the cumulative impact on serogroup~B disease
+exceeded 95\% \cite{Rodriguez1999,SierraGonzalez2019}. Together with the Norwegian and New Zealand
+experiences, the Cuban programme is one of the few in which wild-type OMV vaccines controlled
+serogroup~B epidemics \cite{Holst2009,Holst2013}.
+
+OMV vaccines have a characteristic reactogenicity profile. Local reactions and fever are frequent
+in young children, whereas serious and neurological adverse events are very rare
+\cite{Nokleby2007,Holst2009}. The pyrogenicity of OMV has been linked to their membrane-bound
+endotoxin, both in experimental models of the four-component serogroup~B vaccine
+\cite{Sheerin2019} and in formulation studies, where adsorption onto aluminium hydroxide reduced
+pyrogenicity \cite{Rosenqvist1998}. Because VA-MENGOC-BC is administered to infants alongside the
+whole-cell pertussis pentavalent vaccine, which is itself the most reactogenic product of the
+Cuban schedule \cite{Galindo2012,CruzRodriguez2021}, the attribution of fever and local reactions
+to a single product is not straightforward.
+
+Cuba established a national surveillance system for adverse events following immunization (AEFI)
+in 1999 \cite{Galindo2012,Reed2007}. Its first decade of data (1999--2008) yielded an overall
+rate of 57.8 AEFI per \num{100000} doses \cite{Galindo2012}, and the programme uses 50 per \num{100000}
+doses as the expected national rate \cite{CruzRodriguez2021}. Since then, published analyses have
+been descriptive and provincial \cite{CruzRodriguez2021}, and no study has examined VA-MENGOC-BC
+with the methods now standard in pharmacovigilance: disproportionality analysis with
+comparator-sensitivity designs \cite{Evans2001,vanPuijenbroek2002,Bate1998,Noren2013,DuMouchel1999},
+explicit handling of masking and co-administration \cite{Maignen2014,Salvo2013}, and transparent
+reporting \cite{Fusaroli2024Statement,Fusaroli2024Elaboration}. Machine-learning approaches have
+also entered pharmacovigilance, but their added value depends on temporal validation and
+calibration rather than on apparent accuracy \cite{Salas2022,Collins2024,VanCalster2019}.
+
+We therefore analysed the national spontaneous reports of \VStudyFirstYear--\VStudyLastYear{}
+with four objectives: (i) to
+estimate AEFI reporting rates for VA-MENGOC-BC and their trend; (ii) to screen for
+disproportionate reporting of specific events against all other vaccines, testing the robustness
+of any signal to the choice of comparator; (iii) to describe the latent structure of co-reported
+events; and (iv) to describe the correlates of hospitalisation among reports.
+
+\section{Methods}\label{sec:methods}
+
+\subsection{Design, setting and reporting}\label{sec:design}
+This was a disproportionality analysis of individual case safety reports, complemented by
+reporting-rate, latent class and prediction analyses, in the national AEFI surveillance database of
+Cuba. The database receives case investigation forms from vaccination sites in all provinces through
+municipal and provincial epidemiology units \cite{Galindo2012,WHO2016AEFI}; its custodian is
+\VCustodian{} and the data were extracted on \VExtractionDate. The report follows the READUS-PV guideline for
+disproportionality analyses \cite{Fusaroli2024Statement,Fusaroli2024Elaboration} (checklist in
+the Supplementary Material), the RECORD-PE statement for routinely collected data
+\cite{Langan2018} and, for the hospitalisation models, TRIPOD+AI \cite{Collins2024}.
+
+\subsection{Data sources and processing}\label{sec:data}
+The study used \VNFiles{} annual files of AEFI reports (\VStudyFirstYear--\VStudyLastYear) with
+61 variables per report: demographics, vaccines, doses, lots and manufacturers, dates of
+vaccination, onset and notification, \PONEventsScreened{} predefined event indicators, family history,
+hospitalisation and outcome. Annual doses of VA-MENGOC-BC administered came from the national
+immunization programme series, and the annual incidence of meningococcal disease
+(\POITSFirstYear--\POITSLastYear) from national statistics. The database recorded
+\PONVaccines{} different vaccines; vaccines were harmonised to a versioned dictionary of
+national product names and events were coded with the predefined indicators of the national
+form (no MedDRA coding is used by the system). All processing ran on an institutional workstation with an open-source
+pipeline (Python 3.11 \cite{Harris2020,Virtanen2020,McKinney2010,Seabold2010,Pedregosa2011,Hunter2007};
+version \VCodeVersion, random seed \VSeed) that records the provenance of every run
+\cite{Sandve2013,MHRA2018}.
+
+Because the structure of the files changed across years, column names were mapped to a
+versioned schema with alias matching and schema-drift reports, and every value was parsed with
+an explicit status (valid, recovered, invalid, missing) to support data-quality assessment
+following the harmonised framework of Kahn et al. \cite{Kahn2016}. Names and addresses were
+replaced at ingestion by keyed hashes (HMAC-SHA-256) with a secret key stored outside the
+repository \cite{ENISA2019}; dates of birth were converted to age; free-text fields were
+processed locally and never released, in accordance with the Cuban data-protection law
+\cite{Ley149}. Exact duplicate records (\VExactDuplicates) were removed, and records sharing the
+pseudonymised person, vaccination date, vaccines and lots were merged (\VKeyDuplicatesMerged{}
+rows), leaving \VReportsDedup{} reports. The analytic year was the year of vaccination; the study
+window retained \VReportsInWindow{} reports (\VReportsOutsideWindow{} outside the window were
+excluded; \figref{fig:flow}).
+
+\begin{figure}[tbp]
+\centering
+\ReportFlow
+\caption{Flow of AEFI reports from the annual files to the analysis population. Counts come from
+the disclosure-controlled release.}
+\label{fig:flow}
+\end{figure}
+
+\subsection{Exposure and event definitions}\label{sec:events}
+A report was attributed to VA-MENGOC-BC when the vaccine was among those administered, including
+co-administration with other vaccines. Events were the \PONEventsScreened{} indicators of the national form, which
+follow the WHO classification of common, rare and serious events \cite{WHO2016AEFI,CIOMS2012};
+when available, the corresponding Brighton Collaboration definitions are cited for reference
+\cite{Marcy2004,Bonhoeffer2004Crying,Bonhoeffer2004Seizure,Ruggeberg2007,Kohl2007,Buettcher2007,Wise2007,Gidudu2008,Sejvar2007,Tapiainen2007},
+but reports were not re-adjudicated against them \cite{Kohl2008}. Causality assessment by the
+national committee \cite{WHO2018Causality} was not used as an inclusion criterion, and no
+case-by-case review of the reports was performed in this study. Before the analysis, fever of at
+least 39 and 40\,\textdegree{}C, severe local reactions and sterile abscess were classified as
+expected reactions to aluminium-adsorbed OMV vaccines \cite{Nokleby2007,Holst2009,Jefferson2004};
+signals for any other event were classified as emerging.
+
+\subsection{Reporting rates}\label{sec:m-rates}
+Annual reporting rates were computed per \num{100000} doses of VA-MENGOC-BC with exact Poisson
+(Garwood) intervals \cite{Garwood1936}. The linear trend was estimated with a quasi-Poisson model
+with log-dose offset (rate ratio per year, dispersion estimated from Pearson's statistic) and
+checked with a negative-binomial model. Rates were compared descriptively with the programme's
+expected rate of \POExpectedRate{} per \num{100000} doses, which refers to all childhood vaccines
+\cite{CruzRodriguez2021,Mahaux2016}.
+
+\subsection{Disproportionality analysis}\label{sec:m-disp}
+For each event, a two-by-two table crossed reports with and without VA-MENGOC-BC against
+reports with and without the event. We computed the reporting odds ratio (ROR) with Woolf
+intervals and Haldane correction when needed \cite{vanPuijenbroek2002,Woolf1955,Haldane1956},
+the proportional reporting ratio (PRR) with Yates' $\chi^2$ \cite{Evans2001}, the Bayesian
+confidence propagation neural network information component (IC) with its lower 95\% credibility
+bound IC\textsubscript{025} \cite{Bate1998,Noren2013}, and the empirical Bayes geometric mean
+(EBGM) of the multi-item gamma Poisson shrinker, whose two-gamma prior was estimated by maximum
+likelihood over all vaccine--event pairs of the database \cite{DuMouchel1999,Szarfman2002}. The
+prespecified primary signal criterion was IC\textsubscript{025}${}>0$ with at least
+\PODispMinReports{} reports; the number of methods meeting their conventional thresholds (ROR lower bound ${}>1$;
+PRR ${}\geq2$ with $\chi^2\geq4$; EBGM lower bound ${}\geq2$) is reported as a measure of
+concordance.
+
+All comparators were vaccines, so the measures express reporting relative to other vaccines in
+the same system rather than risk relative to non-vaccination. Four comparator designs were
+prespecified: the primary design (VA-MENGOC-BC reports against all other reports); an infant
+active-comparator design restricted to reports in children younger than \POInfantMonths{}
+months; a design
+restricted to single-vaccine reports (VA-MENGOC-BC given alone against other vaccines given
+alone); and a design removing the reports that mention the pentavalent vaccine, the dominant
+reactogenic product, from the comparator group to assess masking \cite{Maignen2014}. The cumulative IC was
+recomputed year by year to show the temporal stability of the estimates. Given the exploratory
+nature of signal detection, no adjustment for multiplicity was applied to the screening
+\cite{Rothman1990}; signals are hypotheses for clinical review rather than confirmed risks
+\cite{Fusaroli2026Pitfalls,Fusaroli2026Causal}.
+
+\subsection{Latent class analysis of co-reported events}\label{sec:m-lca}
+Event indicators with a prevalence of at least 0.5\% were modelled with latent class analysis (a
+mixture of independent Bernoulli distributions) fitted by the expectation--maximisation algorithm
+\cite{Dempster1977} with a Beta(1.5, 1.5) prior on item probabilities and \POLCAStarts{} random
+starts per model. Models with \POLCAKMin--\POLCAKMax{} classes were compared with the Bayesian information criterion
+\cite{Schwarz1978}; the integrated completed likelihood \cite{Biernacki2000} and entropy were
+reported \cite{Nylund2007}. Stability was measured by the median adjusted Rand index
+\cite{Hubert1985} between the original classification and \POLCABootstrap{} bootstrap refits, after optimal
+label matching \cite{Kuhn1955}. Class membership was compared between VA-MENGOC-BC and other
+reports with a $\chi^2$ test.
+
+\subsection{Correlates of hospitalisation}\label{sec:m-hosp}
+Hospitalisation was modelled from age, sex, co-administration, region, vaccines and event
+indicators. Because rare, serious events separate the outcome, the multivariable logistic model
+was fitted by Firth's penalised likelihood \cite{Firth1993,Heinze2002}, after removal of exactly
+collinear terms, and its adjusted odds ratios are reported with Wald intervals. A gradient-boosted
+tree model (LightGBM) \cite{Ke2017} captured non-linearities and interactions. Both models were
+trained on \POTrainYears{} and evaluated on \POTestYears{} (temporal validation), reporting the area under
+the ROC and precision--recall curves, the Brier score and the calibration intercept and slope
+\cite{VanCalster2019,Collins2024}; logistic predictions used the FLIC intercept correction
+\cite{Puhr2017}. Exact TreeSHAP contributions described the boosted model
+\cite{Lundberg2020}. The models are explanatory and were not designed for clinical triage.
+
+\subsection{Temporal patterns and epidemiological context}\label{sec:m-time}
+Monthly report counts were variance-stabilised with the Anscombe transformation
+\cite{Anscombe1948} and segmented with an exact PELT algorithm \cite{Killick2012,Truong2020}
+(minimum segment of six months, BIC-type penalty). To place the vaccine in context, the annual
+national cases of meningococcal disease (\POITSFirstYear--\POITSLastYear) were analysed as an
+interrupted time series with a segmented negative-binomial model, treating \POITSTransition{}
+(mass vaccination and inclusion in the programme) as a transition period \cite{Bernal2017}.
+
+\subsection{Disclosure control, reproducibility and ethics}\label{sec:m-sdc}
+Only aggregated results left the controlled environment. Non-zero counts below \VMinCell{}
+were suppressed, statistics derived from suppressed counts were removed and
+complementary suppression protected contingency tables \cite{Hundepool2012}; an automated
+verifier checked every released file. Every number in this article is generated from the
+released tables, and the pipeline, synthetic test data and release are openly available
+\cite{Wilkinson2016}. The analysis used pseudonymised routine surveillance records processed
+under the institutional data-governance procedure of the Finlay Vaccine Institute and Law
+149/2022 \cite{Ley149}; the institutional approval is detailed in the Declarations.
+
+\section{Results}\label{sec:results}
+
+\subsection{Reports and characteristics}\label{sec:r-reports}
+The analysis included \PONReports{} reports, of which \PONTarget{} (\POPctTarget) involved
+VA-MENGOC-BC and \PONTargetOnly{} of these had no co-administered vaccine
+(\tabref{tab:characteristics}). The median delay from vaccination to notification was
+\PODelayMedian{} days.
+
+\begin{table}[tbp]
+\centering\small
+\caption{Characteristics of AEFI reports involving VA-MENGOC-BC and other vaccines. Values are
+$n$ (\%) unless stated otherwise; counts below \VMinCell{} are suppressed, and [c] marks
+complementary suppression that prevents their recovery by subtraction.}
+\label{tab:characteristics}
+\POTableCharacteristics
+\end{table}
+
+\subsection{Reporting rates}\label{sec:r-rates}
+The pooled reporting rate for VA-MENGOC-BC between \PORateFirstYear{} and \PORateLastYear{} was
+\POPooledRate{} per \num{100000} doses (\CI{} \POPooledRateCI), \PORateVsExpected{} the programme's
+reference rate of \POExpectedRate{} per \num{100000} doses for all childhood vaccines
+(\figref{fig:rates}; Supplementary \tabref{tab:S-rates}). The rate \POTrendWord{} over the period (rate ratio
+per year \POTrendRR, \CI{} \POTrendRRCI; $p$\POTrendP; quasi-Poisson dispersion
+\PODispersion).
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth]{p1_rates}
+\caption{Reporting over time. (a) Monthly number of AEFI reports for all vaccines and for
+VA-MENGOC-BC; vertical lines mark the change points detected by PELT in the series of all
+vaccines. (b) Annual reporting rate of VA-MENGOC-BC per \num{100000} doses with exact 95\%
+confidence interval (band); the horizontal line is the programme's expected rate for all childhood
+vaccines.}
+\label{fig:rates}
+\end{figure}
+
+\subsection{Disproportionality}\label{sec:r-disp}
+Under the primary comparator, \POSignalsPrimaryAllOtherVaccines{} of the \PONEventsScreened{}
+screened event types met the prespecified signal criterion (\POSignalList;
+\tabref{tab:disproportionality}, \figref{fig:forest}): \PONSignalsExpectedPhrase{} for expected
+reactions (\POSignalExpectedList) and \PONSignalsEmergingPhrase{} for events not classified as
+expected (\POSignalEmergingList). The number of signals was \POSignalsInfantActiveComparator{} in
+the infant active-comparator design, \POSignalsExcludingCoadministration{} in single-vaccine
+reports and \POSignalsExcludingPentavalentMasking{} when pentavalent-vaccine reports were removed
+from the comparator (\tabref{tab:designs}; Supplementary
+Tables~\ref{tab:S-disp-primary}--\ref{tab:S-disp-masking}); \PONSignalsRobustPhrase{} persisted in
+all \PONDesigns{} designs (\POSignalRobustList). The cumulative IC of each event is shown year by
+year in Supplementary \tabref{tab:S-cumic}. For fever of at least 39\,\textdegree{}C, the ROR
+was \POEvFeverThreeNineROR{} (\CI{} \POEvFeverThreeNineRORCI) and IC\textsubscript{025}
+\POEvFeverThreeNineICLow; for severe local reactions they were \POEvSevereLocalReactionROR{}
+(\CI{} \POEvSevereLocalReactionRORCI) and \POEvSevereLocalReactionICLow.
+
+\begin{table}[tbp]
+\centering\small
+\caption{Disproportionality of events reported with VA-MENGOC-BC against all other vaccines
+(primary design), for events with at least \VMinCell{} reports. $a$, reports with VA-MENGOC-BC and
+the event; $E$, expected $a$; IC\textsubscript{025}, lower 95\% credibility bound of the
+information component; EB\textsubscript{05}, lower 5th percentile of the empirical Bayes
+geometric mean; Methods, number of the four methods meeting their thresholds; Signal,
+prespecified criterion (IC\textsubscript{025}${}>0$, $a\geq\PODispMinReports$).}
+\label{tab:disproportionality}
+\POTableDispMain
+\end{table}
+
+\begin{table}[tbp]
+\centering\small
+\caption{Number of disproportionality signals under the four prespecified comparator designs.}
+\label{tab:designs}
+\POTableDesigns
+\end{table}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics{p1_forest}
+\caption{Reporting odds ratios (95\% CI, logarithmic scale) of events reported with VA-MENGOC-BC
+against all other vaccines (primary design) and in the infant active-comparator design. Events
+with fewer than \VMinCell{} reports in the primary design are not shown; all four designs are
+reported in Supplementary Tables~\ref{tab:S-disp-primary}--\ref{tab:S-disp-masking}.}
+\label{fig:forest}
+\end{figure}
+
+\subsection{Latent phenotypes of co-reported events}\label{sec:r-lca}
+The Bayesian information criterion selected a \POLCABestK-class model (Supplementary
+\tabref{tab:S-lca}),
+whose classification was stable across bootstrap samples (median adjusted Rand index
+\POLCAAri). Class membership \POLCAGroupWord{} between VA-MENGOC-BC reports and other reports
+($\chi^2=\POLCAChi$, \POLCADf{} degrees of freedom; $p$\POLCAP; \figref{fig:lca}).
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth]{p1_lca}
+\caption{Latent classes of co-reported events. (a) Probability of each event within each latent
+class (values of at least 0.2 are printed). (b) Share of reports assigned to each class among
+reports with VA-MENGOC-BC and with other vaccines.}
+\label{fig:lca}
+\end{figure}
+
+\subsection{Correlates of hospitalisation}\label{sec:r-hosp}
+The training period included \PONTrain{} reports (\POEventsTrain{} hospitalisations) and the test
+period \PONTest{} reports (\POEventsTest{} hospitalisations). In the test years, the
+\POBestModel{} model had the higher discrimination (area under the ROC curve \POBestAuroc;
+\tabref{tab:models}), which we graded as \PODiscriminationWord. A calibration slope below one
+indicates predictions that are too extreme in the test years, and a slope above one predictions
+that are too moderate. The adjusted odds ratios of the Firth model are given in Supplementary
+\tabref{tab:S-logistic} and the TreeSHAP importance in \figref{fig:shap}.
+
+\begin{table}[tbp]
+\centering\small
+\caption{Temporal validation of the hospitalisation models (trained on \POTrainYears, tested on
+\POTestYears). AUROC and AUPRC, areas under the receiver operating characteristic and
+precision--recall curves.}
+\label{tab:models}
+\POTableModels
+\end{table}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics{p1_shap}
+\caption{Mean absolute TreeSHAP contribution of the twelve most influential predictors to the
+predicted log-odds of hospitalisation in the test years (gradient-boosted model). Region
+contrasts are relative to the western region.}
+\label{fig:shap}
+\end{figure}
+
+\subsection{Temporal patterns and context}\label{sec:r-time}
+The PELT segmentation identified \PONBreaksAllPhrase{} in the monthly number of reports
+(\POBreaksAll). In the national series of meningococcal disease, the segmented model showed
+\POITSWord{} after the \POITSTransition{} transition (level rate ratio \POITSLevelRR, \CI{}
+\POITSLevelRRCI); the mean incidence was \POITSRatePre{} per \num{100000} population before the
+campaign and \POITSRatePost{} afterwards (Supplementary \figref{fig:S-its}).
+
+\section{Discussion}\label{sec:discussion}
+
+\subsection{Principal findings}\label{sec:d-principal}
+In \VStudyFirstYear--\VStudyLastYear, VA-MENGOC-BC accounted for \POPctTarget{} of AEFI
+reports, with a pooled reporting rate of \POPooledRate{} per \num{100000} doses that
+\POTrendWord{} over the period. Disproportionality analysis flagged \POSignalList{} under the
+primary comparator, and \POSignalRobustList{} under every comparator. Co-reported events organised
+into \POLCABestK{} phenotypes, and the information in the reports predicted hospitalisation with
+\PODiscriminationWord{} discrimination.
+
+\subsection{Interpretation}\label{sec:d-interpretation}
+The most frequently reported events with VA-MENGOC-BC were \POTopEvents. Fever and local
+reactions are the expected reactions to aluminium-adsorbed OMV vaccines \cite{Nokleby2007,Holst2009},
+whose endotoxin content drives pyrogenicity \cite{Sheerin2019,Rosenqvist1998}. Disproportionality in a
+vaccine-only database measures how the profile of VA-MENGOC-BC reports differs from that of other
+vaccines. Because most comparators are themselves reactogenic, and the pentavalent whole-cell
+vaccine is co-administered with VA-MENGOC-BC, a signal that disappears when co-administration or
+the pentavalent vaccine is removed is better explained by attribution and masking than by the
+product \cite{Maignen2014,Salvo2013}; conversely, signals that persist across all comparators are
+those most deserving clinical review. The structured, multi-comparator design is therefore the
+main safeguard of this analysis, together with the prespecified criterion and the transparent
+reporting of every event screened \cite{Fusaroli2024Elaboration,Fusaroli2026Pitfalls}.
+Signals for expected reactions (\POSignalExpectedList) quantify how much more often the known
+reactogenicity of an OMV vaccine appears in reports than for other vaccines; signals for emerging
+events (\POSignalEmergingList) are the ones that require case-by-case review before any
+interpretation.
+
+The reporting rate must be read against the characteristics of the Cuban system: a mandatory form
+completed at the vaccination site, active follow-up by epidemiology services and a strong
+reporting culture \cite{Galindo2012,Reed2007}. Reporting rates in such systems reflect the
+sensitivity of surveillance as much as the frequency of reactions, as the Pinar del Río experience
+showed \cite{CruzRodriguez2021}, and
+the WHO uses reporting rates as an indicator of surveillance performance \cite{Lei2018}. The
+programme's reference rate refers to all vaccines, so the comparison with VA-MENGOC-BC is only a
+benchmark \cite{Mahaux2016}.
+
+Latent classes offer a data-driven alternative to single-event screening: they describe
+syndromes as they are reported, separate febrile from local or allergic presentations and allow
+the comparison of phenotype distributions between vaccines. The hospitalisation models reached
+\PODiscriminationWord{} discrimination in later years. \POHospInterpretation, so report-based models
+should not be used to triage cases \cite{VanCalster2019,Collins2024}.
+
+The findings apply to a mature, mandatory surveillance system with high vaccination coverage and
+to an aluminium-adsorbed wild-type OMV vaccine given with a whole-cell pentavalent vaccine; their
+transfer to other settings or OMV formulations requires the same comparator-sensitivity approach.
+Two further designs would test the signals: a self-controlled case series in linked immunisation
+and hospital records, which removes time-invariant confounding, and the analysis of the quality
+attributes of the administered lots, which addresses manufacturing variability.
+
+\subsection{Strengths and limitations}\label{sec:d-limitations}
+The study covers every report received nationally in \VStudyFirstYear--\VStudyLastYear, harmonises files whose
+structure changed over time, prespecifies its signal criterion and comparator designs, and
+generates every number from a verified, disclosure-controlled release, so that the analysis can be
+reproduced and extended each year.
+
+Its limitations are those of spontaneous reporting, reinforced by specific features of the data.
+First, under-reporting and stimulated reporting affect the numerators \cite{Hazell2006,Pariente2007};
+doses administered, the only denominator available, were not stratified by age, dose or province.
+Second, the event indicators were not validated against Brighton definitions
+\cite{Kohl2008}, and free-text descriptions were excluded from the analysis to protect
+confidentiality. Third, reports attributed to VA-MENGOC-BC include co-administered vaccines, and
+disproportionality cannot separate their contributions; the sensitivity designs address but do
+not remove this limitation. Fourth, all comparators are vaccines, so disproportionality does not
+measure risk relative to non-vaccination, and a signal is a hypothesis for causality assessment
+\cite{WHO2018Causality,Fusaroli2026Causal}. Fifth, the interrupted time series of national
+incidence is ecological and serves only as context. Finally, small counts were suppressed in the
+release, so rare serious events can be described only qualitatively.
+
+\subsection{Implications}\label{sec:d-implications}
+The pipeline developed for this study can run each year on new files, turning a retrospective
+analysis into continuous, auditable surveillance. Signals that persist across comparators should
+be reviewed with the clinical records by the national causality committee, and linking reports to
+the quality attributes of the administered lots offers a way to study whether manufacturing
+variability contributes to reactogenicity.
+
+\section{Conclusions}\label{sec:conclusions}
+This nationwide analysis describes the post-marketing reporting profile of VA-MENGOC-BC with
+methods that are transparent about their assumptions and reproducible from a public,
+disclosure-controlled release. Signals that persist across comparator designs define the
+priorities for clinical review, and the framework provides a basis for continuous safety
+surveillance of the Cuban immunization programme.
+
+\section*{Declarations}
+\input{papers/p1-pharmacovigilance/shared/declarations_en.tex}
+
+\bibliographystyle{vancouver}
+\bibliography{papers/shared/bib/pubmed,papers/shared/bib/manual}
+
+\end{document}

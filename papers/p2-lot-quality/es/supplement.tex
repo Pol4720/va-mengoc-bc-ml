@@ -1,0 +1,91 @@
+% Material suplementario — Artículo 2 (español). Se compila antes que manuscript.tex.
+\documentclass[11pt]{article}
+\newcommand{\DocLang}{es}
+\input{papers/shared/preamble.tex}
+\input{papers/shared/authors.tex}
+\usepackage{pdflscape}
+\hypersetup{pdftitle={Material suplementario: Atributos de liberacion de los lotes y reactogenicidad de VA-MENGOC-BC}}
+
+\begin{document}
+\SupplementaryNumbering
+\SyntheticNotice
+\begin{center}
+{\Large\bfseries Material suplementario\par}
+\medskip
+{\large Atributos de liberación de los lotes y reactogenicidad de una vacuna de vesículas de
+membrana externa: vinculación de los datos de control de calidad de \PTNLots{} lotes de VA-MENGOC-BC
+con las notificaciones nacionales de eventos adversos\par}
+\medskip
+{\small \AuthorOne{} y \AuthorTwo\par}
+\end{center}
+
+\tableofcontents
+
+\section{Gráficos de control}\label{sec:S-charts}
+\begin{table}[htbp]
+\centering\small
+\caption{Señales en el gráfico de valores individuales (reglas de Nelson) y en el gráfico de media
+móvil ponderada exponencialmente ($\lambda=\PTEWMALambda$) de cada atributo, en orden de producción.
+Las señales indican desviaciones de un proceso estable, no no conformidad.}
+\label{tab:S-charts}
+\PTTableControlCharts
+\end{table}
+
+\section{Lotes nacionales y de exportación}\label{sec:S-equivalence}
+\begin{table}[htbp]
+\centering\small
+\caption{Equivalencia de los lotes nacionales y de exportación mediante dos pruebas unilaterales en la
+escala de la ventana de especificación (margen de $\pm$\PTEqMarginPct{} de la ventana): diferencia de
+medias con intervalo de confianza del 90\,\% y desplazamiento de Hodges--Lehmann con intervalo de
+confianza del 95\,\%.}
+\label{tab:S-equivalence}
+\PTTableEquivalence
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{p2_equivalence}
+\caption{Diferencia entre lotes nacionales y de exportación (intervalo de confianza del 90\,\%)
+respecto al margen de equivalencia (sombreado).}
+\label{fig:S-equivalence}
+\end{figure}
+
+\section{Vinculación}\label{sec:S-linkage}
+\begin{table}[htbp]
+\centering\small
+\caption{Notificaciones con VA-MENGOC-BC vinculadas con un lote liberado, por año de vacunación.}
+\label{tab:S-linkage}
+\PTTableLinkage
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Características de las notificaciones vinculadas y no vinculadas con un lote liberado
+(evaluación del sesgo de vinculación).}
+\label{tab:S-linkbias}
+\PTTableLinkBias
+\end{table}
+
+\section{Análisis de sensibilidad}\label{sec:S-sensitivity}
+\begin{landscape}
+\begin{table}[htbp]
+\centering\small
+\caption{Razones de odds por DE (IC 95\,\%) de las asociaciones preespecificadas en análisis
+alternativos: ecuaciones de estimación generalizadas principales; restricción a enlaces exactos;
+exclusión de vacunas coadministradas; conservación de los enlaces temporalmente inverosímiles; modelo
+logístico bayesiano con intercepto aleatorio (intervalo de credibilidad del 95\,\%); modelo
+cuasibinomial a nivel de lote de la proporción de notificaciones con la reacción.}
+\label{tab:S-sensitivity}
+\PTTableSensitivity
+\end{table}
+\end{landscape}
+
+\section{Asociaciones exploratorias}\label{sec:S-exploratory}
+{\small
+\PTTableGEEExploratory{Asociaciones exploratorias entre cada atributo de los lotes (incluida la
+atipicidad multivariante) y las reacciones principales y secundarias: modelos logísticos con errores
+estándar robustos agrupados por lote (correlación de trabajo de independencia), ajustados como en el
+análisis principal. $q$, valor de $p$ ajustado por Benjamini--Hochberg dentro de la familia
+exploratoria.\label{tab:S-exploratory}}}
+
+\end{document}

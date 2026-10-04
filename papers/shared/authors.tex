@@ -1,0 +1,32 @@
+% =============================================================================
+%  Author metadata — single source for every manuscript, cover letter and report.
+%  ORCID iDs verified at orcid.org. Items listed in docs/SUBMISSION_CHECKLIST.md
+%  (e-mail addresses, CRediT roles) must be confirmed by the authors.
+% =============================================================================
+\newcommand{\AuthorOne}{Richard Alejandro Matos Arder\'i}
+\newcommand{\AuthorOneShort}{R.\,A.~Matos Arder\'i}
+\newcommand{\AuthorOneORCID}{0009-0008-0751-5855}
+\newcommand{\AuthorTwo}{Abel Ponce Gonz\'alez}
+\newcommand{\AuthorTwoShort}{A.~Ponce Gonz\'alez}
+\newcommand{\AuthorTwoORCID}{0009-0001-9200-4564}
+
+% Institutional affiliation (both authors).
+\newcommand{\AffilDept}{\VLang{Clinical Research and Impact Evaluation Directorate (DICEI)}%
+  {Direcci\'on de Investigaciones Cl\'inicas y Evaluaci\'on de Impacto (DICEI)}}
+\newcommand{\AffilInst}{\VLang{Finlay Vaccine Institute}{Instituto Finlay de Vacunas}}
+\newcommand{\AffilCity}{\VLang{Havana, Cuba}{La Habana, Cuba}}
+\newcommand{\Affiliation}{\AffilDept, \AffilInst, \AffilCity}
+
+% Corresponding author. Leave \CorrEmail empty until the authors confirm the address:
+% the title page then omits the line instead of printing an invented one.
+\newcommand{\CorrAuthor}{\AuthorOne}
+\newcommand{\CorrEmail}{}
+
+\newcommand{\AuthorBlock}{%
+  {\large \AuthorOne\,\orcidlink{\AuthorOneORCID}\textsuperscript{1,*} \quad
+   \AuthorTwo\,\orcidlink{\AuthorTwoORCID}\textsuperscript{1}}\par\medskip
+  {\small\textsuperscript{1}\,\Affiliation\par
+   \textsuperscript{*}\,\VLang{Corresponding author}{Autor para la correspondencia}: \CorrAuthor
+   \ifdefempty{\CorrEmail}{}{ (\href{mailto:\CorrEmail}{\CorrEmail})}\par
+   ORCID: \AuthorOne{} \url{https://orcid.org/\AuthorOneORCID};
+   \AuthorTwo{} \url{https://orcid.org/\AuthorTwoORCID}\par}}

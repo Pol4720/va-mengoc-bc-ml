@@ -1,0 +1,34 @@
+% Linkage flow (Paper 2). Every count is a macro from the public release.
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,calc}
+\newcommand{\LinkageFlow}{%
+\begin{tikzpicture}[
+    font=\small,
+    box/.style={draw=vgrey, rounded corners=2pt, align=center, text width=54mm, inner sep=4pt},
+    side/.style={draw=vgrey!70, dashed, rounded corners=2pt, align=left, text width=50mm,
+                 inner sep=4pt, anchor=west},
+    arr/.style={-{Stealth[length=2mm]}, vgrey}]
+  \node[box] (rep) {\VLang{AEFI reports with VA-MENGOC-BC}{Notificaciones de ESAVI con VA-MENGOC-BC}\\
+    \PTNTargetReports};
+  \node[box, below=16mm of rep] (lnk) {\VLang{Linked to a released lot}{Enlazadas a un lote liberado}\\
+    \PTNLinked{} (\PTLinkRate)\\[2pt]
+    {\footnotesize \VLang{exact}{exacto} \PTLinkExact; \VLang{core}{núcleo} \PTLinkCore;
+    \VLang{fuzzy}{aproximado} \PTLinkFuzzy}};
+  \node[box, below=14mm of lnk] (ana) {\VLang{Analysed reports}{Notificaciones analizadas}\\
+    \PTNAnalysed{} \VLang{in}{en} \PTNAnalysedLots{} \VLang{lots}{lotes}};
+  \node[box, left=8mm of rep, text width=34mm] (lots) {\VLang{Released lots}{Lotes liberados}
+    \PTLotFirstYear--\PTLotLastYear\\ \PTNLots{} (\PTNAttributes{} \VLang{attributes}{atributos})};
+  \coordinate (m1) at ($(rep.south)!0.5!(lnk.north)$);
+  \coordinate (m2) at ($(lnk.south)!0.5!(ana.north)$);
+  \node[side] (nl) at ($(m1)+(31mm,0)$) {\VLang{No lot recorded}{Sin lote registrado}: \PTLinkNoLotRecorded\\
+    \VLang{No matching lot}{Sin lote coincidente}: \PTLinkNoMatch};
+  \node[side] (ti) at ($(m2)+(31mm,0)$) {\VLang{Vaccinated more than \PTMaxYearsAfterProduction{} years after
+    production (implausible link)}{Vacunación más de \PTMaxYearsAfterProduction{} años después de la
+    producción (enlace inverosímil)}: \PTTemporalImplausible\\
+    \VLang{Missing covariates}{Covariables ausentes}: \PTExcludedOther};
+  \draw[arr] (rep) -- (lnk);
+  \draw[arr] (lnk) -- (ana);
+  \draw[arr, vgrey!70] (m1) -- (nl.west);
+  \draw[arr, vgrey!70] (m2) -- (ti.west);
+  \draw[arr, vgrey!70] (lots.south) |- (lnk.west);
+\end{tikzpicture}}

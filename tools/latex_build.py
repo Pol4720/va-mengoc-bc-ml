@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -105,10 +106,18 @@ def build(tex: Path, timeout: int = 900) -> Result:
         "-quiet",
         tex.name,
     ]
+    env = dict(os.environ)
+    # The repository root is searched after the document directory, so documents use
+    # root-relative paths (papers/shared/..., release/...) from any directory.
+    # The build directory is searched too, so \externaldocument finds the .aux of a companion
+    # document (e.g. the supplement) built earlier in tools/latex_documents.txt.
+    for var in ("TEXINPUTS", "BIBINPUTS", "BSTINPUTS"):
+        env[var] = f".{os.pathsep}{out_dir}{os.pathsep}{ROOT}{os.pathsep}{env.get(var, '')}"
     try:
         proc = subprocess.run(  # noqa: S603 - fixed latexmk command, no shell
             cmd,
             cwd=tex.parent,
+            env=env,
             capture_output=True,
             text=True,
             timeout=timeout,
@@ -134,7 +143,7 @@ def build(tex: Path, timeout: int = 900) -> Result:
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(pdf, target)
         res.pdf = str(target.relative_to(ROOT))
-        m = re.search(r"Output written on .*\((\d+) pages?", log)
+        m = re.search(r"Output written on .*?\((\d+) pages?", " ".join(_join_wrapped(log)))
         res.pages = int(m.group(1)) if m else None
     res.ok = proc.returncode == 0 and not res.diagnostics and pdf.is_file()
     return res

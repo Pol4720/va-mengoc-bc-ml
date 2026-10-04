@@ -1,0 +1,114 @@
+% =============================================================================
+%  Shared preamble for every manuscript, supplement and report of the project.
+%
+%  Usage (after \documentclass):
+%      \newcommand{\DocLang}{en}          % or es
+%      \input{papers/shared/preamble.tex}
+%
+%  Paths are relative to the repository root: tools/latex_build.py and the
+%  latexmkrc files put the root on TEXINPUTS/BIBINPUTS.
+%
+%  Results are never typed by hand. They come from the generated macro and
+%  table files of the public release: release/public when it exists (real
+%  data, after disclosure control), otherwise release/synthetic (simulated
+%  data, watermarked).
+% =============================================================================
+
+% ---- language ---------------------------------------------------------------
+\RequirePackage{etoolbox}
+\newif\ifVSpanish
+\ifdefstring{\DocLang}{es}{\VSpanishtrue}{\VSpanishfalse}
+\newcommand{\VLang}[2]{\ifVSpanish#2\else#1\fi}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{stix2}  % Times-compatible text and maths (Type 1, embeddable)
+\ifVSpanish
+  \usepackage[spanish,es-noshorthands,es-tabla,es-nolists]{babel}
+\else
+  \usepackage[british]{babel}
+\fi
+
+% ---- page, typography ---------------------------------------------------------
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{threeparttable}
+\usepackage{makecell}
+\usepackage{longtable}
+\usepackage[font=small,labelfont=bf,skip=4pt]{caption}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{siunitx}
+\ifVSpanish
+  % Real Academia Española / ISO 80000: decimal comma, thin space for thousands,
+  % four-digit numbers not grouped.
+  \sisetup{output-decimal-marker={,}, group-separator={\,}, group-minimum-digits=5,
+           list-final-separator={ y }, range-phrase={ a }}
+\else
+  % English medical style: comma for thousands, no space before the percent sign.
+  \sisetup{group-separator={,}, group-minimum-digits=4, quantity-product={}}
+\fi
+\usepackage[numbers,sort&compress,square]{natbib}
+\usepackage{xurl}
+\usepackage{xr-hyper}  % cross-references between a manuscript and its supplement (\externaldocument)
+\usepackage[hidelinks,pdfusetitle]{hyperref}
+\usepackage{orcidlink}
+
+% ---- colours (Okabe--Ito compatible, same palette as the figures) -----------------
+\definecolor{vblue}{HTML}{2A78D6}
+\definecolor{vorange}{HTML}{EB6834}
+\definecolor{vgrey}{HTML}{6F6D66}
+
+% ---- release selection ----------------------------------------------------------
+\IfFileExists{release/public/latex/macros_common.tex}
+  {\newcommand{\ReleaseDir}{release/public}}
+  {\newcommand{\ReleaseDir}{release/synthetic}}
+\input{\ReleaseDir/latex/macros_common.tex}
+\input{\ReleaseDir/latex/macros_p1.tex}
+\input{\ReleaseDir/latex/macros_p2.tex}
+\input{\ReleaseDir/latex/tables_p1.tex}
+\input{\ReleaseDir/latex/tables_p2.tex}
+\graphicspath{{\ReleaseDir/figures/\DocLang/}}
+\newif\ifVSynthetic
+\ifdefstring{\VDataOrigin}{synthetic}{\VSynthetictrue}{\VSyntheticfalse}
+
+% On synthetic data every page carries a watermark and the first page a notice:
+% the document is a template whose numbers are NOT results about the vaccine.
+\ifVSynthetic
+  \usepackage{draftwatermark}
+  \DraftwatermarkOptions{text={\VLang{SYNTHETIC DATA}{DATOS SINTÉTICOS}}, fontsize=3.6cm,
+    color={black!7}, angle=45}
+\fi
+\newcommand{\SyntheticNotice}{%
+  \ifVSynthetic
+    \begin{center}\fcolorbox{vorange}{white}{\parbox{0.92\linewidth}{\small\raggedright
+      \textbf{\VLang{Synthetic-data build.}{Compilación con datos sintéticos.}}
+      \VLang{Every number, table and figure in this version was computed on simulated records
+      (\texttt{release/synthetic}). They demonstrate the reproducible pipeline and are not
+      results about VA-MENGOC-BC. The submission version is built from
+      \texttt{release/public}.}{Todos los números, tablas y figuras de esta versión se
+      calcularon con registros simulados (\texttt{release/synthetic}). Demuestran el flujo
+      reproducible y no son resultados sobre VA-MENGOC-BC. La versión para envío se compila a
+      partir de \texttt{release/public}.}}}\end{center}
+  \fi}
+
+% ---- small helpers ---------------------------------------------------------------
+\newcommand{\VAM}{VA-MENGOC-BC\textsuperscript{\textregistered}}
+\newcommand{\VAMplain}{VA-MENGOC-BC}
+\newcommand{\CI}{\VLang{95\% CI}{IC 95\,\%}}
+\newcommand{\per}{\VLang{per}{por}}
+\newcommand{\ORsd}{\VLang{OR per SD}{OR por DE}}
+\newcommand{\figref}[1]{\VLang{Fig.}{Fig.}~\ref{#1}}
+\newcommand{\tabref}[1]{\VLang{Table}{Tabla}~\ref{#1}}
+\newcommand{\secref}[1]{\VLang{Section}{Sección}~\ref{#1}}
+\newcommand{\suppref}[1]{\VLang{Supplementary}{Material suplementario,}~#1}
+% Supplementary numbering (S1, S2, ...) for documents that \input this after \begin{document}.
+\newcommand{\SupplementaryNumbering}{%
+  \renewcommand{\thetable}{S\arabic{table}}%
+  \renewcommand{\thefigure}{S\arabic{figure}}%
+  \renewcommand{\thesection}{S\arabic{section}}}

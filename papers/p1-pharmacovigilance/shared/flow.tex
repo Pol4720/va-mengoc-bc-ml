@@ -1,0 +1,33 @@
+% Flow of reports (Paper 1). Every count is a macro from the public release.
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,calc}
+\newcommand{\ReportFlow}{%
+\begin{tikzpicture}[
+    font=\small,
+    box/.style={draw=vgrey, rounded corners=2pt, align=center, text width=50mm, inner sep=4pt},
+    side/.style={draw=vgrey!70, dashed, rounded corners=2pt, align=left, text width=58mm,
+                 inner sep=4pt, anchor=west},
+    arr/.style={-{Stealth[length=2mm]}, vgrey}]
+  \node[box] (files) {\VLang{Annual AEFI files}{Ficheros anuales de ESAVI} (\VNFiles)\\
+    \VLang{records}{registros}: \VReportsRaw};
+  \node[box, below=16mm of files] (dedup) {\VLang{Deduplicated reports}{Notificaciones sin duplicados}\\
+    \VReportsDedup};
+  \node[box, below=12mm of dedup] (win) {\VLang{Analysis population}{Población de análisis}
+    \VStudyFirstYear--\VStudyLastYear\\ \VReportsInWindow};
+  \node[box, below=10mm of win, xshift=-29mm, text width=40mm] (t) {VA-MENGOC-BC\\ \PONTarget};
+  \node[box, below=10mm of win, xshift=29mm, text width=40mm] (o)
+    {\VLang{Other vaccines only}{Solo otras vacunas}\\ \PONOther};
+  \coordinate (m1) at ($(files.south)!0.5!(dedup.north)$);
+  \coordinate (m2) at ($(dedup.south)!0.5!(win.north)$);
+  \node[side] (dup) at ($(m1)+(33mm,0)$) {\VLang{Exact duplicates removed}{Duplicados exactos
+    eliminados}: \VExactDuplicates\\ \VLang{Rows merged (same person, date, vaccines and
+    lots)}{Filas fusionadas (misma persona, fecha, vacunas y lotes)}: \VKeyDuplicatesMerged};
+  \node[side] (out) at ($(m2)+(33mm,0)$) {\VLang{Vaccination year outside the study
+    window}{Año de vacunación fuera de la ventana de estudio}: \VReportsOutsideWindow};
+  \draw[arr] (files) -- (dedup);
+  \draw[arr] (dedup) -- (win);
+  \draw[arr] (win.south) -- ++(0,-5mm) -| (t.north);
+  \draw[arr] (win.south) -- ++(0,-5mm) -| (o.north);
+  \draw[arr, vgrey!70] (m1) -- (dup.west);
+  \draw[arr, vgrey!70] (m2) -- (out.west);
+\end{tikzpicture}}
