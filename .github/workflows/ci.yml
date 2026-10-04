@@ -18,7 +18,7 @@ jobs:
     name: Data guard (no restricted data or secrets)
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Check every tracked file
         run: python3 tools/check_no_data.py --all
 
@@ -27,10 +27,11 @@ jobs:
     runs-on: ubuntu-24.04
     needs: data-guard
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
+          python-version: "3.11"   # same interpreter as the development environment (.python-version)
       - name: Install (locked)
         run: uv sync --all-extras --locked
       - name: Lint
@@ -64,7 +65,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs: data-guard
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install TeX Live (same distribution as the development environment)
         run: |
           sudo apt-get update -qq
