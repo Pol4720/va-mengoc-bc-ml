@@ -77,6 +77,13 @@ TUNABLES: list[dict[str, Any]] = [
         "en": "Minimum reports for a signal",
     },
     {
+        "path": "analysis.disproportionality.primary_criterion",
+        "type": "enum",
+        "options": ["ic", "ror", "prr", "ebgm", "consensus2"],
+        "es": "Criterio principal de señal",
+        "en": "Primary signal criterion",
+    },
+    {
         "path": "analysis.disproportionality.eb05_threshold",
         "type": "float",
         "min": 1.0,

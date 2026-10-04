@@ -103,6 +103,7 @@ sdc:
   secondary_suppression: true
   round_rates_digits: 1
   release_lot_values: normalized         # none | normalized | raw
+  release_specifications: false          # absolute specification limits stay local (industrial information)
   forbidden_columns:                     # must never appear in any released file
     - full_name
     - address

@@ -544,8 +544,13 @@ def _paper1_tables(w: _Writer, p1: dict[str, Any], labels: dict[str, Any], targe
 
 def _paper2_tables(w: _Writer, p2: dict[str, Any], project: Project, lot_values: str) -> dict[str, Any]:
     scales = p2["scales"]
-    w.json("p2_specifications", {k: v["spec"] for k, v in scales.items()})
-    w.json("p2_scales", {k: {kk: vv for kk, vv in v.items() if kk != "spec"} for k, v in scales.items()})
+    if project.config.sdc.release_specifications:
+        w.json("p2_specifications", {k: v["spec"] for k, v in scales.items()})
+        w.json("p2_scales", {k: {kk: vv for kk, vv in v.items() if kk != "spec"} for k, v in scales.items()})
+    else:
+        # Only the kind of limit and the analysis transform: absolute limits and units stay local.
+        w.json("p2_specifications", {k: {"op": v["spec"].get("op")} for k, v in scales.items()})
+        w.json("p2_scales", {k: {"transform": v["transform"], "one_sided": v["one_sided"]} for k, v in scales.items()})
     cap = p2["capability"].copy()
     if lot_values != "raw":
         cap = cap.drop(columns=["mean", "sd"], errors="ignore")

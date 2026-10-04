@@ -108,6 +108,10 @@ def test_release_is_complete_and_clean(pipeline_run: tuple[Project, PipelineOutp
     local = out.run.run_dir / "local_only"
     assert (local / "README.txt").is_file() and not str(local).startswith(str(root))
     assert (local / "results.pkl").is_file()
+    specs = json.loads((root / "tables" / "p2_specifications.json").read_text(encoding="utf-8"))
+    scales = json.loads((root / "tables" / "p2_scales.json").read_text(encoding="utf-8"))
+    assert all(set(v) == {"op"} for v in specs.values())  # no absolute limits or units released
+    assert all(set(v) == {"transform", "one_sided"} for v in scales.values())
     p1 = (root / "latex" / "macros_p1.tex").read_text(encoding="utf-8")
     p2 = (root / "latex" / "macros_p2.tex").read_text(encoding="utf-8")
     for name in ("POTrendWord", "PORateVsExpected", "POSignalList", "POBestModel", "POITSWord"):
