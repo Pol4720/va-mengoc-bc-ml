@@ -1,0 +1,11 @@
+% Shared letter layout for cover letters (after the project preamble).
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6\baselineskip}
+\newcommand{\LetterHead}{%
+  {\small\raggedleft \AffilDept\\ \AffilInst\\ \AffilCity\\[2pt] \today\par}\bigskip}
+\newcommand{\LetterSignature}{%
+  \VLang{Yours sincerely,}{Atentamente,}\par\medskip
+  \AuthorOne\ (ORCID \AuthorOneORCID)\\
+  \VLang{on behalf of both authors}{en nombre de ambos autores}\\
+  \Affiliation\par}
