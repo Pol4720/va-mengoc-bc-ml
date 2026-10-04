@@ -1,90 +1,46 @@
 {
   "aloh3_conc": {
-    "high": 5.0,
-    "low": 3.0,
     "one_sided": null,
-    "transform": null,
-    "window_high": 5.0,
-    "window_low": 3.0
+    "transform": null
   },
   "bactericidal_titer": {
-    "high": null,
-    "low": 2.0,
     "one_sided": "lower",
-    "transform": "log2",
-    "window_high": 11.0,
-    "window_low": 2.0
+    "transform": "log2"
   },
   "endotoxin": {
-    "high": 4.301051709845226,
-    "low": null,
     "one_sided": "upper",
-    "transform": "log10p1",
-    "window_high": 4.301051709845226,
-    "window_low": 0.0
+    "transform": "log10p1"
   },
   "fill_volume": {
-    "high": null,
-    "low": 0.5,
     "one_sided": "lower",
-    "transform": null,
-    "window_high": 0.6,
-    "window_low": 0.5
+    "transform": null
   },
   "igg_elisa": {
-    "high": null,
-    "low": 3.845098040014257,
     "one_sided": "lower",
-    "transform": "log10",
-    "window_high": 4.810447595123116,
-    "window_low": 3.845098040014257
+    "transform": "log10"
   },
   "ph": {
-    "high": 7.2,
-    "low": 6.0,
     "one_sided": null,
-    "transform": null,
-    "window_high": 7.2,
-    "window_low": 6.0
+    "transform": null
   },
   "protein_adsorption": {
-    "high": null,
-    "low": 80.0,
     "one_sided": "lower",
-    "transform": null,
-    "window_high": 100.0,
-    "window_low": 80.0
+    "transform": null
   },
   "protein_conc": {
-    "high": 130.0,
-    "low": 70.0,
     "one_sided": null,
-    "transform": null,
-    "window_high": 130.0,
-    "window_low": 70.0
+    "transform": null
   },
   "ps_adsorption": {
-    "high": null,
-    "low": 80.0,
     "one_sided": "lower",
-    "transform": null,
-    "window_high": 100.0,
-    "window_low": 80.0
+    "transform": null
   },
   "ps_conc": {
-    "high": 130.0,
-    "low": 70.0,
     "one_sided": null,
-    "transform": null,
-    "window_high": 130.0,
-    "window_low": 70.0
+    "transform": null
   },
   "thiomersal_conc": {
-    "high": 0.13,
-    "low": 0.07,
     "one_sided": null,
-    "transform": null,
-    "window_high": 0.13,
-    "window_low": 0.07
+    "transform": null
   }
 }
