@@ -1,0 +1,81 @@
+% READUS-PV checklist (Fusaroli et al., Drug Saf 2024) for Paper 1 — built after manuscript.tex.
+\documentclass[10pt]{article}
+\newcommand{\DocLang}{en}
+\input{papers/shared/preamble.tex}
+\usepackage{longtable}
+\externaldocument[M-]{manuscript}
+\geometry{margin=2cm}
+\hypersetup{pdftitle={READUS-PV checklist: Post-marketing safety of VA-MENGOC-BC in Cuba}}
+\newcommand{\Loc}[1]{\S\ref{M-#1}}
+
+\begin{document}
+\SyntheticNotice
+\section*{READUS-PV checklist}
+\noindent Manuscript: \emph{Post-marketing safety of the VA-MENGOC-BC meningococcal B and~C vaccine in
+Cuba, \VStudyFirstYear--\VStudyLastYear: a nationwide analysis of spontaneous reports with
+disproportionality, latent class and machine-learning methods.} Items are those of the
+READUS-PV statement \cite{Fusaroli2024Statement}; locations refer to the sections of the manuscript.
+
+\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{0.8cm}>{\raggedright\arraybackslash}p{8.4cm}>{\raggedright\arraybackslash}p{3.4cm}@{}}
+\toprule
+Section & Item & Checklist item (abridged) & Location \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+Title & 1a & Identify the study as a disproportionality analysis; type of data and database & Title \\
+ & 1b & Name the adverse events and/or drugs under study & Title \\
+Background & 2a & Drug, utilisation, nature and frequency of the events, existing knowledge & \Loc{sec:intro} \\
+ & 2b & Rationale for the analysis & \Loc{sec:intro} \\
+ & 2c & Why ICSR databases and disproportionality are suitable & \Loc{sec:intro} \\
+Objectives & 3 & Objectives, events, drug and reference group, prespecified hypotheses & \Loc{sec:intro} (last paragraph) \\
+Study design & 4a & Identify the study and the type of data & \Loc{sec:design} \\
+ & 4b & Outline of the design, primary and sensitivity analyses & \Loc{sec:design}, \Loc{sec:m-disp} \\
+Data & 5a & Database, custodian, coverage, number of drugs, coding of drugs and events & \Loc{sec:design}, \Loc{sec:data} \\
+ & 5b & Extraction dates; pre-processing, transformations and exclusions & \Loc{sec:design}, \Loc{sec:data}; Fig.~\ref{M-fig:flow} \\
+Variables & 6a & Study population and restrictions & \Loc{sec:data}, \Loc{sec:m-disp} \\
+ & 6b & Key variables & \Loc{sec:events} \\
+ & 6c & Grouping of drugs or events; role of the drug & \Loc{sec:events} \\
+ & 6d & Additional data sources and how they interact with the ICSRs & \Loc{sec:data}, \Loc{sec:m-rates}, \Loc{sec:m-time} \\
+Statistical methods & 7a & Descriptive analyses, tests and thresholds & \Loc{sec:m-rates}, \Loc{sec:m-lca}, \Loc{sec:m-hosp} \\
+ & 7b & Disproportionality measures and signal thresholds, with justification & \Loc{sec:m-disp} \\
+ & 7c & Sensitivity analyses and control of confounding & \Loc{sec:m-disp} \\
+ & 7d & Case-by-case analysis and causality assessment & Not performed; stated in \Loc{sec:events} \\
+ & 7e & Methods for other data sources & \Loc{sec:m-rates}, \Loc{sec:m-time} \\
+Participants & 8a & Number of ICSRs at each stage and reasons for exclusion & \Loc{sec:r-reports}; Fig.~\ref{M-fig:flow} \\
+ & 8b & Demographic and clinical characteristics, with a reference group & Table~\ref{M-tab:characteristics} \\
+Disproportionality & 9 & All results with confidence intervals, including sensitivity analyses & \Loc{sec:r-disp}; Tables~\ref{M-tab:disproportionality}--\ref{M-tab:designs}; Supplementary Material \\
+Case-by-case & 10 & Case-by-case analysis and causality assessment & Not applicable (not performed) \\
+Key results & 11 & Key results in context; expected reactions versus emerging signals & \Loc{sec:d-principal}, \Loc{sec:d-interpretation} \\
+External validity & 12a & External validity & \Loc{sec:d-interpretation} \\
+ & 12b & Relevance for clinical practice & \Loc{sec:d-implications} \\
+ & 12c & Further study designs & \Loc{sec:d-interpretation}, \Loc{sec:d-implications} \\
+Limitations & 13 & Disproportionality cannot prove causation or measure incidence; specific limitations & \Loc{sec:d-limitations} \\
+Declarations & 14a & Funding and role of funders & Declarations \\
+ & 14b & Conflicts of interest & Declarations \\
+ & 14c & Institutional approval & Declarations \\
+ & 14d & Data and code availability, software version, protocol registration & Declarations \\
+\end{longtable}
+
+\subsection*{Checklist for the abstract}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{0.8cm}>{\raggedright\arraybackslash}p{8.4cm}>{\raggedright\arraybackslash}p{3.4cm}@{}}
+\toprule
+Section & Item & Checklist item (abridged) & Location \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+Background & 1a--1c & Aim, events and drug, population or setting & Introduction, Objective \\
+Methods & 2a & Disproportionality analysis and type of data & Methods \\
+ & 2b & Database and type of access & Methods \\
+ & 2c & Timeframe and region & Methods \\
+ & 2d & Measures and thresholds & Methods \\
+ & 2e & Whether a case-by-case analysis was performed & Methods \\
+Results & 3 & Main findings with precision & Results \\
+Conclusion & 4a--4c & Key conclusions; hypothesis-generating nature; implications & Conclusions \\
+\end{longtable}
+
+\bibliographystyle{vancouver}
+\bibliography{papers/shared/bib/pubmed}
+\end{document}

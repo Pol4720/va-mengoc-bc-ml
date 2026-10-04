@@ -1,0 +1,375 @@
+% Paper 2 — lot release attributes and reactogenicity of VA-MENGOC-BC (English).
+% Target journal: Vaccine (Elsevier; research article, abstract <= 250 words).
+\documentclass[11pt]{article}
+\newcommand{\DocLang}{en}
+\input{papers/shared/preamble.tex}
+\input{papers/shared/authors.tex}
+\input{papers/shared/pending.tex}
+\input{papers/p2-lot-quality/shared/flow.tex}
+\externaldocument{supplement}
+\usepackage{lineno}
+\onehalfspacing
+
+\hypersetup{pdftitle={Lot release attributes and reactogenicity of the VA-MENGOC-BC outer membrane vesicle vaccine},
+  pdfauthor={Richard Alejandro Matos Arderi; Abel Ponce Gonzalez}}
+
+\begin{document}
+
+\begin{titlepage}
+\SyntheticNotice
+\begin{center}
+{\LARGE\bfseries Lot release attributes and reactogenicity of an outer membrane vesicle vaccine:
+linkage of quality-control data from \PTNLots{} VA-MENGOC-BC lots with national adverse event
+reports\par}
+\bigskip
+\AuthorBlock
+\end{center}
+\bigskip
+\noindent\textbf{Running title:} Lot quality and reactogenicity of VA-MENGOC-BC\par
+\noindent\textbf{Keywords:} vaccine lot release; quality control; statistical process control;
+outer membrane vesicle; endotoxin; adverse events following immunization; case-only design;
+pharmacovigilance\par
+\end{titlepage}
+
+\linenumbers
+
+\section*{Abstract}
+\noindent\textbf{Background:} Whether the measured quality of vaccine lots influences reported
+reactions is debated and unstudied for outer membrane vesicle (OMV) vaccines, whose reactogenicity
+depends on endotoxin and adjuvant.\par
+\noindent\textbf{Methods:} Release data of \PTNLots{} VA-MENGOC-BC lots (\PTLotFirstYear--\PTLotLastYear;
+\PTNAttributes{} attributes) were analysed with process control, capability ($P_{pk}$), robust
+multivariate monitoring, change-point detection and national-versus-export equivalence tests.
+Cuban reports of adverse events following immunization (\VStudyFirstYear--\VStudyLastYear) were
+linked to the administered lots. In a case-only design, generalised estimating equations clustered
+by lot estimated whether reports of fever or severe local reactions varied with lot attributes, with
+false-discovery-rate control, a negative-control exposure and sensitivity analyses.\par
+\noindent\textbf{Results:} \PTConformitySentence; $P_{pk}$ was below 1.0 for \PTNAttrPpkBelowOne{}
+attributes and national and export lots were equivalent for \PTNEquivalent{} of \PTNAttributes.
+Of \PTNTargetReports{} reports, \PTNLinked{} (\PTLinkRate) were linked to \PTNLinkedLots{} lots.
+\PTNSignificantFDR{} of \PTNPrimaryTests{} prespecified associations survived correction
+(\PTSignificantList); the odds ratio per standard deviation of endotoxin for fever of at least
+39\,\textdegree{}C was \PTEvFeverThreeNineEndotoxinOR{} (\CI{} \PTEvFeverThreeNineEndotoxinCI).
+\PTNegControlSentence, and lot attributes \PTIncrementalWord{} out-of-lot prediction.\par
+\noindent\textbf{Conclusions:} Linking routine release testing with pharmacovigilance is feasible
+and tests lot-related hypotheses about reactogenicity within specification, supporting quality risk
+management and post-marketing surveillance of OMV vaccines.
+
+\clearpage
+\section{Introduction}\label{sec:intro}
+
+Every lot of a vaccine is released only after its quality attributes have been tested against the
+specifications of its licence \cite{WHO2013LotRelease}. Within those limits, attributes such as
+antigen content, adsorption to the adjuvant or residual endotoxin still vary from lot to lot. Whether
+this variability within specification influences the reactions that vaccinees experience is a
+question that pharmaceutical quality systems \cite{ICHQ9R1,ICHQ10} and pharmacovigilance rarely
+answer together. Interest in the question has grown since analyses of national reporting systems
+suggested heterogeneity in suspected adverse events across lots of COVID-19 vaccines
+\cite{Schmeling2023,Manniche2024,Furst2024,Schmeling2025}. Those analyses also showed the pitfalls
+of the approach: the number of doses actually administered from each lot, differences in the
+populations vaccinated and changes in reporting over time can create apparent differences between
+lots \cite{Hviid2023,Scott2023}. Methodological work has proposed scan statistics over the
+manufacturing genealogy to locate such signals \cite{Mahaux2019}, but no study has related measured
+release attributes to reported reactions.
+
+Outer membrane vesicle (OMV) vaccines against serogroup~B meningococcal disease are a natural
+setting for this question. Their reactogenicity---mainly fever and local reactions in young
+children---is well described \cite{Nokleby2007,Holst2009}, and it has plausible lot-level
+determinants: the membrane-bound endotoxin of the vesicles drives the febrile response
+\cite{Sheerin2019,Zariri2016}, and adsorption onto aluminium hydroxide reduces pyrogenicity
+\cite{Rosenqvist1998}. VA-MENGOC-BC, the Cuban OMV vaccine against serogroups~B and~C, has been
+produced continuously for more than three decades and is administered to every Cuban infant
+\cite{Sotolongo2007,SierraGonzalez2019}. Its manufacturer keeps the release record of every lot,
+and the national surveillance system records the lot administered in each report of an adverse
+event following immunization (AEFI) \cite{Galindo2012}.
+
+We linked these two sources with two aims: (i) to characterise the consistency of VA-MENGOC-BC
+production with statistical process control, process capability and multivariate monitoring; and
+(ii) to estimate, in a case-only design, whether lot attributes are associated with the profile of
+reactions reported after vaccination, with prespecified hypotheses, a negative-control exposure
+and an explicit assessment of statistical power.
+
+\section{Methods}\label{sec:methods}
+
+\subsection{Design and data sources}\label{sec:design}
+The study combined a retrospective analysis of lot release data with a case-only analysis of
+linked AEFI reports, and is reported following RECORD-PE \cite{Langan2018}. The release record
+contained \PTNLots{} lots produced in \PTLotFirstYear--\PTLotLastYear, \PTNNationalLots{} for the
+national programme and \PTNExportLots{} for export, with \PTNAttributes{} quality attributes and
+their specifications. The AEFI reports came from the national surveillance database described in a
+companion analysis: \VNFiles{} annual files of \VStudyFirstYear--\VStudyLastYear, harmonised,
+pseudonymised and deduplicated with the same open-source pipeline (version \VCodeVersion)
+\cite{Kahn2016,ENISA2019}. Lot data are confidential industrial information; they were analysed
+on an institutional workstation and are released only as positions within the specification
+window (0 = lower limit, 1 = upper limit), never as raw values.
+
+\subsection{Attributes and scales}\label{sec:scales}
+Attributes were analysed on their natural scale or after the transformation that makes their
+variation approximately symmetric: base-2 logarithm for the bactericidal titre, base-10 logarithm
+for the anti-OMV IgG concentration and $\log_{10}(1+x)$ for endotoxin. For the association
+analyses, each attribute was standardised to the mean and standard deviation (SD) of the linked
+lots, so that odds ratios refer to a one-SD difference between lots.
+
+\subsection{Process performance}\label{sec:m-spc}
+For each attribute in production order we built individual and moving-range charts with Nelson's
+rules \cite{Nelson1984,Montgomery2019} and an exponentially weighted moving average chart
+($\lambda=\PTEWMALambda$) \cite{Lucas1990}. Process performance was summarised with $P_{pk}$
+with \PTCapBootstrap{} percentile bootstrap intervals \cite{Efron1987} and with the
+percentile-based $P_{pk}$ of ISO~22514-2, which does not assume normality \cite{ISO22514-2}, for
+all lots and for lots produced before (\PTPeriodOne) and during (\PTPeriodTwo) the
+pharmacovigilance window; the split was fixed by the study design, not by the data. Abrupt shifts
+were located with an exact PELT algorithm with a BIC-type penalty \cite{Killick2012,Truong2020}.
+Multivariate atypicality was monitored with a robust principal component model (minimum covariance
+determinant \cite{Rousseeuw1999}, components explaining at least 85\% of the variance), with
+Hotelling's $T^2$ control limits from the beta distribution \cite{Tracy1992} and the squared
+prediction error with Jackson--Mudholkar limits \cite{Jackson1979,MacGregor1995}, both at
+$\alpha=\PTMSPCAlpha$. National and export lots were compared with two one-sided tests
+\cite{Schuirmann1987} (Welch standard errors; equivalence margin of \PTEqMarginPct{} of the
+specification window), the Hodges--Lehmann shift \cite{Hodges1963} and a multivariate energy test
+\cite{Szekely2013}.
+
+\subsection{Linkage of reports to lots}\label{sec:m-link}
+Lot numbers recorded in the reports were normalised and matched to the release record in three
+steps: exact match, match on the core of the lot code (ignoring separators and suffixes), and
+fuzzy match (similarity of at least \PTFuzzyThreshold{} among national lots produced before
+vaccination). Ambiguous matches were resolved in favour of national lots and of the most recent
+lot produced before the year of vaccination. Links implying vaccination more than
+\PTMaxYearsAfterProduction{} years after production were considered implausible and excluded from
+the primary analysis (\figref{fig:flow}). Characteristics of linked and unlinked reports were
+compared to assess linkage bias (Supplementary \tabref{tab:S-linkbias}).
+
+\begin{figure}[tbp]
+\centering
+\LinkageFlow
+\caption{Linkage of AEFI reports involving VA-MENGOC-BC to the release record of the administered
+lots. Counts come from the disclosure-controlled release.}
+\label{fig:flow}
+\end{figure}
+
+\subsection{Case-only association analysis}\label{sec:m-assoc}
+Because the number of doses administered from each lot is not recorded, absolute risks per lot
+cannot be estimated. We therefore used a case-only design \cite{Piegorsch1994}: among reports
+linked to a lot, we estimated whether the probability that a report included a given reaction
+varied with the attributes of the lot. The design is valid for the relative profile of reactions
+under the assumption that the completeness of reporting of one reaction relative to another does
+not vary with the attributes of the lot.
+
+The prespecified primary family comprised three outcomes (fever of at least 39 and
+40\,\textdegree{}C and severe local reaction) and four exposures with a plausible mechanism
+(endotoxin, aluminium hydroxide, protein concentration and protein adsorption), that is
+\PTNPrimaryTests{} associations. Fill volume, which should not influence the type of reaction, was
+a negative-control exposure \cite{Lipsitch2010,Arnold2016}. Each association was estimated with a
+logistic generalised estimating equation with exchangeable working correlation within lot and
+robust standard errors \cite{Liang1986,Zeger1986}, adjusted for age (log months), sex, dose number,
+co-administration and calendar year; unadjusted estimates are reported alongside. The Benjamini--Hochberg procedure controlled the false
+discovery rate at \PTFDRAlpha{} within the primary family \cite{Benjamini1995}; the negative control
+was not part of the family. The other attributes, the multivariate atypicality ($T^2$) and the
+secondary outcomes were exploratory.
+
+Sensitivity analyses restricted the data to exact links, excluded co-administered vaccines and
+retained temporally implausible links; refitted the exposures in a Bayesian random-intercept
+logistic model; and modelled the proportion of reports with each reaction at lot level with a
+quasi-binomial model weighted by the number of reports per lot. To interpret null findings, the
+minimum detectable odds ratio per SD with 80\% power was computed from the number of reports, the
+prevalence of each reaction and the intra-lot correlation (design effect) \cite{Hsieh1998}.
+
+\subsection{Incremental predictive value}\label{sec:m-ml}
+We asked whether the attributes of a lot help predict the reactions reported with it beyond the
+characteristics of the vaccinee. Gradient-boosted trees \cite{Ke2017} were trained with and without
+the lot attributes and evaluated by the area under the ROC curve in \PTCVFolds-fold cross-validation
+grouped by lot, so that every prediction concerns lots unseen during training. The difference in
+area was compared with its distribution under \PTNPermutations{} permutations of complete attribute
+profiles between lots, which preserves the correlation between attributes and the clustering of
+reports.
+
+\subsection{Disclosure control and ethics}\label{sec:m-sdc}
+Only aggregated results left the controlled environment: non-zero counts below \VMinCell{} were
+suppressed together with the statistics derived from them, lot attributes were released only as
+positions within the specification window, and an automated verifier checked every released file
+\cite{Hundepool2012}. The study used pseudonymised surveillance records and manufacturing records
+under the institutional data-governance procedure of the Finlay Vaccine Institute and Law 149/2022
+\cite{Ley149}.
+
+\section{Results}\label{sec:results}
+
+\subsection{Consistency of production}\label{sec:r-spc}
+\PTConformitySentence{} (lowest percentage of conforming lots for any attribute,
+\PTPctConforming). $P_{pk}$ was at least 1.33 for \PTNAttrPpkAbove{} attributes and
+below 1.0 for \PTNAttrPpkBelowOne{} (\PTPpkBelowOneList; \tabref{tab:capability},
+\figref{fig:capability}); values below 1.0 indicate that the process is centred or spread such
+that lots close to a limit are expected. The PELT algorithm located
+\PTNChangepoints{} sustained shifts (\PTChangepointList). The robust principal component model
+retained \PTNComponents{} components explaining \PTExplainedVar{} of the variance; \PTTTwoFlagged{}
+lots exceeded the $T^2$ limit and \PTSPEFlagged{} the squared-prediction-error limit
+(\figref{fig:t2}). National and export lots were equivalent within the prespecified margin for
+\PTNEquivalent{} of \PTNAttributes{} attributes (Supplementary \tabref{tab:S-equivalence}), and their
+multivariate distributions \PTEnergyWord{} (energy test $p$\PTEnergyP).
+
+\begin{table}[tbp]
+\centering\small
+\caption{Process performance of VA-MENGOC-BC lots: $P_{pk}$ with 95\% bootstrap interval for all
+lots and by production period, and production year of the change points located by PELT.}
+\label{tab:capability}
+\PTTableCapability
+\end{table}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth]{p2_qc_annual}
+\caption{Release attributes of VA-MENGOC-BC lots by production year, shown as position within the
+specification window (0, lower limit; 1, upper limit). Lines show the annual median and band the
+interquartile range; red lines mark specification limits.}
+\label{fig:qcannual}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\begin{minipage}[t]{0.49\textwidth}\centering
+\includegraphics[width=\linewidth]{p2_capability}
+\caption{$P_{pk}$ (95\% bootstrap interval) by production period. Vertical lines mark 1.00 and
+1.33.}
+\label{fig:capability}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.49\textwidth}\centering
+\includegraphics[width=\linewidth]{p2_t2}
+\caption{Multivariate atypicality ($T^2$) of lots by production year, with the control limit.}
+\label{fig:t2}
+\end{minipage}
+\end{figure}
+
+\subsection{Linkage}\label{sec:r-link}
+Of \PTNTargetReports{} reports involving VA-MENGOC-BC, \PTNLinked{} (\PTLinkRate) were linked to
+\PTNLinkedLots{} lots: \PTLinkExact{} by exact match, \PTLinkCore{} by the core of the code and
+\PTLinkFuzzy{} by fuzzy match (\figref{fig:flow}; Supplementary \tabref{tab:S-linkage}). The primary
+analysis included \PTNAnalysed{} reports in \PTNAnalysedLots{} lots (median \PTReportsPerLot{}
+reports per lot).
+
+\subsection{Lot attributes and reported reactions}\label{sec:r-assoc}
+\PTNSignificantFDR{} of the \PTNPrimaryTests{} prespecified associations remained significant after
+false-discovery-rate correction (\PTSignificantList; \tabref{tab:gee}, \figref{fig:forest}). The
+proportion of reports with fever of at least 39\,\textdegree{}C was
+\PTEvFeverThreeNineEndotoxinDir{} the endotoxin content of the lot (odds ratio per SD
+\PTEvFeverThreeNineEndotoxinOR, \CI{} \PTEvFeverThreeNineEndotoxinCI; $q$\PTEvFeverThreeNineEndotoxinQ)
+and \PTEvFeverThreeNineAlohThreeConcDir{} its aluminium hydroxide content (\PTEvFeverThreeNineAlohThreeConcOR,
+\CI{} \PTEvFeverThreeNineAlohThreeConcCI). Fever of at least 40\,\textdegree{}C was
+\PTEvFeverFourZeroEndotoxinDir{} endotoxin (\PTEvFeverFourZeroEndotoxinOR, \CI{}
+\PTEvFeverFourZeroEndotoxinCI), and severe local reactions were \PTEvSevereLocalReactionAlohThreeConcDir{}
+aluminium hydroxide (\PTEvSevereLocalReactionAlohThreeConcOR, \CI{}
+\PTEvSevereLocalReactionAlohThreeConcCI). \PTNegControlSentence{} ($p<0.05$ in \PTNNegControlNominal{} of three outcomes). \PTSensSentence{} (Supplementary
+\tabref{tab:S-sensitivity}).
+
+\begin{table}[tbp]
+\centering\small
+\caption{Association between lot attributes and the reactions reported with VA-MENGOC-BC
+(case-only design). Odds ratios per SD of the attribute between lots, from logistic generalised
+estimating equations clustered by lot, crude and adjusted for age, sex, dose, co-administration and
+year;
+$q$, Benjamini--Hochberg adjusted $p$ within the prespecified family (the negative control is
+outside the family).}
+\label{tab:gee}
+\PTTableGEE
+\end{table}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth]{p2_forest}
+\caption{Adjusted odds ratios per SD of each lot attribute (95\% CI) for each reaction,
+single-exposure models. The shaded band spans the minimum detectable effect (from 1/MDE to MDE);
+grey markers show the negative-control exposure.}
+\label{fig:forest}
+\end{figure}
+
+\subsection{Power and incremental predictive value}\label{sec:r-power}
+With the observed number of lots and intra-lot correlation, the minimum detectable odds ratio per
+SD was \PTEvFeverThreeNineMDE{} for fever of at least 39\,\textdegree{}C, \PTEvFeverFourZeroMDE{}
+for fever of at least 40\,\textdegree{}C and \PTEvSevereLocalReactionMDE{} for severe local
+reactions (\tabref{tab:power}). Adding all lot attributes to the characteristics of the vaccinee
+\PTIncrementalWord{} the out-of-lot prediction of the reactions: the change in the area under the
+ROC curve was \PTEvFeverThreeNineDeltaAUC{} for fever of at least 39\,\textdegree{}C (permutation
+$p$\PTEvFeverThreeNinePermP; \figref{fig:incremental}).
+
+\begin{table}[tbp]
+\centering\small
+\caption{Minimum detectable effect (MDE; odds ratio per SD with 80\% power, two-sided
+$\alpha=0.05$) given the clustering of reports in lots, and incremental value of the lot attributes
+for out-of-lot prediction ($\Delta$AUC, change in the area under the ROC curve; $p$ from
+permutations of attribute profiles between lots).}
+\label{tab:power}
+\PTTablePower
+\end{table}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics{p2_incremental}
+\caption{Change in the cross-validated area under the ROC curve when lot attributes are added
+(points), against its permutation distribution (95th percentile marked).}
+\label{fig:incremental}
+\end{figure}
+
+\section{Discussion}\label{sec:discussion}
+
+\subsection{Principal findings}\label{sec:d-principal}
+The release record of \PTNLots{} lots of VA-MENGOC-BC showed a process
+\PTWithinSpecPhrase, with \PTNChangepoints{} sustained shifts and capability below 1.0 for
+\PTNAttrPpkBelowOne{} attributes. Linking \PTLinkRate{} of the AEFI reports to their lots, we found
+that \PTNSignificantFDR{} of \PTNPrimaryTests{} prespecified associations between lot attributes
+and the profile of reported reactions survived correction for multiplicity (\PTSignificantList),
+while the negative-control exposure \PTNegControlWord{} with the reactions.
+
+\subsection{Interpretation}\label{sec:d-interpretation}
+An association between endotoxin and fever would be biologically coherent: OMV-associated
+lipooligosaccharide activates innate immunity through Toll-like receptor~4, and the febrile
+response to OMV vaccines has been attributed to it \cite{Sheerin2019,Zariri2016}, while adsorption
+onto aluminium hydroxide modulates pyrogenicity \cite{Rosenqvist1998}. Any such association must be
+read for what the design can show: a shift in the composition of the reports, among lots that were
+all within specification, not an absolute risk per dose. The negative-control exposure, the
+sensitivity analyses and the minimum detectable effects help separate true lot effects from the
+artefacts that have affected lot-level analyses of spontaneous reports---differences in the
+populations vaccinated with each lot, in calendar time and in reporting
+\cite{Hviid2023,Scott2023}. For the same reason, an absence of association is informative only for
+effects larger than the minimum detectable odds ratios reported here.
+
+Statistical process control applied retrospectively to release data adds a different kind of
+evidence: whether the process remained stable, whether it changed abruptly and whether lots for
+national use and for export were equivalent. A capability index below 1.0 does not mean
+non-conformity, but indicates that the margin between the process and its limits is narrow and is a
+natural target for quality risk management \cite{ICHQ9R1,ICHQ10}. Combining these indicators with
+the safety linkage turns the lot release record into a tool for post-marketing surveillance.
+
+\subsection{Strengths and limitations}\label{sec:d-limitations}
+The study links, for the first time for an OMV vaccine, the measured quality of each lot with the
+reactions reported after its administration; it uses the complete release record and the national
+reports of \VStudyFirstYear--\VStudyLastYear, prespecifies its hypotheses and controls multiplicity, and generates every number
+from a verified, disclosure-controlled release.
+
+It has important limitations. First, the doses administered per lot were unknown, so the design
+estimates the relative profile of reactions, not their incidence; an attribute that raised the
+frequency of all reactions equally would not be detected. Second, reporting completeness could
+differ between lots in ways related to their attributes, for example through calendar time;
+adjustment for year and the negative control mitigate but do not exclude this bias. Third, lot
+numbers were missing or unmatched in some reports, and linked and unlinked reports may differ
+(Supplementary \tabref{tab:S-linkbias}). Fourth, the lots were \PTWithinSpecPhrase, so the
+results do not extrapolate beyond the specified range. Fifth, release tests
+measure a sample of each lot at release and do not capture changes during storage and distribution.
+Finally, reactions were recorded as indicators of the national form without clinical validation.
+
+\subsection{Implications}\label{sec:d-implications}
+Manufacturers already hold the release records and national systems already record the lot
+administered; the pipeline used here shows that both can be linked routinely, with confidentiality
+of industrial data preserved through disclosure control. Recording the doses distributed per lot
+would allow incidence per lot to be estimated, and the same framework can be applied to other
+vaccines with lot-level quality data.
+
+\section{Conclusions}\label{sec:conclusions}
+VA-MENGOC-BC lots were produced \PTWithinSpecPhrase. Linking lot release attributes
+with national AEFI reports is feasible and provides a reproducible way to test whether variation
+within specification is associated with reactogenicity; the associations identified here
+(\PTSignificantList) define hypotheses for confirmation and for quality risk management.
+
+\section*{Declarations}
+\input{papers/p2-lot-quality/shared/declarations_en.tex}
+
+\bibliographystyle{vancouver}
+\bibliography{papers/shared/bib/pubmed,papers/shared/bib/manual}
+
+\end{document}

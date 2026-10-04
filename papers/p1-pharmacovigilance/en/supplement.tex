@@ -1,0 +1,135 @@
+% Supplementary Material — Paper 1 (English). Built before manuscript.tex (cross-references).
+\documentclass[11pt]{article}
+\newcommand{\DocLang}{en}
+\input{papers/shared/preamble.tex}
+\input{papers/shared/authors.tex}
+\usepackage{pdflscape}
+\hypersetup{pdftitle={Supplementary Material: Post-marketing safety of VA-MENGOC-BC in Cuba}}
+
+\begin{document}
+\SupplementaryNumbering
+\SyntheticNotice
+\begin{center}
+{\Large\bfseries Supplementary Material\par}
+\medskip
+{\large Post-marketing safety of the VA-MENGOC-BC meningococcal B and~C vaccine in Cuba,
+\VStudyFirstYear--\VStudyLastYear: a nationwide analysis of spontaneous reports with
+disproportionality, latent class and machine-learning methods\par}
+\medskip
+{\small \AuthorOne{} and \AuthorTwo\par}
+\end{center}
+
+\tableofcontents
+
+\section{Annual reporting rates}\label{sec:S-rates}
+\begin{table}[htbp]
+\centering\small
+\caption{Annual AEFI reports involving VA-MENGOC-BC, doses administered and reporting rates per
+\num{100000} doses with exact Poisson 95\% confidence intervals. The ratio compares each rate with
+the programme's expected rate of \POExpectedRate{} per \num{100000} doses for all childhood
+vaccines. Years without a dose denominator show a dash.}
+\label{tab:S-rates}
+\POTableRates
+\end{table}
+
+\section{Latent class model selection}\label{sec:S-lca}
+\begin{table}[htbp]
+\centering\small
+\caption{Latent class models with $K=\POLCAKMin,\dots,\POLCAKMax$ classes fitted to the event indicators with a
+prevalence of at least 0.5\%. The model with the lowest BIC was selected; ICL-BIC penalises
+poorly separated classes and the entropy $R^2$ measures classification certainty (1 = perfect).}
+\label{tab:S-lca}
+\POTableLCASelection
+\end{table}
+
+\section{Correlates of hospitalisation}\label{sec:S-logistic}
+\begin{table}[htbp]
+\centering\small
+\caption{Adjusted odds ratios of hospitalisation from the multivariable Firth logistic regression
+fitted to all reports (Wald 95\% confidence intervals). Region contrasts are relative to the
+western region; event and vaccine terms are present-versus-absent indicators. Terms recorded in
+fewer than \VMinCell{} reports are suppressed.}
+\label{tab:S-logistic}
+\POTableLogistic
+\end{table}
+
+\section{Disproportionality under each comparator design}\label{sec:S-designs}
+All tables follow the notation of the main text: $a$, reports with VA-MENGOC-BC and the event;
+$E$, expected $a$ under independence; IC\textsubscript{025}, lower 95\% credibility bound of the
+information component; EB\textsubscript{05}, lower 5th percentile of the empirical Bayes geometric
+mean (primary design only, because the gamma Poisson shrinker prior is estimated on the whole
+database); Methods, number of the four methods meeting their thresholds; Signal, prespecified
+criterion (IC\textsubscript{025}${}>0$ with $a\geq\PODispMinReports$). Counts below \VMinCell{} are suppressed
+together with the statistics derived from them.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Primary design: VA-MENGOC-BC reports against all other reports (all event types).}
+\label{tab:S-disp-primary}
+\POTableDispPrimaryAllOtherVaccines
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Infant active-comparator design: reports in children younger than \POInfantMonths{}
+months.}
+\label{tab:S-disp-infant}
+\POTableDispInfantActiveComparator
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Single-vaccine design: VA-MENGOC-BC given alone against other vaccines given alone.}
+\label{tab:S-disp-single}
+\POTableDispExcludingCoadministration
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Masking design: comparator group without the reports that mention the pentavalent
+vaccine (PENTA-L).}
+\label{tab:S-disp-masking}
+\POTableDispExcludingPentavalentMasking
+\end{table}
+
+\section{Temporal stability of the information component}\label{sec:S-cumic}
+\begin{table}[htbp]
+\centering\small
+\caption{Cumulative information component (IC) with 95\% credibility interval, recomputed with
+the reports accumulated up to the end of each year, for the four most frequently reported events
+and for every event meeting the primary signal criterion.}
+\label{tab:S-cumic}
+\POTableCumulativeIC
+\end{table}
+
+\section{Data quality}\label{sec:S-dq}
+Data quality was assessed with the harmonised framework of Kahn et al.\ (conformance,
+completeness and plausibility) on the harmonised reports before deduplication.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Completeness: percentage of reports with each key field recorded, by year of the source
+file.}
+\label{tab:S-completeness}
+\POTableCompleteness
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Plausibility checks over all years. When some yearly counts were suppressed, the number
+flagged is shown as a lower bound and the percentage is omitted.}
+\label{tab:S-plausibility}
+\POTablePlausibility
+\end{table}
+
+\section{Meningococcal disease in Cuba, \POITSFirstYear--\POITSLastYear}\label{sec:S-its}
+\begin{figure}[htbp]
+\centering
+\includegraphics{p1_incidence}
+\caption{Annual national cases of meningococcal disease (logarithmic scale) and fit of the
+segmented negative-binomial model. The shaded band marks the \POITSTransition{} transition (efficacy trial,
+mass vaccination and inclusion in the national programme).}
+\label{fig:S-its}
+\end{figure}
+
+\end{document}

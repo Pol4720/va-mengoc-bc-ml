@@ -1,1 +1,17 @@
-# Documents built by tools/latex_build.py and CI (one per line).
+# Documents built by tools/latex_build.py and CI (one per line, in build order:
+# a supplement precedes its manuscript, and a checklist follows it, because they
+# exchange cross-references through \externaldocument).
+papers/p1-pharmacovigilance/en/supplement.tex
+papers/p1-pharmacovigilance/en/manuscript.tex
+papers/p1-pharmacovigilance/en/checklist_readus.tex
+papers/p1-pharmacovigilance/es/supplement.tex
+papers/p1-pharmacovigilance/es/manuscript.tex
+papers/p2-lot-quality/en/supplement.tex
+papers/p2-lot-quality/en/manuscript.tex
+papers/p2-lot-quality/en/checklist_recordpe.tex
+papers/p2-lot-quality/es/supplement.tex
+papers/p2-lot-quality/es/manuscript.tex
+submission/strategy/estrategia_publicacion.tex
+submission/p1-pharmacovigilance/cover_letter.tex
+submission/p2-lot-quality/cover_letter.tex
+submission/p2-lot-quality/highlights.tex

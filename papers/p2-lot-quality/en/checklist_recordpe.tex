@@ -1,0 +1,62 @@
+% RECORD-PE checklist (Langan et al., BMJ 2018) for Paper 2 — built after manuscript.tex.
+\documentclass[10pt]{article}
+\newcommand{\DocLang}{en}
+\input{papers/shared/preamble.tex}
+\externaldocument[M-]{manuscript}
+\externaldocument[S-]{supplement}
+\geometry{margin=2cm}
+\hypersetup{pdftitle={RECORD-PE checklist: Lot release attributes and reactogenicity of VA-MENGOC-BC}}
+\newcommand{\Loc}[1]{\S\ref{M-#1}}
+
+\begin{document}
+\SyntheticNotice
+\section*{RECORD-PE checklist}
+\noindent Manuscript: \emph{Lot release attributes and reactogenicity of an outer membrane vesicle
+vaccine: linkage of quality-control data from \PTNLots{} VA-MENGOC-BC lots with national adverse
+event reports.} Items are those of the RECORD-PE statement \cite{Langan2018}, which extends STROBE
+and RECORD; locations refer to the sections of the manuscript and Supplementary Material.
+
+\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.4cm}>{\raggedright\arraybackslash}p{1.1cm}>{\raggedright\arraybackslash}p{8.6cm}>{\raggedright\arraybackslash}p{3.6cm}@{}}
+\toprule
+Topic & Item & Recommendation (abridged) & Location \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+Title, abstract & 1 & Design with a common term; informative and balanced summary & Title; Abstract \\
+ & 1.1--1.3 & Type of data and databases; region and timeframe; linkage stated & Title; Abstract \\
+Background & 2 & Scientific background and rationale & \Loc{sec:intro} \\
+Objectives & 3 & Specific objectives and prespecified hypotheses & \Loc{sec:intro} \\
+Study design & 4 & Key elements of the design & \Loc{sec:design} \\
+ & 4.a--4.b & Details of the designs used; diagram of key aspects & \Loc{sec:design}, \Loc{sec:m-assoc}; Fig.~\ref{M-fig:flow} \\
+Setting & 5 & Setting, locations and relevant dates & \Loc{sec:design} \\
+Participants & 6 & Eligibility, sources and methods of selection & \Loc{sec:design}, \Loc{sec:m-link} \\
+ & 6.1--6.3 & Selection algorithms, their validation and the linkage & \Loc{sec:m-link}; Fig.~\ref{M-fig:flow} \\
+Variables & 7 & Outcomes, exposures, confounders & \Loc{sec:scales}, \Loc{sec:m-assoc} \\
+ & 7.1 & Codes and algorithms for exposures, outcomes and confounders & \Loc{sec:m-assoc}; dictionaries in the code repository \\
+ & 7.1.a--c & Exposure definition, data sources, exposure window & \Loc{sec:scales}, \Loc{sec:m-link} \\
+Data sources & 8, 8.a & Sources and measurement; health system and exposure records & \Loc{sec:design}, \Loc{sec:m-link} \\
+Bias & 9 & Efforts to address bias & \Loc{sec:m-assoc} (negative control, sensitivity analyses) \\
+Study size & 10 & How the study size was arrived at & \Loc{sec:m-assoc} (minimum detectable effect) \\
+Quantitative variables & 11 & Handling of quantitative variables & \Loc{sec:scales} \\
+Statistical methods & 12a--e & Methods, confounding, subgroups, missing data, sensitivity analyses & \Loc{sec:m-spc}, \Loc{sec:m-assoc}, \Loc{sec:m-ml} \\
+ & 12.1.a--b & Evaluation of assumptions; multiple designs & \Loc{sec:m-assoc} \\
+Data access & 12.1--12.2 & Access to the database population; data cleaning & \Loc{sec:design} \\
+Linkage & 12.3 & Linkage level, methods and quality evaluation & \Loc{sec:m-link}; Supplementary Table~\ref{S-tab:S-linkbias} \\
+Participants & 13, 13.1 & Numbers at each stage; selection including linkage; flow diagram & \Loc{sec:r-link}; Fig.~\ref{M-fig:flow} \\
+Descriptive data & 14 & Characteristics, exposures, missing data & \Loc{sec:r-spc}, \Loc{sec:r-link}; Supplementary Table~\ref{S-tab:S-linkbias} \\
+Outcome data & 15 & Numbers of outcome events & Table~\ref{M-tab:power} (prevalence) \\
+Main results & 16 & Unadjusted and adjusted estimates with precision; confounders & \Loc{sec:r-assoc}; Table~\ref{M-tab:gee} \\
+Other analyses & 17 & Subgroups, interactions, sensitivity analyses & \Loc{sec:r-power}; Supplementary Tables~\ref{S-tab:S-sensitivity}--\ref{S-tab:S-exploratory} \\
+Key results & 18 & Key results with reference to objectives & \Loc{sec:d-principal} \\
+Limitations & 19, 19.1, 19.1.a & Bias and imprecision; routinely collected data; capture of exposure & \Loc{sec:d-limitations} \\
+Interpretation & 20, 20.a & Cautious interpretation; alternative explanations & \Loc{sec:d-interpretation} \\
+Generalisability & 21 & External validity & \Loc{sec:d-implications}, \Loc{sec:d-limitations} \\
+Funding & 22 & Funding and role of funders & Declarations \\
+Accessibility & 22.1 & Protocol, raw data and code & Declarations (data availability, protocol) \\
+\end{longtable}
+
+\bibliographystyle{vancouver}
+\bibliography{papers/shared/bib/pubmed}
+\end{document}

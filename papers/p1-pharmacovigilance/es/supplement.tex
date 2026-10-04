@@ -1,0 +1,139 @@
+% Material suplementario — Artículo 1 (español). Se compila antes que manuscript.tex.
+\documentclass[11pt]{article}
+\newcommand{\DocLang}{es}
+\input{papers/shared/preamble.tex}
+\input{papers/shared/authors.tex}
+\hypersetup{pdftitle={Material suplementario: Seguridad poscomercializacion de VA-MENGOC-BC en Cuba}}
+
+\begin{document}
+\SupplementaryNumbering
+\SyntheticNotice
+\begin{center}
+{\Large\bfseries Material suplementario\par}
+\medskip
+{\large Seguridad poscomercialización de la vacuna antimeningocócica B y~C VA-MENGOC-BC en Cuba,
+\VStudyFirstYear--\VStudyLastYear: análisis nacional de notificaciones espontáneas con métodos de
+desproporcionalidad, clases latentes y aprendizaje automático\par}
+\medskip
+{\small \AuthorOne{} y \AuthorTwo\par}
+\end{center}
+
+\tableofcontents
+
+\section{Tasas anuales de notificación}\label{sec:S-rates}
+\begin{table}[htbp]
+\centering\small
+\caption{Notificaciones anuales de ESAVI con VA-MENGOC-BC, dosis administradas y tasas de
+notificación por \num{100000} dosis con intervalos de confianza de Poisson exactos del 95\,\%. La
+razón compara cada tasa con la tasa esperada del programa, de \POExpectedRate{} por \num{100000}
+dosis para todas las vacunas infantiles. Los años sin denominador de dosis muestran una raya.}
+\label{tab:S-rates}
+\POTableRates
+\end{table}
+
+\section{Selección del modelo de clases latentes}\label{sec:S-lca}
+\begin{table}[htbp]
+\centering\small
+\caption{Modelos de clases latentes con $K=\POLCAKMin,\dots,\POLCAKMax$ clases ajustados a los
+indicadores de eventos con prevalencia de al menos el 0,5\,\%. Se seleccionó el modelo con menor BIC;
+el ICL-BIC penaliza las clases poco separadas y la $R^2$ de entropía mide la certeza de la
+clasificación (1 = perfecta).}
+\label{tab:S-lca}
+\POTableLCASelection
+\end{table}
+
+\section{Factores asociados a la hospitalización}\label{sec:S-logistic}
+\begin{table}[htbp]
+\centering\small
+\caption{Razones de odds ajustadas de hospitalización del modelo de regresión logística de Firth
+multivariable ajustado a todas las notificaciones (intervalos de confianza de Wald del 95\,\%). Los
+contrastes por región se refieren a la región occidental; los términos de eventos y vacunas son
+indicadores de presencia frente a ausencia. Se suprimen los términos registrados en menos de
+\VMinCell{} notificaciones.}
+\label{tab:S-logistic}
+\POTableLogistic
+\end{table}
+
+\section{Desproporcionalidad en cada diseño de comparación}\label{sec:S-designs}
+Todas las tablas siguen la notación del texto principal: $a$, notificaciones con VA-MENGOC-BC y el
+evento; $E$, valor esperado de $a$ bajo independencia; IC\textsubscript{025}, límite inferior de
+credibilidad del 95\,\% del componente de información; EB\textsubscript{05}, percentil 5 inferior de
+la media geométrica bayesiana empírica (solo en el diseño principal, porque la distribución previa
+gamma-Poisson se estima con toda la base); Métodos, número de los cuatro métodos que cumplen sus
+umbrales; Señal, criterio preespecificado (IC\textsubscript{025}${}>0$ con
+$a\geq\PODispMinReports$). Los recuentos menores que \VMinCell{} se suprimen junto con los
+estadísticos derivados de ellos.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Diseño principal: notificaciones con VA-MENGOC-BC frente al resto (todos los tipos de
+evento).}
+\label{tab:S-disp-primary}
+\POTableDispPrimaryAllOtherVaccines
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Diseño de comparador activo en lactantes: notificaciones en menores de \POInfantMonths{}
+meses.}
+\label{tab:S-disp-infant}
+\POTableDispInfantActiveComparator
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Diseño de una sola vacuna: VA-MENGOC-BC administrada sola frente a otras vacunas
+administradas solas.}
+\label{tab:S-disp-single}
+\POTableDispExcludingCoadministration
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Diseño de enmascaramiento: grupo de comparación sin las notificaciones que mencionan la
+vacuna pentavalente (PENTA-L).}
+\label{tab:S-disp-masking}
+\POTableDispExcludingPentavalentMasking
+\end{table}
+
+\section{Estabilidad temporal del componente de información}\label{sec:S-cumic}
+\begin{table}[htbp]
+\centering\small
+\caption{Componente de información (IC) acumulado con intervalo de credibilidad del 95\,\%,
+recalculado con las notificaciones acumuladas hasta el final de cada año, para los cuatro eventos
+más notificados y para cada evento que cumple el criterio principal de señal.}
+\label{tab:S-cumic}
+\POTableCumulativeIC
+\end{table}
+
+\section{Calidad de los datos}\label{sec:S-dq}
+La calidad de los datos se evaluó con el marco armonizado de Kahn et al.\ (conformidad, completitud
+y plausibilidad) sobre las notificaciones armonizadas antes de eliminar duplicados.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Completitud: porcentaje de notificaciones con cada campo clave registrado, por año del
+fichero de origen.}
+\label{tab:S-completeness}
+\POTableCompleteness
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Verificaciones de plausibilidad en todos los años. Cuando algún recuento anual se suprimió,
+el número de registros señalados se muestra como cota inferior y se omite el porcentaje.}
+\label{tab:S-plausibility}
+\POTablePlausibility
+\end{table}
+
+\section{Enfermedad meningocócica en Cuba, \POITSFirstYear--\POITSLastYear}\label{sec:S-its}
+\begin{figure}[htbp]
+\centering
+\includegraphics{p1_incidence}
+\caption{Casos nacionales anuales de enfermedad meningocócica (escala logarítmica) y ajuste del
+modelo binomial negativo segmentado. La banda sombreada marca la transición de \POITSTransition{}
+(ensayo de eficacia, vacunación masiva e incorporación al programa nacional).}
+\label{fig:S-its}
+\end{figure}
+
+\end{document}
