@@ -200,6 +200,7 @@ class SDCConfig(_Frozen):
     secondary_suppression: bool
     round_rates_digits: int
     release_lot_values: Literal["none", "normalized", "raw"]
+    release_specifications: bool = False  # absolute specification limits are industrial information
     forbidden_columns: list[str]
     forbidden_patterns: list[str]
 
