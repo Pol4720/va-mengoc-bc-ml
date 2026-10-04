@@ -13,7 +13,7 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-__all__ = ["MacroSet", "join_words", "latex_text", "lower_first"]
+__all__ = ["MacroSet", "format_p", "join_words", "latex_text", "lower_first"]
 
 _NAME = re.compile(r"^[A-Za-z]+$")
 _DIGIT_WORDS = {
@@ -66,6 +66,27 @@ class MacroSet:
     def number(self, name: str, value: float | int | str | None, digits: int = 0, comment: str = "") -> None:
         """A plain number (``\\num``); suppressed or missing values render as a token."""
         self._put(name, self._fmt(value, digits), comment)
+
+    def pvalue(self, name: str, value: float | None, comment: str = "") -> None:
+        """A p- or q-value for running text, with its relation: ``= 0.042`` or ``< 0.001``.
+
+        Write ``$p$\\POTrendP`` in the manuscript; tables use :func:`format_p` (value only).
+        """
+        body = format_p(value)
+        if body.startswith("\\ensuremath{<}"):
+            body = "\\ensuremath{{}<{}}" + body.removeprefix("\\ensuremath{<}")
+        elif body.startswith("\\num"):
+            body = "\\ensuremath{{}={}}" + body
+        else:
+            body = "\\ensuremath{{}={}}" + body
+        self._put(name, body, comment)
+
+    def counted(self, name: str, n: int, en: tuple[str, str], es: tuple[str, str], comment: str = "") -> None:
+        """A count with a noun in the right grammatical number: ``\\num{1} signal`` / ``\\num{3} signals``."""
+        i = int(n)
+        en_word = en[0] if i == 1 else en[1]
+        es_word = es[0] if i == 1 else es[1]
+        self._put(name, f"\\num{{{i}}}~\\VLang{{{latex_text(en_word)}}}{{{latex_text(es_word)}}}", comment)
 
     def percent(self, name: str, value: float | None, digits: int = 1, comment: str = "") -> None:
         body = self._fmt(value, digits)
@@ -120,6 +141,19 @@ class MacroSet:
         return path
 
 
+def format_p(value: float | str | None) -> str:
+    """LaTeX for a p-value: ``\\num{0.042}``, ``\\ensuremath{<}\\num{0.001}``, or an em dash."""
+    try:
+        v = float(value) if value is not None else math.nan
+    except (TypeError, ValueError):
+        return "\\textemdash{}"
+    if math.isnan(v):
+        return "\\textemdash{}"
+    if v < 0.001:
+        return "\\ensuremath{<}\\num{0.001}"
+    return f"\\num{{{min(v, 1.0):.3f}}}"
+
+
 _SUBSCRIPTS = str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789")
 _SUPERSCRIPTS = str.maketrans("⁰¹²³⁴⁵⁶⁷⁸⁹", "0123456789")
 _SYMBOLS = {
@@ -130,6 +164,9 @@ _SYMBOLS = {
     "–": "--",
     "—": "---",
     "·": "\\textperiodcentered{}",
+    "σ": "\\ensuremath{\\sigma}",
+    "λ": "\\ensuremath{\\lambda}",
+    "α": "\\ensuremath{\\alpha}",
 }
 # Characters pdfLaTeX (inputenc utf8 + T1) typesets directly.
 _DIRECT = set("áéíóúÁÉÍÓÚñÑüÜ°¿¡àèìòùçÇ")

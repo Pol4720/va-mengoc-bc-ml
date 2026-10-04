@@ -294,7 +294,7 @@ def fig_forest_disproportionality(data: dict[str, Any], lang: str, path: Path, s
     ax.set_yticklabels([labels_map.get(e, {}).get(f"label_{lang}", e) for e in events])
     ax.set_xlabel(label("ror", lang))
     ax.grid(axis="y", visible=False)
-    ax.legend(loc="lower right", handletextpad=0.3)
+    ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1.0), ncols=2, handletextpad=0.3)
     fig.tight_layout()
     _watermark(fig, synthetic, lang)
     return _save(fig, path)
@@ -539,7 +539,7 @@ def fig_incremental(data: dict[str, Any], lang: str, path: Path, synthetic: bool
 def fig_capability(data: dict[str, Any], lang: str, path: Path, synthetic: bool) -> Path:
     cap: pd.DataFrame = data["capability"]
     names: dict[str, str] = data["names"]
-    periods = [p for p in ("2011-2017", "2018-2025") if p in set(cap["period"])]
+    periods = [p for p in dict.fromkeys(cap["period"].astype(str)) if p != "all"][:2]
     attrs = list(dict.fromkeys(cap["attribute"]))
     fig, ax = plt.subplots(figsize=(SINGLE_COL + 0.9, 0.26 * len(attrs) + 0.9))
     colors = [PALETTE["blue"], PALETTE["orange"]]
@@ -551,7 +551,16 @@ def fig_capability(data: dict[str, Any], lang: str, path: Path, synthetic: bool)
                 continue
             x, lo, hi = _num(s.loc[a, "ppk"]), _num(s.loc[a, "ppk_lo"]), _num(s.loc[a, "ppk_hi"])
             ax.plot([lo, hi], [i + off] * 2, color=colors[k], lw=1.0)
-            ax.plot([x], [i + off], "o", color=colors[k], ms=4, mec="white", mew=0.7, label=p if i == 0 else None)
+            ax.plot(
+                [x],
+                [i + off],
+                "o",
+                color=colors[k],
+                ms=4,
+                mec="white",
+                mew=0.7,
+                label=p.replace("-", "\u2013") if i == 0 else None,
+            )
     ax.axvline(1.33, color=PALETTE["ink2"], lw=0.8)
     ax.axvline(1.0, color=PALETTE["red"], lw=0.8)
     ax.set_yticks(range(len(attrs)))
