@@ -61,7 +61,7 @@ def git_state(root: Path) -> dict[str, Any]:
         return out.stdout.strip()
 
     commit = run("rev-parse", "HEAD")
-    status = run("status", "--porcelain")
+    status = run("status", "--porcelain", "--untracked-files=no")  # outputs being built are untracked
     return {
         "commit": commit,
         "dirty": bool(status) if status is not None else None,
