@@ -54,7 +54,7 @@ jobs:
             --set paths.release_dir=build/ci-release --set paths.runs_dir=build/ci-runs \
             --set paths.curated_dir=build/ci-curated --set analysis.qc_safety.permutation_tests=5 \
             --set analysis.lca.n_starts=4 --set analysis.qc.capability_bootstrap=200
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: coverage
           path: coverage.xml
@@ -88,7 +88,7 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: End-to-end tests (desktop light, desktop dark, mobile)
         run: npx playwright test
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report
@@ -119,7 +119,7 @@ jobs:
             if pdffonts "$f" | awk 'NR>2 && $(NF-4)!="yes"{bad=1} END{exit bad}'; then :; else
               echo "Non-embedded font in $f"; exit 1; fi
           done
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: pdfs
