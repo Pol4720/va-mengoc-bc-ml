@@ -1,0 +1,309 @@
+% Informe técnico de socialización (español). Todas las cifras proceden del release con control de
+% divulgación (release/public o, mientras no exista, release/synthetic con marca de agua).
+\documentclass[11pt]{article}
+\newcommand{\DocLang}{es}
+\input{papers/shared/preamble.tex}
+\input{papers/shared/authors.tex}
+\input{papers/p2-lot-quality/shared/flow.tex}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\setlength{\headheight}{14pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{vgrey}{Informe técnico VA-MENGOC-BC}}
+\fancyhead[R]{\small\textcolor{vgrey}{DICEI, Instituto Finlay de Vacunas}}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\hypersetup{pdftitle={Informe tecnico: farmacovigilancia y calidad de lotes de VA-MENGOC-BC},
+  pdfauthor={Richard Alejandro Matos Arderi; Abel Ponce Gonzalez}}
+
+\newcommand{\Mensaje}[1]{\item #1}
+
+\begin{document}
+
+\begin{titlepage}
+\SyntheticNotice
+\vspace*{2cm}
+{\small\textcolor{vblue}{\textbf{INFORME TÉCNICO}}\par}
+\medskip
+{\LARGE\bfseries Evidencia reproducible sobre la vacuna VA-MENGOC-BC: seguridad poscomercialización y
+calidad de los lotes liberados, \VStudyFirstYear--\VStudyLastYear\par}
+\bigskip
+{\large Informe para el grupo de expertos y la dirección del Instituto Finlay de Vacunas\par}
+\vspace{1.5cm}
+\AuthorBlock
+\vfill
+{\small\noindent
+\begin{tabularx}{\linewidth}{@{}lY@{}}
+Versión del código & \VCodeVersion{} (semilla \VSeed)\\
+Origen de los datos & \ifVSynthetic Release sintético (datos simulados, no reales)\else Release
+público con control de divulgación\fi\\
+Tamaño mínimo de celda & \VMinCell{} (supresión primaria y complementaria)\\
+Fecha de extracción & \VExtractionDate\\
+Custodio de la base de datos & \VCustodian\\
+Fecha de compilación & \today\\
+\end{tabularx}\par}
+\end{titlepage}
+
+\tableofcontents
+\clearpage
+
+\section*{Mensajes principales}
+\addcontentsline{toc}{section}{Mensajes principales}
+\begin{itemize}[leftmargin=*,itemsep=3pt]
+\Mensaje{Se analizaron \PONReports{} notificaciones de eventos supuestamente atribuibles a la
+  vacunación o inmunización (ESAVI) sin duplicados; \PONTarget{} (\POPctTarget) incluyeron
+  VA-MENGOC-BC.}
+\Mensaje{La tasa global de notificación fue de \POPooledRate{} por \num{100000} dosis (\CI{}
+  \POPooledRateCI), \PORateVsExpected{} la tasa de referencia del programa, y \POTrendWord{} entre
+  \PORateFirstYear{} y \PORateLastYear{} (razón de tasas anual \POTrendRR, \CI{} \POTrendRRCI).}
+\Mensaje{Con el criterio preespecificado, \POSignalsPrimaryAllOtherVaccines{} tipos de evento se
+  notificaron de forma desproporcionada (\POSignalList); \PONSignalsRobustPhrase{} se mantuvo en los
+  \PONDesigns{} diseños de comparación. Las señales no descritas como esperadas
+  (\POSignalEmergingList) requieren revisión clínica caso a caso.}
+\Mensaje{Se enlazaron \PTNLinked{} de \PTNTargetReports{} notificaciones (\PTLinkRate) con un lote
+  liberado. \PTConformitySentence.}
+\Mensaje{De \PTNPrimaryTests{} asociaciones preespecificadas entre atributos de los lotes y
+  reacciones, \PTNSignificantFDR{} superaron la corrección por comparaciones múltiples
+  (\PTSignificantList). \PTNegControlSentence.}
+\Mensaje{Ninguna persona es identificable en los resultados: el release aplica supresión de celdas
+  menores que \VMinCell{} y protege los totales frente a la recuperación por diferencia.}
+\end{itemize}
+
+\section{Objetivo y alcance}
+El proyecto genera, con un flujo de trabajo reproducible, la evidencia de dos artículos científicos
+sobre VA-MENGOC-BC, la vacuna cubana de vesículas de membrana externa contra los meningococos de los
+serogrupos B y~C:
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Artículo 1} (\emph{Drug Safety}): perfil de seguridad notificado en el sistema nacional
+  de vigilancia pasiva, con tasas de notificación, análisis de desproporcionalidad según READUS-PV,
+  fenotipos latentes de eventos notificados conjuntamente y factores asociados a la hospitalización.
+\item \textbf{Artículo 2} (\emph{Vaccine}): calidad de los lotes liberados y asociación entre la
+  variación dentro de especificación de sus atributos y el perfil de reactogenicidad notificado,
+  según STROBE y RECORD-PE.
+\end{enumerate}
+Este informe resume los métodos, los resultados y las decisiones pendientes para el grupo de
+expertos. No sustituye a los manuscritos, que contienen la descripción completa y la bibliografía.
+
+\section{Datos y gobernanza}
+\subsection{Fuentes}
+Se utilizaron \VNFiles{} ficheros anuales de notificaciones de ESAVI (\VStudyFirstYear--%
+\VStudyLastYear) del sistema nacional de vigilancia y el registro de liberación de \PTNLots{} lotes
+producidos entre \PTLotFirstYear{} y \PTLotLastYear{} (\PTNNationalLots{} nacionales y
+\PTNExportLots{} de exportación). De \VReportsRaw{} registros leídos se eliminaron
+\VExactDuplicates{} duplicados exactos y se fusionaron \VKeyDuplicatesMerged{} duplicados por clave;
+\VReportsInWindow{} notificaciones quedaron dentro de la ventana de estudio.
+
+\subsection{Protección de los datos}
+Los datos personales de salud y la información industrial nunca salen de la estación controlada. El
+tratamiento sigue los principios ALCOA+, la seudonimización con clave secreta
+\citep{ENISA2019,MHRA2018}, el control estadístico de la divulgación \citep{Hundepool2012} y la
+Ley~149/2022 de Protección de Datos Personales \citep{Ley149}:
+\begin{itemize}[leftmargin=*]
+\item nombres y direcciones se usan solo para derivar un seudónimo HMAC-SHA256 y se descartan; la
+  fecha de nacimiento se transforma en edad y el texto libre se categoriza y se elimina;
+\item cada ejecución registra la versión del código, la configuración, la semilla y la huella
+  SHA-256 de cada fichero de entrada;
+\item el release público suprime los recuentos menores que \VMinCell{} (marca ``<\VMinCell'') y
+  aplica supresión complementaria (marca [c]) cuando un recuento suprimido podría recuperarse por
+  diferencia; los atributos de los lotes se publican solo como posición normalizada dentro de la
+  ventana de especificación.
+\end{itemize}
+
+\subsection{Calidad de los datos}
+La \tabref{tab:completeness} resume la completitud de los campos clave por año y la
+\tabref{tab:plausibility}, las comprobaciones de plausibilidad. Los registros marcados se informan y
+no se eliminan.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Completitud de los campos clave por año del fichero (\% de registros con el campo
+presente).}
+\label{tab:completeness}
+\POTableCompleteness
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Comprobaciones de plausibilidad: registros marcados en todos los años.}
+\label{tab:plausibility}
+\POTablePlausibility
+\end{table}
+
+\section{Flujo de procesamiento}
+El pipeline es un paquete de Python con pruebas automáticas que se ejecuta con una sola orden
+(\texttt{uv run vamengoc run}). La \tabref{tab:pipeline} describe sus ocho pasos.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Pasos del flujo de procesamiento y garantías que ofrece cada uno.}
+\label{tab:pipeline}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.1cm}Y>{\raggedright\arraybackslash}p{4cm}@{}}
+\toprule
+Paso & Qué hace & Garantía\\
+\midrule
+1. Ingesta & Lee los ficheros tal como llegan; detecta cabeceras desplazadas y deriva del esquema
+  entre años & Originales inmutables y trazables\\
+2. Seudonimización & Seudónimo HMAC; elimina nombres, direcciones y texto libre & Minimización desde
+  la primera línea\\
+3. Normalización & Tipa fechas, edades, dosis, lotes y especificaciones con reglas explícitas &
+  Sin limpieza manual\\
+4. Calidad de datos & Completitud, conformidad y plausibilidad por campo y año & Calidad medida
+  antes de analizar\\
+5. Enlace con lotes & Une cada notificación con su lote (exacto, núcleo o aproximado) & Información
+  industrial protegida\\
+6. Análisis & Análisis preespecificados de ambos artículos con semillas fijas & Resultados
+  reproducibles\\
+7. Control de divulgación & Supresión primaria y complementaria; verificación independiente &
+  Nadie identificable\\
+8. Publicación & Tablas, figuras y macros para manuscritos, informes, web y presentaciones & Texto y
+  resultados coherentes\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Resultados del artículo 1: seguridad poscomercialización}
+\subsection{Notificaciones y tasas}
+La mediana del tiempo entre la vacunación y la notificación fue de \PODelayMedian{} días. La
+\figref{fig:rates} muestra la serie mensual de notificaciones y la tasa anual de VA-MENGOC-BC por
+\num{100000} dosis, con la tasa de referencia del programa (\POExpectedRate{} por \num{100000}
+dosis). Se detectaron \PONBreaksAllPhrase{} en la serie mensual de todas las vacunas
+(\POBreaksAll).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{p1_rates}
+\caption{(a) Notificaciones mensuales de ESAVI para todas las vacunas y para VA-MENGOC-BC, con los
+puntos de cambio detectados por PELT. (b) Tasa anual de notificación de VA-MENGOC-BC por
+\num{100000} dosis con intervalo de confianza exacto del 95\,\%.}
+\label{fig:rates}
+\end{figure}
+
+\subsection{Desproporcionalidad}
+Se evaluaron \PONEventsScreened{} tipos de evento con cuatro métodos (ROR, PRR, componente de
+información y EBGM). El criterio preespecificado fue IC\textsubscript{025}${}>0$ con al menos
+\PODispMinReports{} notificaciones. La \tabref{tab:designs} muestra el número de señales en cada
+diseño de comparación y la \figref{fig:forest}, las razones de odds de notificación.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Número de señales de desproporcionalidad en los diseños de comparación preespecificados.}
+\label{tab:designs}
+\POTableDesigns
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{p1_forest}
+\caption{Razones de odds de notificación (IC 95\,\%, escala logarítmica) de los eventos con
+VA-MENGOC-BC frente al resto de las vacunas y en el diseño de comparador activo en lactantes.}
+\label{fig:forest}
+\end{figure}
+
+\subsection{Fenotipos latentes y hospitalización}
+El análisis de clases latentes seleccionó \POLCABestK{} clases, estables entre remuestreos (mediana
+del índice de Rand ajustado \POLCAAri; \figref{fig:lca}). En la validación temporal
+(entrenamiento \POTrainYears, prueba \POTestYears), el mejor modelo de hospitalización alcanzó un
+área bajo la curva ROC de \POBestAuroc, una discriminación \PODiscriminationWord.
+\POHospInterpretation.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{p1_lca}
+\caption{Perfiles de las clases latentes: probabilidad de cada evento en cada clase y tamaño
+relativo de las clases.}
+\label{fig:lca}
+\end{figure}
+
+\section{Resultados del artículo 2: calidad de los lotes y reactogenicidad}
+\subsection{Enlace notificación--lote}
+La \figref{fig:flow} resume el enlace y las exclusiones. Se analizaron \PTNAnalysed{} notificaciones
+en \PTNAnalysedLots{} lotes (mediana de \PTReportsPerLot{} notificaciones por lote).
+
+\begin{figure}[htbp]
+\centering
+\LinkageFlow
+\caption{Enlace de las notificaciones de VA-MENGOC-BC con los lotes liberados.}
+\label{fig:flow}
+\end{figure}
+
+\subsection{Calidad del proceso}
+\PTConformitySentence. Se detectaron \PTNChangepoints{} puntos de cambio en la secuencia de
+producción (\PTChangepointList). La \figref{fig:capability} muestra la capacidad de proceso por
+atributo y período; los atributos con Ppk inferior a~1 fueron: \PTPpkBelowOneList. Los lotes
+nacionales y de exportación fueron equivalentes en \PTNEquivalent{} de \PTNAttributes{} atributos
+(margen del \PTEqMarginPct\,\% de la ventana).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{p2_capability}
+\caption{Índice de capacidad de proceso Ppk por atributo y período de producción, con intervalo de
+confianza bootstrap del 95\,\%.}
+\label{fig:capability}
+\end{figure}
+
+\subsection{Asociación entre atributos de los lotes y reacciones}
+El diseño de solo casos compara el perfil de reacciones entre notificaciones de lotes con distintos
+valores de los atributos, con ecuaciones de estimación generalizadas que tienen en cuenta la
+correlación dentro del lote \citep{Liang1986} y la corrección de Benjamini--Hochberg
+\citep{Benjamini1995}. La \tabref{tab:gee} presenta las estimaciones y la \figref{fig:p2forest}, su
+representación gráfica. \PTSensSentence. \PTNegControlSentence.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Razones de odds por desviación estándar (IC 95\,\%) de las asociaciones preespecificadas:
+estimaciones crudas y ajustadas por edad, sexo, dosis, año y coadministración; $q$, valor de $p$
+ajustado por Benjamini--Hochberg.}
+\label{tab:gee}
+\PTTableGEE
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{p2_forest}
+\caption{Razones de odds por desviación estándar de cada atributo para las reacciones principales,
+con la banda del efecto mínimo detectable.}
+\label{fig:p2forest}
+\end{figure}
+
+\section{Limitaciones}
+\begin{itemize}[leftmargin=*]
+\item La vigilancia pasiva no permite medir la infranotificación ni la notificación estimulada; la
+  desproporcionalidad genera hipótesis y no estima riesgos.
+\item Los eventos no se validaron frente a las definiciones de caso de Brighton; las señales no
+  descritas requieren revisión caso a caso.
+\item No se dispone de dosis por edad, número de dosis ni provincia, ni de dosis distribuidas por
+  lote: no pueden calcularse tasas estratificadas ni incidencias por lote.
+\item Los ensayos de liberación describen el lote en el momento de liberarse, no tras el
+  almacenamiento y la distribución.
+\end{itemize}
+
+\section{Decisiones que se solicitan al grupo de expertos}
+\begin{enumerate}[leftmargin=*]
+\item Confirmar el significado de las siglas de las vacunas y de los códigos de provincia.
+\item Fijar la fecha que define el año analítico (vacunación, notificación o año del fichero).
+\item Validar la clasificación de gravedad de los eventos y decidir si se codifican con MedDRA o
+  CIE-10.
+\item Autorizar, si procede, la publicación de algún atributo de calidad en unidades absolutas.
+\item Aportar las dosis administradas en \VStudyLastYear{} y confirmar la tasa de referencia del
+  programa.
+\item Organizar la revisión caso a caso de las señales no descritas por el comité nacional.
+\item Completar la aprobación ética, la financiación y las contribuciones de los autores antes del
+  envío.
+\end{enumerate}
+
+\section{Reproducibilidad y material disponible}
+\begin{itemize}[leftmargin=*]
+\item Código, configuración y release público: \url{https://github.com/Pol4720/va-mengoc-bc-ml}.
+\item Aplicación web interactiva y presentaciones:
+  \url{https://pol4720.github.io/va-mengoc-bc-ml/}.
+\item Regeneración completa en la estación controlada: \texttt{uv run vamengoc run} seguido de
+  \texttt{uv run vamengoc release verify public}; los manuscritos, este informe y la web se
+  actualizan a partir del nuevo release sin editar ninguna cifra a mano.
+\end{itemize}
+
+\bibliographystyle{vancouver}
+\bibliography{papers/shared/bib/pubmed,papers/shared/bib/manual}
+
+\end{document}

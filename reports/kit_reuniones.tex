@@ -1,0 +1,169 @@
+% Kit para las reuniones periódicas con el grupo de expertos (español): agenda tipo, preparación,
+% plantilla de acta, registro de decisiones con las preguntas abiertas y seguimiento de acciones.
+\documentclass[11pt]{article}
+\newcommand{\DocLang}{es}
+\input{papers/shared/preamble.tex}
+\input{papers/shared/authors.tex}
+\usepackage{tabularx}
+\usepackage{pdflscape}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\Casilla}{$\square$}
+\newcommand{\Linea}{\rule{0pt}{18pt}}
+\hypersetup{pdftitle={Kit para las reuniones de expertos: VA-MENGOC-BC},
+  pdfauthor={Richard Alejandro Matos Arderi; Abel Ponce Gonzalez}}
+
+\begin{document}
+\begin{center}
+{\small\textcolor{vblue}{\textbf{KIT DE REUNIONES}}\par}
+\medskip
+{\Large\bfseries Reuniones periódicas del grupo de expertos sobre VA-MENGOC-BC\par}
+\medskip
+{\small DICEI, Instituto Finlay de Vacunas \textperiodcentered{} versión del código
+\VCodeVersion\par}
+\end{center}
+
+\section{Propósito y funcionamiento}
+Las reuniones revisan el avance del proyecto, validan las decisiones metodológicas que solo pueden
+tomar los expertos y aprueban los resultados antes de su publicación. Se celebran una vez al mes y,
+además, en cada hito: datos reales procesados, release público verificado, manuscritos listos para
+envío y respuesta de las revistas.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Funciones en las reuniones.}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{4.2cm}Y@{}}
+\toprule
+Función & Responsabilidades\\
+\midrule
+Coordinación (DICEI) & Convoca, prepara el material, modera y redacta el acta\\
+Responsable de datos & Ejecuta el flujo en la estación controlada, revisa y firma el release
+  público\\
+Farmacovigilancia & Interpreta las señales y organiza la revisión caso a caso\\
+Calidad y producción & Interpreta los atributos de los lotes y decide qué puede publicarse\\
+Clínica y epidemiología & Valida definiciones de eventos, gravedad y contexto epidemiológico\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Agenda tipo (90 minutos)}
+\begin{table}[htbp]
+\centering\small
+\caption{Agenda tipo de cada reunión.}
+\begin{tabularx}{\linewidth}{@{}rY>{\raggedright\arraybackslash}p{4.4cm}@{}}
+\toprule
+Min. & Punto & Material\\
+\midrule
+10 & Apertura, aprobación del acta anterior y estado de las acciones & Registro de acciones
+  (\secref{sec:acciones})\\
+15 & Estado del flujo de trabajo y calidad de los datos & Presentación ``Reunión periódica de
+  seguimiento''\\
+20 & Resultados del artículo~1 & Presentación ``Artículo~1'', informe técnico\\
+20 & Resultados del artículo~2 & Presentación ``Artículo~2'', informe técnico\\
+15 & Decisiones pendientes & Registro de decisiones (\secref{sec:decisiones})\\
+10 & Acuerdos, responsables, fechas y próxima reunión & Plantilla de acta (\secref{sec:acta})\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Preparación (una semana antes)}
+\begin{itemize}[leftmargin=*,label=\Casilla]
+\item Ejecutar el flujo en la estación controlada (\texttt{uv run vamengoc run}) y verificar el release
+  (\texttt{uv run vamengoc release verify public}).
+\item Revisar el registro de supresión del release y firmar el commit (responsable de datos).
+\item Recompilar el informe técnico, el resumen ejecutivo y los manuscritos con
+  \texttt{python} \nolinkurl{tools/latex_build.py}.
+\item Comprobar que las presentaciones de la aplicación web muestran el release nuevo:
+  \url{https://pol4720.github.io/va-mengoc-bc-ml/\#/slides}.
+\item Enviar a los participantes el orden del día, el acta anterior y el resumen ejecutivo.
+\item Actualizar el registro de decisiones con las preguntas nuevas.
+\end{itemize}
+
+\section{Durante la reunión}
+\begin{itemize}[leftmargin=*]
+\item Las presentaciones se proyectan desde la aplicación web: flechas para avanzar, \texttt{F} para
+  pantalla completa y \texttt{N} para las notas del orador; ``Folleto / PDF'' imprime todas las
+  diapositivas.
+\item Las preguntas sobre los datos se responden con las vistas interactivas (cambio de regla de
+  señal, diseño comparador o atributo de calidad) sin recalcular nada fuera de la estación
+  controlada.
+\item Cada decisión se registra con su justificación, el responsable y el fichero de configuración
+  que la refleja.
+\end{itemize}
+
+\section{Registro de decisiones}\label{sec:decisiones}
+Preguntas abiertas al propietario de los datos (\nolinkurl{docs/OPEN_QUESTIONS.md}) con la decisión
+provisional que aplica el código mientras no se resuelvan.
+
+\begin{landscape}
+\begin{table}[htbp]
+\centering\small
+\caption{Registro de decisiones. Estado: P, pendiente; C, por confirmar; R, resuelta.}
+\begin{tabularx}{\linewidth}{@{}r>{\raggedright\arraybackslash}p{6.4cm}Y>{\raggedright\arraybackslash}p{4.6cm}>{\raggedright\arraybackslash}p{2.2cm}c@{}}
+\toprule
+\# & Pregunta & Decisión provisional en el código & Dónde se configura & Responsable &
+  Estado\\
+\midrule
+1 & Significado de las siglas de las vacunas y códigos de provincia & Mapeos marcados como
+  inferidos & \nolinkurl{vaccines.yaml}, \nolinkurl{geography.yaml} & & P\\
+2 & Fecha que define el año de un registro; esquema de los ficheros 2018--2025 & Año analítico = año
+  de vacunación; esquema validado fichero a fichero & \nolinkurl{analysis.analytic_year_from} & & P\\
+3 & Significado de la columna MES y de la columna final sin cabecera & MES solo como control de
+  calidad; la columna sin cabecera se descarta & \nolinkurl{aefi_model.py} & & P\\
+4 & Clasificación de gravedad; codificación MedDRA o CIE-10 & Clasificación de la OMS y definiciones
+  de Brighton & \nolinkurl{events.yaml} & & P\\
+5 & Vacuna del fichero de lotes y significado de ``-'' en Inocuidad & VA-MENGOC-BC; ``-'' = no
+  determinado & \nolinkurl{lots.yaml} & & P\\
+6 & Clave única de lote y motivo de los identificadores duplicados & Clave compuesta; se prefiere el
+  lote nacional más reciente & \nolinkurl{linkage.py} & & P\\
+7 & Base legal, aprobación ética y retención; evaluación de impacto & Tratamiento local seudonimizado;
+  release agregado con control de divulgación & \nolinkurl{DATA_GOVERNANCE.md} & & P\\
+8 & Dosis aplicadas en \VStudyLastYear{} (denominador) & Tasas de \VStudyLastYear{} no calculadas &
+  Hoja de cobertura & & P\\
+9 & Atributos de calidad publicables en unidades absolutas & Solo posición normalizada e índices
+  adimensionales & \nolinkurl{sdc.release_lot_values} & & P\\
+10 & Tasa de referencia del programa (\POExpectedRate{} por \num{100000} dosis) & Tomada de la
+  literatura nacional & \nolinkurl{expected_national_rate_per_100k} & & C\\
+11 & Revisión caso a caso de las señales no descritas (\POSignalEmergingList) & Pendiente del comité
+  nacional & --- & & P\\
+\Linea & & & & & \\
+\Linea & & & & & \\
+\bottomrule
+\end{tabularx}
+\end{table}
+\end{landscape}
+
+\section{Plantilla de acta}\label{sec:acta}
+\noindent
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{4cm}Y@{}}
+\toprule
+Fecha y lugar & \\
+Asistentes & \\
+Release revisado & Ejecución: \hfill Commit: \hfill Origen: \phantom{sintético}\\
+Acta anterior & \Casilla{} aprobada \quad \Casilla{} aprobada con cambios\\
+\midrule
+Puntos tratados & \\
+\Linea & \\
+\Linea & \\
+Decisiones (núm. del registro) & \\
+\Linea & \\
+Próxima reunión & \\
+\bottomrule
+\end{tabularx}
+
+\section{Seguimiento de acciones}\label{sec:acciones}
+\noindent
+\begin{tabularx}{\linewidth}{@{}rY>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}p{2.4cm}>{\raggedright\arraybackslash}p{2cm}@{}}
+\toprule
+\# & Acción & Responsable & Fecha límite & Estado\\
+\midrule
+1 & Ejecutar la fase~1 sobre los datos reales y verificar el release & Responsable de datos & & \\
+2 & Completar aprobación ética, financiación y contribuciones CRediT & Autores & & \\
+3 & Revisión caso a caso de las señales no descritas & Farmacovigilancia & & \\
+4 & Responder las preguntas abiertas del registro de decisiones & Grupo de expertos & & \\
+5 & Activar GitHub Pages (\emph{Settings, Pages, GitHub Actions}) & Coordinación & & \\
+\Linea & & & & \\
+\Linea & & & & \\
+\bottomrule
+\end{tabularx}
+
+\end{document}

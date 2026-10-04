@@ -15,3 +15,6 @@ submission/strategy/estrategia_publicacion.tex
 submission/p1-pharmacovigilance/cover_letter.tex
 submission/p2-lot-quality/cover_letter.tex
 submission/p2-lot-quality/highlights.tex
+reports/informe_tecnico.tex
+reports/resumen_ejecutivo.tex
+reports/kit_reuniones.tex

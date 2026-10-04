@@ -1,0 +1,88 @@
+% Resumen ejecutivo (español, dos páginas) para la dirección. Cifras generadas desde el release.
+\documentclass[11pt]{article}
+\newcommand{\DocLang}{es}
+\input{papers/shared/preamble.tex}
+\input{papers/shared/authors.tex}
+\usepackage{tabularx}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+\geometry{margin=2cm}
+\pagestyle{plain}
+\hypersetup{pdftitle={Resumen ejecutivo: evidencia sobre VA-MENGOC-BC},
+  pdfauthor={Richard Alejandro Matos Arderi; Abel Ponce Gonzalez}}
+
+% Cifra destacada: valor grande y etiqueta debajo.
+\newcommand{\Cifra}[2]{{\Large\bfseries #1}\par\vspace{2pt}{\footnotesize\color{vgrey}#2}}
+
+\begin{document}
+\SyntheticNotice
+{\small\textcolor{vblue}{\textbf{RESUMEN EJECUTIVO}} \textcolor{vgrey}{\textperiodcentered{}
+DICEI, Instituto Finlay de Vacunas \textperiodcentered{} \today}\par}
+\medskip
+{\Large\bfseries VA-MENGOC-BC: seguridad poscomercialización y calidad de los lotes,
+\VStudyFirstYear--\VStudyLastYear\par}
+\medskip
+{\small \AuthorOne{} y \AuthorTwo\par}
+
+\bigskip
+\noindent
+\begin{tabularx}{\linewidth}{@{}CCCC@{}}
+\Cifra{\PONTarget}{notificaciones de ESAVI con VA-MENGOC-BC} &
+\Cifra{\POPooledRate}{notificaciones por \num{100000} dosis} &
+\Cifra{\POSignalsPrimaryAllOtherVaccines}{señales de desproporcionalidad (\PONSignalsRobust{} robustas)} &
+\Cifra{\PTLinkRate}{notificaciones enlazadas con su lote}\\
+\end{tabularx}
+
+\section*{Qué se ha hecho}
+Un flujo de trabajo automático y auditable transforma las notificaciones de eventos supuestamente
+atribuibles a la vacunación o inmunización (ESAVI) y el registro de liberación de los lotes en dos
+artículos científicos, informes, presentaciones y una aplicación web, sin que ningún dato personal
+o industrial salga de la estación controlada del Instituto.
+
+\section*{Qué muestran los resultados}
+\begin{itemize}[leftmargin=*,itemsep=2pt]
+\item \textbf{Notificación.} La tasa de notificación fue \PORateVsExpected{} la de referencia del
+  programa y \POTrendWord{} entre \PORateFirstYear{} y \PORateLastYear.
+\item \textbf{Señales.} Con el criterio preespecificado, se identificaron
+  \POSignalsPrimaryAllOtherVaccines{} señales (\POSignalList): \PONSignalsExpectedPhrase{} de
+  reacciones esperadas y \PONSignalsEmergingPhrase{} de eventos no descritos como esperados, que
+  deben revisarse caso a caso. La desproporcionalidad genera hipótesis; no mide riesgos.
+\item \textbf{Fenotipos y hospitalización.} Los eventos notificados conjuntamente forman
+  \POLCABestK{} perfiles latentes; la hospitalización se predice con una discriminación
+  \PODiscriminationWord, por lo que el formulario no basta para clasificar la gravedad.
+\item \textbf{Calidad de los lotes.} \PTConformitySentence; los atributos con capacidad de proceso
+  inferior a~1 fueron: \PTPpkBelowOneList.
+\item \textbf{Lotes y reactogenicidad.} De \PTNPrimaryTests{} asociaciones preespecificadas,
+  \PTNSignificantFDR{} superaron la corrección por comparaciones múltiples (\PTSignificantList).
+  \PTNegControlSentence.
+\end{itemize}
+
+\section*{Qué se necesita de la dirección}
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item Autorizar la ejecución del flujo sobre los datos reales en la estación controlada y designar
+  al responsable de datos que revisará y firmará el release público.
+\item Gestionar la aprobación ética y la declaración de financiación de ambos artículos.
+\item Convocar al comité nacional para la revisión caso a caso de las señales no descritas.
+\item Decidir qué atributos de calidad pueden publicarse en unidades absolutas (por defecto, solo
+  posiciones normalizadas).
+\end{enumerate}
+
+\section*{Calendario propuesto}
+\noindent
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.2cm}Y@{}}
+\toprule
+Etapa & Resultado\\
+\midrule
+Fase~1 (local) & Ejecución sobre los datos reales, verificación y revisión humana del release\\
+Revisión & Lectura crítica de los manuscritos por el grupo de expertos con las cifras reales\\
+Envío & Artículo~1 a \emph{Drug Safety}; artículo~2 a \emph{Vaccine} (ruta de suscripción, sin
+  cargos para los autores)\\
+Socialización & Informe técnico, presentaciones y aplicación web actualizadas automáticamente\\
+\bottomrule
+\end{tabularx}
+
+\medskip
+\noindent{\small Material completo: informe técnico, manuscritos y
+\url{https://pol4720.github.io/va-mengoc-bc-ml/}.\par}
+
+\end{document}
