@@ -90,12 +90,19 @@ este nivel de información, que es el que se publica.
 Antes de confirmar `release/public/` en git, el responsable de datos:
 
 1. revisa `release/public/README.md` y el registro de supresión del `manifest.json`;
-1. comprueba los riesgos que las reglas automáticas no cubren por completo: combinaciones de tablas
+2. comprueba los riesgos que las reglas automáticas no cubren por completo: combinaciones de tablas
    con subgrupos anidados distintos de los previstos, eventos graves o raros que puedan identificar a
    una persona en una provincia o año concretos, y cualquier tabla nueva añadida al release;
-2. confirma que las tablas de lotes no revelan información industrial no autorizada;
-3. ejecuta `uv run vamengoc release verify public` (debe terminar sin errores);
-4. firma el commit con su identidad institucional.
+3. confirma que las tablas de lotes no revelan información industrial no autorizada;
+4. ejecuta `uv run vamengoc release verify public` (debe terminar sin errores);
+5. firma el commit con su identidad institucional.
+
+Confirmar `release/public/` equivale a publicarlo: la aplicación web de GitHub Pages
+(`.github/workflows/pages.yml`) copia su `web/bundle.json` y nada más. Mientras no exista, el sitio
+muestra el release sintético con la advertencia *Datos sintéticos* en todas las páginas. El
+laboratorio de la aplicación nunca envía datos a Internet: llama a la API local
+(`uv run vamengoc serve`, solo 127.0.0.1, con token de sesión) y recibe únicamente un release
+verificado.
 
 ## 6. Retención y acceso
 
