@@ -57,7 +57,18 @@ El release es el único artefacto que sale de la estación controlada. Reglas ap
 
 * conteos de personas entre 1 y `min_cell − 1` (por defecto 1–4) → `"<5"`;
 * porcentajes, tasas, razones y estimaciones derivadas de un conteo suprimido → eliminados;
-* supresión complementaria en tablas de contingencia con márgenes;
+* supresión complementaria (marca `[c]`, distinta de `"<5"` porque no son conteos pequeños) cuando un
+  conteo suprimido podría recuperarse por diferencia: tablas de contingencia con márgenes, series
+  anuales o mensuales cuyos totales se publican en otra tabla, y celdas de un mismo nivel por grupos;
+* no se publica el grupo «Todas» (= diana + otras) en las tablas por grupo: los documentos lo recalculan
+  solo cuando ambos grupos son visibles; tampoco se publican variables que son agrupaciones de otras ya
+  publicadas (p. ej., grupo de edad frente a banda de edad);
+* en la tabla 2×2 de desproporcionalidad solo se publica `a`; `b`, `c` y `d` se sustituyen por los
+  tamaños de cada diseño (`p1_design_sizes`), porque con los totales revelarían un `a` suprimido;
+* los diseños de sensibilidad (subconjuntos del principal), las series acumuladas y los análisis
+  restringidos se retienen cuando difieren del principal o del valor anterior en un conteo pequeño;
+* los porcentajes y proporciones publicados sin su conteo se eliminan cuando implican un conteo
+  pequeño (o su complemento lo es);
 * sin fechas con precisión de día; geografía máxima: región o provincia agregada;
 * sin identificadores (ni seudónimos), texto libre, lotes originales ni valores de control de calidad en
   unidades absolutas (por defecto, `sdc.release_lot_values: normalized` expresa cada valor como posición
@@ -79,6 +90,9 @@ este nivel de información, que es el que se publica.
 Antes de confirmar `release/public/` en git, el responsable de datos:
 
 1. revisa `release/public/README.md` y el registro de supresión del `manifest.json`;
+1. comprueba los riesgos que las reglas automáticas no cubren por completo: combinaciones de tablas
+   con subgrupos anidados distintos de los previstos, eventos graves o raros que puedan identificar a
+   una persona en una provincia o año concretos, y cualquier tabla nueva añadida al release;
 2. confirma que las tablas de lotes no revelan información industrial no autorizada;
 3. ejecuta `uv run vamengoc release verify public` (debe terminar sin errores);
 4. firma el commit con su identidad institucional.
