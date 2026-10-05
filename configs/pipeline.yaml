@@ -114,6 +114,7 @@ sdc:
     - person_id
     - notification_id
     - lot_id_raw
+    - national_id
   forbidden_patterns:                    # regexes scanned in every released text file
     - '(?i)nombres?\s+y\s+apellidos'
     - '(?i)\bdirecci[oó]n\s+(particular|postal|de\s+residencia)\b'

@@ -1,10 +1,10 @@
 {
   "data_origin": "synthetic",
   "synthetic": true,
-  "generated_utc": "2026-10-05T16:48:31+00:00",
-  "run_id": "20261005T163243Z-d36319",
+  "generated_utc": "2026-10-05T19:27:33+00:00",
+  "run_id": "20261005T192724Z-459077",
   "code_version": "0.1.0",
-  "git_commit": "417221ef6878ba5f5212c9c2a38d8ac8af212543",
+  "git_commit": "109914519ce172f7ad993229131b36f6967ad6a2",
   "git_dirty": true,
   "seed": 20260930,
   "study_years": [
@@ -23,10 +23,10 @@
     "configs/dictionaries/geography.yaml": "2b9a6921741a61052d81972372911466609a8d2f9a6b602a83a90df78c4cff71",
     "configs/dictionaries/manufacturers.yaml": "4837f046666400951d766d12e2748e1c8e30e1468f101734521a8da8ac9e5a86",
     "configs/dictionaries/vaccines.yaml": "8535797d6fdd976519ac49170d2d091fe820066dcd44072b689c386311f18139",
-    "configs/pipeline.yaml": "89c41ff4a50f2705877b5579a1028da494047c1a083659e0ed95804a2d5a0a63",
+    "configs/pipeline.yaml": "04411a62ce02b20c0fd387de28e09c4fac3aca7a551361c269cd6cc7fe7a8691",
     "configs/schemas/aefi.yaml": "1c30794d7ebcec25ecca4e603b4e9a9d9a529f760f19e326885b5f975e7b1b40",
     "configs/schemas/lots.yaml": "09184f212cd9a14afef50e04747d469d42468cc70bbfc88cf532067c47917a40",
-    "<merged pipeline config>": "c6745c04fbe3f3bca595a2693a3b481cc718b1d439078bf0ce6e7b2f77106806"
+    "<merged pipeline config>": "7b3c1bcb97ec94e2ddcf13b1e187cc445fe8385ab19972b538cbf8d3b9c93e18"
   },
   "inputs_sha256": {
     "BD_para_publicación_lotes_final.xlsx": "069f69c69ede113400218457cbfd20f587a2d99fbda8b858913827aaf5cd3dfc",
@@ -135,7 +135,7 @@
     }
   },
   "files": {
-    "README.md": "e9b869fe064e9e9b58a2bbef29360e6854939578e44df45f8b7f2f4f2edb1f45",
+    "README.md": "30f2ca76f8291ee61616ca5aa47dcd8203e5375056522d2bee3f579a58c09467",
     "figures/en/p1_forest.pdf": "ea38e40f08225d1fc82394c8afb70eef691113a92f3c5fff28f0ed15a0448317",
     "figures/en/p1_incidence.pdf": "dd5c4ceb9c77272690d58624f95e0182a667975ada87477a10b2179604fdd0d4",
     "figures/en/p1_lca.pdf": "6de9d9523d366c653c478f3ea39971dd57c327f6898cd89b973d923a2f5756fe",
@@ -171,7 +171,7 @@
     "tables/dq_completeness.csv": "a4d08d39cef741d00039ddd7e8a8009c034b21010f8c2623116c80c5e5f9f788",
     "tables/dq_conformance.csv": "bb0a145d0823a9347534a0027d251df1979fb6e04a3789baebf87c2df8020cc7",
     "tables/dq_plausibility.csv": "a1af14ce619264d7bc162b48bf64299efb24f198e68b18c3013c3461840e78e7",
-    "tables/dq_summary.json": "ee0304c5f73b82856d540e5fb6c690e86b6ed703bf0b0216b05e9d4ebf61eab8",
+    "tables/dq_summary.json": "ec3d9c0bbd2b1951bb40d586e5f4b2c14d8e45ece8feb893ff2ed4a0987f7ace",
     "tables/p1_calibration.csv": "45f1b14253b0ea893861955b9668c69c8fc8cf1bd0d48e1f36f093ee1631238e",
     "tables/p1_characteristics.csv": "a9c03231b403acf6fe8013fe058f801eb217a1f4d04bc6c0406d8b9693fe39b5",
     "tables/p1_characteristics_continuous.csv": "4dfc9ad937ae177b505373e78d0714f543e63ece0039533acd5a6cc32700ee15",
@@ -223,7 +223,7 @@
     "tables/p2_scales.json": "ebda3122275ae311d22fd5d10d52e81940948ce560c985a187da8f989f30a8d8",
     "tables/p2_specifications.json": "c30710c6cf52f394a8dac6d2652a5db7f37c9e8d5ec5e8a573c1ad5ed2596ec4",
     "tables/provenance_notes.json": "a165c528efae033529de386cac5a844d033dc6a56e9c1bd85d03f83171d705b1",
-    "web/bundle.json": "733c0f2b8c4cadace7df30e46a67588f39e18ed9eb7858361c91713f526d5248"
+    "web/bundle.json": "20f945ec9631f01454ada15cfecdf4de5c68b685c08b220840feca2c2796c5b6"
   },
   "n_tables": 45,
   "n_figures": 22,

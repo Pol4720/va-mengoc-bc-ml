@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pandas as pd
 import pytest
 
@@ -159,3 +161,24 @@ def test_vaccine_event_counts_restriction_is_neutral_when_everything_is_recorded
     only_new = dp.vaccine_event_counts(adm, events_long, ids, recorded={"e1": {1, 2}, "e2": {3, 4}})
     e2 = only_new[only_new["event"] == "e2"].set_index("vaccine")
     assert e2.loc["A", "n"] == 2 and e2.loc["A", "expected"] == pytest.approx(2 * 2 / 2)
+
+
+def test_released_schema_drift_never_uses_identifier_names_as_keys() -> None:
+    from vamengoc.release.builder import forbidden_columns, public_schema_drift
+    from vamengoc.release.verify import VerificationReport, _walk_json
+
+    drift = {
+        "fields_in_all_files": ["sex", "birth_date", "vaccine_raw"],
+        "fields_not_in_all_files": {"birth_date": ["EA 2024.xlsx"], "national_id": ["EA 2017.xlsx"], "ev_pain": []},
+        "unmatched_headers": {},
+        "fuzzy_matches": {},
+    }
+    forbidden = forbidden_columns(Project().config.sdc.forbidden_columns)
+    assert {"birth_date", "national_id"} <= forbidden
+    out = public_schema_drift(drift, forbidden)
+    assert out["fields_not_in_all_files"] == {"ev_pain": []}
+    assert out["identifier_fields_not_in_all_files"] == 2
+    assert out["fields_in_all_files"] == ["sex", "vaccine_raw"]
+    rep = VerificationReport(root=Path())
+    _walk_json({"schema_drift": out}, "$", forbidden, rep, "dq_summary.json")
+    assert rep.ok, rep.errors

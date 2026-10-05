@@ -492,12 +492,9 @@
   },
   "schema_drift": {
     "fields_in_all_files": [
-      "address",
       "admission_date",
       "age_group_raw",
       "age_raw",
-      "birth_date",
-      "clinic",
       "died",
       "discharge_date",
       "dose_raw",
@@ -526,8 +523,6 @@
       "ev_severe_local_reaction",
       "ev_sterile_abscess",
       "ev_toxic_shock",
-      "full_name",
-      "health_area",
       "hist_family_allergy",
       "hist_family_asthma",
       "hist_family_seizure",
@@ -540,7 +535,6 @@
       "month",
       "municipality",
       "notification_date",
-      "other_text",
       "place_raw",
       "pregnant",
       "province",
@@ -558,6 +552,7 @@
       ]
     },
     "fuzzy_matches": {},
+    "identifier_fields_not_in_all_files": 0,
     "unmatched_headers": {
       "EA_2021_TOTAL.xlsx": [
         {

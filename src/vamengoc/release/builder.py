@@ -730,7 +730,7 @@ def _dq_tables(w: _Writer, dq: dict[str, Any]) -> None:
     w.json(
         "dq_summary",
         {
-            "schema_drift": dq["schema_drift"],
+            "schema_drift": public_schema_drift(dq["schema_drift"], forbidden_columns(w.cfg.forbidden_columns)),
             "dedup": dedup,
             "window": dq["window"],
             "normalisation": norm,
@@ -763,6 +763,29 @@ def _dq_tables(w: _Writer, dq: dict[str, Any]) -> None:
         },
     )
     w.json("provenance_notes", dq["provenance_notes"])
+
+
+def forbidden_columns(configured: list[str]) -> set[str]:
+    """Names that must never appear as a key in any released file (see release.verify)."""
+    from vamengoc.release.verify import ALWAYS_FORBIDDEN_COLUMNS
+
+    return set(ALWAYS_FORBIDDEN_COLUMNS) | set(configured)
+
+
+def public_schema_drift(drift: dict[str, Any], forbidden: set[str]) -> dict[str, Any]:
+    """Schema-drift report without identifier field names used as keys.
+
+    A direct or indirect identifier (birth date, name, address, identity card...) that is missing
+    from some annual files is reported only as a count: its name would otherwise appear as a JSON
+    key, which the release verifier rejects by design.
+    """
+    out = dict(drift)
+    by_field = dict(drift.get("fields_not_in_all_files", {}))
+    hidden = sorted(k for k in by_field if k in forbidden)
+    out["fields_not_in_all_files"] = {k: v for k, v in by_field.items() if k not in forbidden}
+    out["identifier_fields_not_in_all_files"] = len(hidden)
+    out["fields_in_all_files"] = [f for f in drift.get("fields_in_all_files", []) if f not in forbidden]
+    return out
 
 
 def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, synthetic: bool) -> list[Path]:

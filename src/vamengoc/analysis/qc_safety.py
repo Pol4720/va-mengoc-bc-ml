@@ -273,8 +273,12 @@ def gee_family(
                 )
                 continue
             terms = label.split("+") if kind == "mutually_adjusted" else [label]
-            ci = res.conf_int()
-            if not np.all(np.isfinite(res.params)) or not np.all(np.isfinite(res.bse)):
+            # A non-positive robust variance (sparse outcome) yields NaN standard errors: such models
+            # are reported as not estimable below, so numpy's sqrt warning is not useful output.
+            with np.errstate(invalid="ignore"):
+                ci = res.conf_int()
+                bse = np.asarray(res.bse, dtype=float)
+            if not np.all(np.isfinite(res.params)) or not np.all(np.isfinite(bse)):
                 rows.append(
                     {
                         "outcome": outcome,
