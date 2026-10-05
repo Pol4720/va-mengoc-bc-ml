@@ -10,6 +10,10 @@ dataset: lots
 
 lots_sheet:
   min_required_matches: 6
+  # Only the lot identifier and the production year are indispensable. Quality attributes
+  # are optional one by one (a renamed or dropped column is reported and the analyses use
+  # the attributes present), but at least this many must be recognised.
+  min_quality_attributes: 6
   fields:
     row_number:         {type: integer, required: false, aliases: ["NO", "#", "NO.", "NUMERO", "NRO"]}
     lot_id:             {type: lot, required: true, aliases: ["LOTE DE VACUNA ENVASADA", "LOTE", "LOTE VACUNA", "LOTE ENVASADO"]}
@@ -17,24 +21,38 @@ lots_sheet:
                          aliases: ["AÑO PRODUCCION DE LA VACUNA", "AÑO PRODUCCIÓN DE LA VACUNA", "AÑO DE PRODUCCION", "AÑO PRODUCCION", "AÑO"]}
     destination_raw:    {type: text, required: false, aliases: ["DESTINO", "PAIS DESTINO", "MERCADO"]}
     organoleptic:       {type: qualitative, required: false, aliases: ["CARACTERISTICAS ORGANOLEPTICAS", "CARACTERÍSTICAS ORGANOLÉPTICAS", "ASPECTO"]}
-    ph:                 {type: quantitative, required: true, aliases: ["PH"]}
-    protein_conc:       {type: quantitative, required: true, aliases: ["CONCENTRACION DE PROTEINAS", "CONCENTRACIÓN DE PROTEÍNAS", "PROTEINAS"]}
-    protein_adsorption: {type: quantitative, required: true, aliases: ["ADSORCION DE PROTEINAS (%)", "ADSORCIÓN DE PROTEÍNAS (%)", "ADSORCION DE PROTEINAS"]}
-    ps_conc:            {type: quantitative, required: true,
-                         aliases: ["CONCENTRACION DE POLISACARIDOS", "CONCENTRACIÓN DE POLISACÁRIDOS", "POLISACARIDOS"]}
-    ps_adsorption:      {type: quantitative, required: true,
-                         aliases: ["ADSORCION DE POLISACARIDOS (%)", "ADSORCIÓN DE POLISACÁRIDOS (%)", "ADSORCION DE POLISACARIDOS"]}
-    aloh3_conc:         {type: quantitative, required: true, aliases: ["CONCENTRACION DE AL(OH)3", "CONCENTRACIÓN DE AL(OH)3", "AL(OH)3", "HIDROXIDO DE ALUMINIO"]}
-    thiomersal_conc:    {type: quantitative, required: true, aliases: ["CONCENTRACION DE TIOMERSAL", "CONCENTRACIÓN DE TIOMERSAL", "TIOMERSAL"]}
-    bactericidal_titer: {type: quantitative, required: true,
-                         aliases: ["INMUNOGENICIDAD (ACT. ANTIC. BACT.)", "INMUNOGENICIDAD (ACT ANTIC BACT)", "ACTIVIDAD BACTERICIDA", "INMUNOGENICIDAD BACT"]}
-    igg_elisa:          {type: quantitative, required: true,
-                         aliases: ["INMUNOGENICIDAD (ACT. ANTIC. IGG)", "INMUNOGENICIDAD (ACT ANTIC IGG)", "IGG", "INMUNOGENICIDAD IGG"]}
+    ph:                 {type: quantitative, required: false, aliases: ["PH"]}
+    protein_conc:       {type: quantitative, required: false, aliases: ["CONCENTRACION DE PROTEINAS", "CONCENTRACIÓN DE PROTEÍNAS", "PROTEINAS"],
+                         patterns: ["CONCENTRACI.*PROTE"]}
+    protein_adsorption: {type: quantitative, required: false, aliases: ["ADSORCION DE PROTEINAS (%)", "ADSORCIÓN DE PROTEÍNAS (%)", "ADSORCION DE PROTEINAS"],
+                         patterns: ["ADSORCI.*PROTE"]}
+    ps_conc:            {type: quantitative, required: false,
+                         aliases: ["CONCENTRACION DE POLISACARIDOS", "CONCENTRACIÓN DE POLISACÁRIDOS", "POLISACARIDOS"],
+                         patterns: ["CONCENTRACI.*POLISAC"]}
+    ps_adsorption:      {type: quantitative, required: false,
+                         aliases: ["ADSORCION DE POLISACARIDOS (%)", "ADSORCIÓN DE POLISACÁRIDOS (%)", "ADSORCION DE POLISACARIDOS"],
+                         patterns: ["ADSORCI.*POLISAC"]}
+    aloh3_conc:         {type: quantitative, required: false, aliases: ["CONCENTRACION DE AL(OH)3", "CONCENTRACIÓN DE AL(OH)3", "AL(OH)3", "HIDROXIDO DE ALUMINIO"],
+                         patterns: ["ALOH3", "ALUMINIO"]}
+    thiomersal_conc:    {type: quantitative, required: false, aliases: ["CONCENTRACION DE TIOMERSAL", "CONCENTRACIÓN DE TIOMERSAL", "TIOMERSAL"],
+                         patterns: ["TIOMERSAL", "THIOMERSAL", "TIMEROSAL"]}
+    bactericidal_titer: {type: quantitative, required: false,
+                         aliases: ["INMUNOGENICIDAD (ACT. ANTIC. BACT.)", "INMUNOGENICIDAD (ACT ANTIC BACT)", "ACTIVIDAD BACTERICIDA", "INMUNOGENICIDAD BACT"],
+                         patterns: ["BACT"]}
+    igg_elisa:          {type: quantitative, required: false,
+                         aliases: ["INMUNOGENICIDAD (ACT. ANTIC. IGG)", "INMUNOGENICIDAD (ACT ANTIC IGG)", "IGG", "INMUNOGENICIDAD IGG",
+                                   "INMUNOGENICIDAD (IGG)", "INMUNOGENICIDAD (ELISA)", "INMUNOGENICIDAD ELISA", "ELISA", "IGG ELISA",
+                                   "ELISA IGG", "ANTICUERPOS IGG", "ACT. ANTIC. IGG", "ACTIVIDAD ANTICUERPOS IGG",
+                                   "ACTIVIDAD DE ANTICUERPOS IGG", "INMUNOGENICIDAD (ACT. ANTIC. IGG) (UIGG/ML)",
+                                   "INMUNOGENICIDAD (UIGG/ML)", "UIGG/ML"],
+                         patterns: ["IGG", "ELISA"]}
     sterility:          {type: qualitative, required: false, aliases: ["ESTERILIDAD"]}
-    endotoxin:          {type: quantitative, required: true,
-                         aliases: ["CONTENIDO DE ENDOTOXINAS (UE/ML)", "CONTENIDO DE ENDOTOXINAS", "ENDOTOXINAS"]}
-    fill_volume:        {type: quantitative, required: true,
-                         aliases: ["CONTENIDO PROMEDIO DEL BULBO", "CONTENIDO DEL BULBO", "VOLUMEN DE LLENADO"]}
+    endotoxin:          {type: quantitative, required: false,
+                         aliases: ["CONTENIDO DE ENDOTOXINAS (UE/ML)", "CONTENIDO DE ENDOTOXINAS", "ENDOTOXINAS"],
+                         patterns: ["ENDOTOX"]}
+    fill_volume:        {type: quantitative, required: false,
+                         aliases: ["CONTENIDO PROMEDIO DEL BULBO", "CONTENIDO DEL BULBO", "VOLUMEN DE LLENADO"],
+                         patterns: ["BULBO", "LLENADO"]}
     identity_ps:        {type: qualitative, required: false, aliases: ["IDENTIDAD DEL POLISACARIDO", "IDENTIDAD DEL POLISACÁRIDO"]}
     identity_protein:   {type: qualitative, required: false, aliases: ["IDENTIDAD DE LA PROTEINA", "IDENTIDAD DE LA PROTEÍNA"]}
     safety_test:        {type: qualitative, required: false, aliases: ["INOCUIDAD"]}

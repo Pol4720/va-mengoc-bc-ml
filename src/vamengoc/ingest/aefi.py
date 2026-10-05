@@ -52,6 +52,9 @@ class AEFIIngestResult:
     schema_reports: dict[str, dict[str, Any]]
     parse_status: dict[str, dict[str, dict[str, int]]]  # file -> field -> status -> n
     local_only: dict[str, Any] = field(default_factory=dict)  # never released
+    # Event indicators whose column exists in each file (the form changed in 2024): an event
+    # absent from a file is *not recorded* there, which is different from "not reported".
+    recorded_events: dict[str, list[str]] = field(default_factory=dict)
 
 
 def discover_aefi_files(directory: Path, pattern: str) -> list[tuple[int, Path]]:
@@ -133,6 +136,7 @@ def ingest_aefi(
     records: list[dict[str, Any]] = []
     schema_reports: dict[str, dict[str, Any]] = {}
     parse_status: dict[str, dict[str, dict[str, int]]] = {}
+    recorded_events: dict[str, list[str]] = {}
     unmapped_vaccines: Counter[str] = Counter()
     other_uncategorised: Counter[str] = Counter()
 
@@ -290,6 +294,7 @@ def ingest_aefi(
             for c in junk_cols
         ]
         schema_reports[path.name] = report
+        recorded_events[path.name] = sorted(f for f in match.field_to_column() if f.startswith("ev_"))
         parse_status[path.name] = {k: dict(v) for k, v in status.items()}
         ctx.step(
             "ingest_aefi_file",
@@ -305,10 +310,13 @@ def ingest_aefi(
     staging = pd.DataFrame.from_records(records)
     for col in ("vaccination_date", "notification_date", "admission_date", "discharge_date"):
         staging[col] = pd.to_datetime(staging[col], errors="raise")
+    yes_no_fields = {name for name, spec in spec_by_name.items() if spec.type in _EVENT_TYPES}
     bool_cols = [
         c
         for c in staging.columns
-        if c.startswith(("ev_", "hist_")) or c in {"hospitalized", "recovered", "died", "sequelae", "pregnant"}
+        if c.startswith(("ev_", "hist_"))
+        or c in yes_no_fields
+        or c in {"hospitalized", "recovered", "died", "sequelae", "pregnant"}
     ]
     for col in bool_cols:
         staging[col] = staging[col].astype("boolean")
@@ -325,6 +333,7 @@ def ingest_aefi(
             "unmapped_vaccine_tokens": dict(unmapped_vaccines.most_common()),
             "uncategorised_other_text": dict(other_uncategorised.most_common(200)),
         },
+        recorded_events=recorded_events,
     )
 
 

@@ -150,18 +150,36 @@ def demo(
 def schema_check(
     input_dir: Annotated[Path | None, typer.Option("--input", help="Directory with the raw files.")] = None,
 ) -> None:
-    """Map the headers of every input file to the schema registry (no analysis, no output files)."""
+    """Map the headers of every input file to the schema registry (no analysis, no output files).
+
+    Prints column titles only, never cell values. Checks the annual AEFI files, the event
+    indicators each year's form carries, and the three sheets of the lot-release workbook.
+    """
     from vamengoc.ingest.aefi import discover_aefi_files
+    from vamengoc.ingest.lots import _find_sheet, find_lots_workbook
     from vamengoc.io.excel import list_sheets, read_sheet
     from vamengoc.io.schema_registry import SchemaError, detect_header_row, fields_from_schema
 
     project = Project()
     src = input_dir or project.raw_dir
     fields = fields_from_schema(project.aefi_schema["fields"])
+    event_fields = [f.name for f in fields if f.name.startswith("ev_")]
+    pii = {f.name for f in fields if f.kind == "pii_direct"}
     table = Table(title=f"AEFI files in {src}")
-    for col in ("file", "sheet", "header row", "matched", "fuzzy", "unmatched", "missing required"):
+    for col in (
+        "file",
+        "sheet",
+        "header row",
+        "matched",
+        "events on form",
+        "identifiers (discarded)",
+        "review",
+        "unmatched",
+        "missing required",
+    ):
         table.add_column(col, no_wrap=col == "file", overflow="fold")
     problems = 0
+    recorded: dict[str, set[str]] = {}
     files = discover_aefi_files(src, project.config.inputs.aefi_file_pattern)
     for _year, path in files:
         sheets = list_sheets(path)
@@ -175,22 +193,89 @@ def schema_check(
                 min_matches=project.config.inputs.min_header_matches,
             )
         except SchemaError as exc:
-            table.add_row(path.name, sheet, "-", "-", "-", "-", str(exc))
+            table.add_row(path.name, sheet, "-", "-", "-", "-", "-", "-", str(exc))
             problems += 1
             continue
         problems += bool(m.missing_required)
+        mapped = set(m.field_to_column())
+        recorded[path.name] = {e for e in event_fields if e in mapped}
+        review = [f"{f['header']}→{f['field']}" for f in m.fuzzy]
         table.add_row(
             path.name,
             sheet,
             str(idx + 1),
             str(m.n_matched),
-            ", ".join(f"{f['header']}→{f['field']}" for f in m.fuzzy) or "-",
+            f"{len(recorded[path.name])}/{len(event_fields)}",
+            ", ".join(sorted(pii & mapped)) or "-",
+            ", ".join(review) or "-",
             ", ".join(str(u["header"]) for u in m.unmatched) or "-",
             ", ".join(m.missing_required) or "-",
         )
     console.print(table)
     console.print(f"{len(files)} AEFI files checked, {problems} with problems.")
-    if problems or not files:
+
+    # Change of form: events that are not on every file's form are analysed only where recorded.
+    partial = [e for e in event_fields if recorded and 0 < sum(e in r for r in recorded.values()) < len(recorded)]
+    if partial:
+        console.print(
+            f"[yellow]{len(partial)} event indicators are not on every year's form; each is analysed "
+            "only in the files that record it (OPEN_QUESTIONS 11: equivalences between forms).[/yellow]"
+        )
+        for e in partial:
+            on = [f for f, r in recorded.items() if e in r]
+            console.print(f"  {e}: {', '.join(on)}")
+
+    # Lot-release workbook (three sheets).
+    lots_problems = 0
+    try:
+        lots_path = find_lots_workbook(src, project.config.inputs.lots_file_pattern)
+    except (FileNotFoundError, SchemaError) as exc:
+        console.print(f"[red]Lot-release workbook: {exc}[/red]")
+        lots_problems += 1
+    else:
+        lt = Table(title=f"Lot-release workbook {lots_path.name}")
+        for col in ("sheet", "header row", "matched", "review", "unmatched", "not found", "problem"):
+            lt.add_column(col, overflow="fold")
+        pats = project.config.inputs.sheet_patterns
+        for key, sch_key in (("lots", "lots_sheet"), ("incidence", "incidence_sheet"), ("coverage", "coverage_sheet")):
+            sch = project.lots_schema[sch_key]
+            lfields = fields_from_schema(sch["fields"])
+            try:
+                sheet = _find_sheet(lots_path, pats[key])
+                grid = read_sheet(lots_path, sheet)
+                idx, m = detect_header_row(
+                    grid.rows,
+                    lfields,
+                    max_rows=project.config.inputs.header_search_rows,
+                    min_matches=int(sch["min_required_matches"]),
+                )
+            except SchemaError as exc:
+                lt.add_row(key, "-", "-", "-", "-", "-", str(exc))
+                lots_problems += 1
+                continue
+            problem = ", ".join(f"required: {f}" for f in m.missing_required)
+            if key == "lots":
+                quant = [f.name for f in lfields if f.type == "quantitative"]
+                found = [q for q in quant if q in m.field_to_column()]
+                minimum = int(sch.get("min_quality_attributes", 1))
+                if len(found) < minimum:
+                    problem = (problem + "; " if problem else "") + f"{len(found)} quality attributes (< {minimum})"
+            lots_problems += bool(problem)
+            lt.add_row(
+                f"{key} ({sheet})",
+                str(idx + 1),
+                str(m.n_matched),
+                ", ".join(f"{f['header']}→{f['field']}" for f in m.fuzzy) or "-",
+                ", ".join(str(u["header"]) for u in m.unmatched) or "-",
+                ", ".join(m.missing_optional) or "-",
+                problem or "-",
+            )
+        console.print(lt)
+        console.print(
+            "Fields under 'not found' are optional: the analyses use the attributes present. If a "
+            "header under 'unmatched' is one of them, add it as an alias in configs/schemas/lots.yaml."
+        )
+    if problems or lots_problems or not files:
         raise typer.Exit(code=1)
 
 

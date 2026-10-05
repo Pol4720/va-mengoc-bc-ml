@@ -48,8 +48,15 @@ class SeriousnessResult:
     notes: list[str] = field(default_factory=list)
 
 
-def build_design(df: pd.DataFrame, min_prevalence: float = 0.002) -> tuple[pd.DataFrame, pd.Series]:
-    """Predictor matrix (numeric, no missing) and binary outcome ``hospitalized``."""
+def build_design(
+    df: pd.DataFrame, min_prevalence: float = 0.002, events: list[str] | None = None
+) -> tuple[pd.DataFrame, pd.Series]:
+    """Predictor matrix (numeric, no missing) and binary outcome ``hospitalized``.
+
+    ``events`` limits the event indicators used as predictors (by default every event column);
+    the pipeline passes the events recorded on every form so that a change of form does not
+    masquerade as a change in risk.
+    """
     d = df[df["hospitalized"].notna()].copy()
     y = d["hospitalized"].astype(bool).astype(int)
     x = pd.DataFrame(index=d.index)
@@ -63,7 +70,7 @@ def build_design(df: pd.DataFrame, min_prevalence: float = 0.002) -> tuple[pd.Da
         x[f"vac_{v}"] = vac.str.split("|").map(lambda s, v=v: int(v in s))
     for region in ("Centro", "Oriente"):  # reference: Occidente (and unknown region)
         x[f"region_{region}"] = d["region"].eq(region).astype(int)
-    for ev in event_columns(d):
+    for ev in events if events is not None else event_columns(d):
         col = d[ev].astype("boolean").fillna(False).astype(int)
         if col.mean() >= min_prevalence:
             x[ev] = col
@@ -133,9 +140,15 @@ def _flic_predict(xtr: pd.DataFrame, ytr: pd.Series, xte: pd.DataFrame) -> np.nd
 
 
 def fit_seriousness(
-    df: pd.DataFrame, *, train_years: tuple[int, int], test_years: tuple[int, int], params: dict[str, Any], seed: int
+    df: pd.DataFrame,
+    *,
+    train_years: tuple[int, int],
+    test_years: tuple[int, int],
+    params: dict[str, Any],
+    seed: int,
+    events: list[str] | None = None,
 ) -> SeriousnessResult:
-    x, y = build_design(df)
+    x, y = build_design(df, events=events)
     years = df.loc[x.index, "analytic_year"].astype(int)
     tr = years.between(*train_years)
     te = years.between(*test_years)

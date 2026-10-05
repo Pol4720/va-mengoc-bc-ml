@@ -21,6 +21,10 @@ min_required_matches: 8
 fields:
   full_name:        {kind: pii_direct, type: text, required: false,
                      aliases: ["NOMBRES Y APELLIDOS", "NOMBRE Y APELLIDOS", "NOMBRE Y APELLIDO", "NOMBRES", "NOMBRE", "PACIENTE"]}
+  # National identity card (form used from 2024). Direct identifier: never read into any
+  # record, log or output; declared only so that it is recognised and reported as such.
+  national_id:      {kind: pii_direct, type: text, required: false,
+                     aliases: ["CARNE DE IDENTIDAD", "CARNÉ DE IDENTIDAD", "CARNET DE IDENTIDAD", "CARNE", "NO. CARNE"]}
   sex:              {kind: quasi_id, type: sex, required: true, aliases: ["SEXO", "SEX"]}
   birth_date:       {kind: pii_indirect, type: date, required: false,
                      aliases: ["F.NACIMIENTO", "F. NACIMIENTO", "FECHA DE NACIMIENTO", "FECHA NACIMIENTO", "FNAC", "F NAC"]}
@@ -39,7 +43,8 @@ fields:
   vaccination_date: {kind: date, type: date, required: true,
                      aliases: ["F.VACUNACION", "F. VACUNACION", "FECHA DE VACUNACION", "FECHA VACUNACION", "F.VACUNACIÓN"]}
   notification_date: {kind: date, type: date, required: false,
-                     aliases: ["F.NOTIFICACION", "F. NOTIFICACION", "FECHA DE NOTIFICACION", "FECHA NOTIFICACION"]}
+                     aliases: ["F.NOTIFICACION", "F. NOTIFICACION", "FECHA DE NOTIFICACION", "FECHA NOTIFICACION",
+                              "F.NTIFICACION", "F. NTIFICACION"]}
   vaccine_raw:      {kind: category, type: multi, required: true,
                      aliases: ["TIPO DE VACUNA", "TIPO VACUNA", "VACUNA", "VACUNAS"]}
   dose_raw:         {kind: category, type: multi, required: false, aliases: ["DOSIS", "NO. DOSIS", "NUMERO DE DOSIS"]}
@@ -55,8 +60,12 @@ fields:
 
   # --- Personal (APP) and family (APF) history ------------------------------
   hist_personal_allergy: {kind: category, type: yes_no, required: false, aliases: ["APP ALERGIA", "APP ALERGIAS", "ALERGIA"], occurrence: 1}
-  hist_personal_seizure: {kind: category, type: yes_no, required: false, aliases: ["CONVULSON", "CONVULSION", "CONVULSIONES"], occurrence: 1}
-  hist_personal_asthma:  {kind: category, type: yes_no, required: false, aliases: ["ASMA"], occurrence: 1}
+  hist_personal_seizure: {kind: category, type: yes_no, required: false, aliases: ["CONVULSON", "CONVULSION", "CONVULSIONES", "APP CONVULSON", "APP CONVULSION"], occurrence: 1}
+  hist_personal_asthma:  {kind: category, type: yes_no, required: false, aliases: ["ASMA", "APP ASMA"], occurrence: 1}
+  # Personal history items added by the form used from 2024 (absent from earlier files).
+  hist_personal_hypertension: {kind: category, type: yes_no, required: false, aliases: ["APP HTA"]}
+  hist_personal_diabetes:     {kind: category, type: yes_no, required: false, aliases: ["APP DM"]}
+  hist_personal_ci:           {kind: category, type: yes_no, required: false, aliases: ["APP CI"]}
   hist_family_allergy:   {kind: category, type: yes_no, required: false, aliases: ["APF ALERGIA", "APF ALERGIAS"], occurrence: 1}
   hist_family_seizure:   {kind: category, type: yes_no, required: false, aliases: ["CONVULSON", "CONVULSION", "CONVULSIONES", "CONVULSON.1"], occurrence: 2}
   hist_family_asthma:    {kind: category, type: yes_no, required: false, aliases: ["ASMA", "ASMA.1"], occurrence: 2}
@@ -88,6 +97,30 @@ fields:
   ev_rash:                   {kind: event, type: yes_no, required: false, aliases: ["RASH", "EXANTEMA"]}
   ev_purpura:                {kind: event, type: yes_no, required: false, aliases: ["PURPURA", "PÚRPURA"]}
   ev_other:                  {kind: event, type: yes_no, required: false, aliases: ["OTROS", "OTRO", "OTRAS"]}
+  # --- Event indicators of the form used from 2024 ----------------------------
+  # Recorded only in the files that carry them; every analysis of an event is restricted to
+  # the files in which its column exists (see docs/OPEN_QUESTIONS.md, question 11, for the
+  # correspondence with the earlier indicators, which only the data owner can confirm).
+  ev_pain:                   {kind: event, type: yes_no, required: false, aliases: ["DOLOR"]}
+  ev_redness:                {kind: event, type: yes_no, required: false, aliases: ["ENROJECIMIENTO"]}
+  ev_induration:             {kind: event, type: yes_no, required: false, aliases: ["INDURACION", "INDURACIÓN"]}
+  ev_abscess_unspecified:    {kind: event, type: yes_no, required: false, aliases: ["ABSCESO"]}
+  ev_somnolence:             {kind: event, type: yes_no, required: false, aliases: ["SOMNOLENCIA"]}
+  ev_high_blood_pressure:    {kind: event, type: yes_no, required: false,
+                              aliases: ["TA ALTA", "T.A. ALTA", "T.A ALTA", "TENSION ARTERIAL ALTA"]}
+  ev_malaise:                {kind: event, type: yes_no, required: false, aliases: ["DECAIMIENTO"]}
+  ev_headache:               {kind: event, type: yes_no, required: false, aliases: ["CEFALEA"]}
+  ev_vasovagal:              {kind: event, type: yes_no, required: false,
+                              aliases: ["CRISIS VAGAL", "CRISS VAGAL", "CRISIS VASOVAGAL"]}
+  ev_erythema:               {kind: event, type: yes_no, required: false, aliases: ["ERITEMA"]}
+  ev_anaphylaxis:            {kind: event, type: yes_no, required: false, aliases: ["ANAFILAXIA"]}
+  ev_low_grade_fever:        {kind: event, type: yes_no, required: false, aliases: ["FEBRICULA", "FEBRÍCULA"]}
+  ev_fever_unspecified:      {kind: event, type: yes_no, required: false, aliases: ["FIEBRE"]}
+  ev_thrombocytopenia:       {kind: event, type: yes_no, required: false, aliases: ["TROMBOCITOPENIA"]}
+  ev_lip_oedema:             {kind: event, type: yes_no, required: false, aliases: ["EDEMA LABIAL"]}
+  ev_facial_oedema:          {kind: event, type: yes_no, required: false, aliases: ["EDEMA FACIAL"]}
+  ev_facial_palsy:           {kind: event, type: yes_no, required: false,
+                              aliases: ["PARALISIS FACIAL", "PARALISS FACIAL", "PARÁLISIS FACIAL"]}
   other_text:                {kind: sensitive_text, type: text, required: false, aliases: ["CUAL (OTRO)", "CUAL", "CUAL(OTRO)", "CUALES"]}
 
   # --- Outcome --------------------------------------------------------------
@@ -96,4 +129,7 @@ fields:
   discharge_date:   {kind: date, type: date, required: false, aliases: ["F.EGRESO", "F. EGRESO", "FECHA DE EGRESO", "FECHA EGRESO"]}
   recovered:        {kind: outcome, type: yes_no, required: false, aliases: ["CURADO", "RECUPERADO"]}
   died:             {kind: outcome, type: yes_no, required: false, aliases: ["FALLECIDO", "FALLECIDA", "MUERTE"]}
+  # Seriousness as classified by the reporter (form used from 2024).
+  reported_serious:     {kind: outcome, type: yes_no, required: false, aliases: ["GRAVE"]}
+  reported_non_serious: {kind: outcome, type: yes_no, required: false, aliases: ["NO GRAVE"]}
   sequelae:         {kind: outcome, type: yes_no, required: false, aliases: ["SECUELA", "SECUELAS"]}

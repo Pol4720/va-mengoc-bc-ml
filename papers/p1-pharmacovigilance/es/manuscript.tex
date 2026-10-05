@@ -147,7 +147,7 @@ el material suplementario), la declaración RECORD-PE para datos recogidos de fo
 
 \subsection{Fuentes de datos y procesamiento}\label{sec:data}
 El estudio utilizó \VNFiles{} ficheros anuales de notificaciones de ESAVI
-(\VStudyFirstYear--\VStudyLastYear) con 61 variables por notificación: datos demográficos, vacunas,
+(\VStudyFirstYear--\VStudyLastYear) que recogen, para cada notificación, datos demográficos, vacunas,
 dosis, lotes y fabricantes, fechas de vacunación, de inicio y de notificación, \PONEventsScreened{}
 indicadores de eventos predefinidos, antecedentes familiares, hospitalización y evolución. Las dosis
 anuales de VA-MENGOC-BC administradas procedieron de las series del programa nacional de
@@ -164,7 +164,7 @@ un flujo de análisis de código abierto (Python 3.11
 Como la estructura de los ficheros cambió entre años, los nombres de las columnas se asignaron a un
 esquema versionado mediante alias, con informes de deriva del esquema, y cada valor se interpretó con
 un estado explícito (válido, recuperado, inválido, ausente) para evaluar la calidad de los datos
-según el marco armonizado de Kahn et al.\ \cite{Kahn2016}. Los nombres y las direcciones se
+según el marco armonizado de Kahn et al.\ \cite{Kahn2016}. \VFormSentence. Los nombres y las direcciones se
 sustituyeron en la ingesta por resúmenes con clave (HMAC-SHA-256) cuya clave secreta se guarda fuera
 del repositorio \cite{ENISA2019}; las fechas de nacimiento se convirtieron en edad, y los campos de
 texto libre se procesaron localmente y nunca se publicaron, conforme a la ley cubana de protección

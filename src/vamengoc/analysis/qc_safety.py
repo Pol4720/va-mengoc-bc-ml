@@ -43,6 +43,7 @@ from statsmodels.genmod.bayes_mixed_glm import BinomialBayesMixedGLM
 
 from vamengoc.analysis.spc import AttributeScale, transform_values
 from vamengoc.analysis.stats_utils import benjamini_hochberg
+from vamengoc.curate.aefi_model import recorded_mask
 
 __all__ = [
     "QCSafetyFrame",
@@ -63,6 +64,12 @@ class QCSafetyFrame:
     covariate_terms: list[str]
     n_lots: int
     notes: list[str] = field(default_factory=list)
+    # Event columns present in each source file; outcomes are analysed only where recorded.
+    recorded_events: dict[str, list[str]] = field(default_factory=dict)
+
+    def rows_for(self, outcome: str) -> pd.DataFrame:
+        """Reports whose notification form recorded ``outcome``."""
+        return self.data[recorded_mask(self.data, outcome, self.recorded_events)]
 
 
 def build_qc_safety_frame(
@@ -76,6 +83,7 @@ def build_qc_safety_frame(
     restrict_levels: tuple[str, ...] = ("exact", "core", "fuzzy"),
     drop_temporal_implausible: bool = True,
     exclude_coadministered: bool = False,
+    recorded_events: dict[str, list[str]] | None = None,
 ) -> QCSafetyFrame:
     notes: list[str] = []
     lk = links[links["lot_key"].notna() & links["match_level"].isin(restrict_levels)].copy()
@@ -136,6 +144,7 @@ def build_qc_safety_frame(
         covariate_terms=cov_terms,
         n_lots=int(d["lot_key"].nunique()),
         notes=notes,
+        recorded_events=dict(recorded_events or {}),
     )
 
 
@@ -221,11 +230,11 @@ def gee_family(
     ``crude=True``, unadjusted single-exposure models (``model == "crude"``) are
     added for reporting (STROBE item 16a); they are outside the FDR family.
     """
-    d = frame.data.copy()
     rows: list[dict[str, Any]] = []
     neg = {f"z_{e}" for e in (negative_controls or [])}
     covs = " + ".join(frame.covariate_terms) if frame.covariate_terms else "1"
     for outcome in outcomes:
+        d = frame.rows_for(outcome).copy()
         d["_y"] = _outcome(d, outcome)
         n_events = int(d["_y"].sum())
         if n_events < 10 or n_events > len(d) - 10:
@@ -311,10 +320,10 @@ def gee_family(
 
 def mixed_model_sensitivity(frame: QCSafetyFrame, outcomes: list[str]) -> pd.DataFrame:
     """Random-intercept logistic model (variational Bayes) with all primary exposures."""
-    d = frame.data.copy()
     rows = []
     fixed = [t for t in frame.covariate_terms if not t.startswith("C(")] + frame.exposures
     for outcome in outcomes:
+        d = frame.rows_for(outcome).copy()
         d["_y"] = _outcome(d, outcome)
         if d["_y"].sum() < 10:
             continue
@@ -342,9 +351,9 @@ def mixed_model_sensitivity(frame: QCSafetyFrame, outcomes: list[str]) -> pd.Dat
 
 def lot_level_models(frame: QCSafetyFrame, outcomes: list[str], min_reports: int = 5) -> pd.DataFrame:
     """Quasi-binomial GLM of the per-lot event proportion on each standardised exposure."""
-    d = frame.data
     rows = []
     for outcome in outcomes:
+        d = frame.rows_for(outcome)
         y = _outcome(d, outcome)
         agg = (
             d.assign(_y=y)
@@ -409,7 +418,7 @@ def minimum_detectable_or(
     ``r2_exposure`` is the share of exposure variance explained by covariates
     (variance-inflation factor 1/(1 − R²)).
     """
-    d = frame.data
+    d = frame.rows_for(outcome)
     y = _outcome(d, outcome)
     p = float(y.mean())
     icc = icc_anova(y, d["lot_key"])
@@ -442,7 +451,7 @@ def incremental_value(
     complete QC profiles among lots (preserving within-lot structure and the
     joint distribution of attributes).
     """
-    d = frame.data
+    d = frame.rows_for(outcome)
     y = _outcome(d, outcome).to_numpy()
     if not frame.exposures or y.sum() < 20 or (len(y) - y.sum()) < 20 or frame.n_lots < folds:
         return {"outcome": outcome, "estimable": False}

@@ -158,3 +158,45 @@ def test_linkage_levels(tmp_path: Path) -> None:
     assert got.loc["r8", "match_level"] == "no_match"
     assert res.summary["n_linked"] == 5 and res.summary["temporal_implausible"] == 1
     assert set(res.bias_table["linked"]) == {True, False}
+
+
+def _lots_copy(synthetic_dir: SyntheticDataset, tmp_path: Path, rename: dict[str, str]) -> Path:
+    """Copy of the synthetic lot-release workbook with some lot-sheet headers renamed."""
+    from openpyxl import load_workbook
+
+    src = next(synthetic_dir.directory.glob("BD*.xlsx"))
+    wb = load_workbook(src)
+    for ws in wb.worksheets:
+        for row in ws.iter_rows(min_row=1, max_row=6):
+            for cell in row:
+                for old, new in rename.items():
+                    if isinstance(cell.value, str) and old.lower() in cell.value.lower():
+                        cell.value = new
+    out = tmp_path / src.name
+    wb.save(out)
+    return out
+
+
+def test_lots_workbook_without_a_recognisable_attribute(synthetic_dir: SyntheticDataset, tmp_path: Path) -> None:
+    from vamengoc.ingest.lots import ingest_lots_workbook
+
+    project = Project(overrides={"paths": {"runs_dir": str(tmp_path)}})
+    path = _lots_copy(synthetic_dir, tmp_path, {"act. antic. IgG": "INMUNOG. XYZ (ANTICUERPOS)"})
+    ctx = RunContext(project, "test", synthetic=True)
+    res = ingest_lots_workbook(project, path, build_normalizers(project), ctx)
+    assert "igg_elisa" not in res.lots.columns
+    assert {"endotoxin", "bactericidal_titer"} <= set(res.lots.columns)
+    assert any(s["step"] == "lots_attributes_not_found" and s["attributes"] == ["igg_elisa"] for s in ctx.steps)
+
+
+def test_lots_workbook_with_too_few_attributes_stops(synthetic_dir: SyntheticDataset, tmp_path: Path) -> None:
+    from vamengoc.ingest.lots import ingest_lots_workbook
+    from vamengoc.io.schema_registry import SchemaError
+
+    project = Project(overrides={"paths": {"runs_dir": str(tmp_path)}})
+    rename = {
+        k: f"COLUMNA {i}" for i, k in enumerate(["Inmunogenicidad", "endotoxinas", "tiomersal", "bulbo", "Al(OH)"])
+    }
+    path = _lots_copy(synthetic_dir, tmp_path, rename)
+    with pytest.raises(SchemaError, match="quality attributes recognised"):
+        ingest_lots_workbook(project, path, build_normalizers(project), RunContext(project, "test", synthetic=True))

@@ -9,9 +9,12 @@ row. Matching is therefore data-driven and explicit:
    occurrence of ``ASMA``;
 2. exact alias matches are taken first, honouring ``occurrence`` for headers
    that legitimately repeat (personal vs family history);
-3. remaining headers are matched fuzzily (rapidfuzz) only when one field wins
-   clearly, and every fuzzy decision is reported for human review;
-4. missing required fields raise :class:`SchemaError` — the pipeline stops
+3. remaining headers are tested against each field's ``patterns`` (regular
+   expressions on the compact key, e.g. ``IGG``) and assigned only when exactly
+   one field matches;
+4. what is still left is matched fuzzily (rapidfuzz) only when one field wins
+   clearly; pattern and fuzzy decisions are both reported for human review;
+5. missing required fields raise :class:`SchemaError` — the pipeline stops
    rather than analysing a misread file.
 """
 
@@ -50,6 +53,7 @@ class FieldSpec:
     occurrence: int = 1
     type: str = "text"
     kind: str = "category"
+    patterns: tuple[str, ...] = ()
 
 
 @dataclass
@@ -94,6 +98,7 @@ def fields_from_schema(fields: dict[str, dict[str, Any]]) -> list[FieldSpec]:
                 occurrence=int(spec.get("occurrence", 1)),
                 type=str(spec.get("type", "text")),
                 kind=str(spec.get("kind", "category")),
+                patterns=tuple(str(x) for x in spec.get("patterns", [])),
             )
         )
     return out
@@ -151,6 +156,29 @@ def match_headers(
             assigned.add(chosen.name)
         else:
             pending.append(col)
+
+    # Pattern pass: a field claims a header when its regular expression is the only one to match.
+    if fuzzy_threshold <= 100:
+        still: list[int] = []
+        for col in pending:
+            key, occ = keys[col]
+            hits = [
+                f
+                for f in fields
+                if f.patterns
+                and f.name not in assigned
+                and f.occurrence == occ
+                and any(re.search(pat, key) for pat in f.patterns)
+            ]
+            if len(hits) == 1:
+                result.columns[col] = hits[0].name
+                assigned.add(hits[0].name)
+                result.fuzzy.append(
+                    {"column": col, "header": cell_to_str(headers[col]), "field": hits[0].name, "score": "pattern"}
+                )
+            else:
+                still.append(col)
+        pending = still
 
     # Fuzzy pass over headers left unmatched (skipped when disabled, e.g. header detection).
     if fuzzy_threshold > 100:

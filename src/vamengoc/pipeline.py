@@ -35,7 +35,13 @@ from vamengoc.analysis.qc_safety import (
     mixed_model_sensitivity,
 )
 from vamengoc.config import Project
-from vamengoc.curate.aefi_model import CuratedAEFI, curate_aefi, event_columns
+from vamengoc.curate.aefi_model import (
+    CuratedAEFI,
+    curate_aefi,
+    event_columns,
+    events_recorded_everywhere,
+    recorded_mask,
+)
 from vamengoc.curate.linkage import LinkageResult, link_reports_to_lots
 from vamengoc.curate.quality import completeness_table, conformance_table, plausibility_table
 from vamengoc.ingest.aefi import AEFIIngestResult, ingest_aefi, schema_drift
@@ -73,9 +79,18 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
     a = project.config.analysis
     target = a.target_vaccine
     rep = cur.reports[cur.reports["in_study_window"]].copy()
-    ev_cols = event_columns(rep)
+    rec_files = cur.recorded_events
+    # Events on the notification form of at least one analysed file. An event that is not on a
+    # year's form is unknown for that year: each event is analysed on the reports that recorded it.
+    known = {e: recorded_mask(rep, e, rec_files) for e in event_columns(rep)}
+    ev_cols = [e for e in event_columns(rep) if bool(known[e].any())]
+    out_partial = sorted(e for e in ev_cols if not bool(known[e].all()))
     labels = project.events["events"]
     out: dict[str, Any] = {}
+    out["events_partially_recorded"] = out_partial
+    out["events_recorded_by_year"] = {
+        e: sorted(int(y) for y in rep.loc[known[e], "analytic_year"].dropna().unique()) for e in out_partial
+    }
 
     out["characteristics"] = descriptive.characteristics_table(rep, target)
     out["characteristics_continuous"] = out["characteristics"].attrs.get("continuous")
@@ -99,11 +114,11 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
         "ev_collapse",
         "ev_allergic_reaction",
     ]:
-        if ev not in rep:
+        if ev not in ev_cols:
             continue
+        sub = rep[rep["has_target"] & known[ev]]
         cnt = (
-            rep[rep["has_target"]]
-            .assign(_e=rep[ev].astype("boolean").fillna(False))
+            sub.assign(_e=sub[ev].astype("boolean").fillna(False))
             .groupby("analytic_year")["_e"]
             .sum()
             .rename("count")
@@ -136,7 +151,11 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
         "excluding_coadministration": (rep["target_only"], ~is_t & ~rep["coadministered"]),
         "excluding_pentavalent_masking": (is_t, ~is_t & ~vac.str.contains("PENTA-L", regex=False)),
     }
-    counts = disproportionality.vaccine_event_counts(cur.administrations, cur.events, rep["record_id"])
+    rec_ids = {e: set(rep.loc[known[e], "record_id"]) for e in ev_cols}
+    events_long = cur.events[cur.events["event"].isin(ev_cols)]
+    counts = disproportionality.vaccine_event_counts(
+        cur.administrations, events_long, rep["record_id"], recorded=rec_ids if out_partial else None
+    )
     out["n_vaccines"] = int(counts["vaccine"].nunique())
     prior = disproportionality.fit_mgps_prior(counts["n"].to_numpy(), counts["expected"].to_numpy())
     out["mgps_prior"] = {
@@ -159,6 +178,7 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
             prior=prior if name.startswith("primary") else None,
             criteria=crit,
             primary=primary_criterion,
+            recorded=known if out_partial else None,
         )
         tab["design"] = name
         tables.append(tab)
@@ -174,13 +194,16 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
     prim_tab = out["disproportionality"].query("design == 'primary_all_other_vaccines'")
     top += [e for e in prim_tab.loc[prim_tab["signal_primary"].astype(bool), "event"] if e not in top]
     out["cumulative_ic"] = (
-        pd.concat([disproportionality.cumulative_ic(rep, is_t, ~is_t, e, years) for e in top], ignore_index=True)
+        pd.concat(
+            [disproportionality.cumulative_ic(rep, is_t, ~is_t, e, years, recorded=known[e]) for e in top],
+            ignore_index=True,
+        )
         if top
         else pd.DataFrame()
     )
 
     # Latent reactogenicity phenotypes.
-    prev = rep[ev_cols].astype("boolean").fillna(False).mean()
+    prev = pd.Series({e: rep.loc[known[e], e].astype("boolean").fillna(False).mean() for e in ev_cols})
     items = [e for e in ev_cols if prev[e] >= 0.005]
     lc = a.lca
     sel = lca.select_lca(
@@ -206,7 +229,8 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
     if ct.shape[1] == 2 and ct.shape[0] > 1:
         chi2, pval, dof, _ = chi2_contingency(ct.to_numpy())
         out["lca_group_test"] = {"chi2": float(chi2), "dof": int(dof), "p_value": float(pval)}
-    out["cooccurrence_target"] = timeseries.cooccurrence(rep[is_t], ev_cols)
+    everywhere = events_recorded_everywhere(rep, ev_cols, rec_files)
+    out["cooccurrence_target"] = timeseries.cooccurrence(rep[is_t], everywhere)
 
     # Hospitalisation model.
     sm_cfg = a.seriousness_model
@@ -218,6 +242,7 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
             test_years=(sm_cfg.test_years[0], sm_cfg.test_years[1]),
             params=sm_cfg.model_dump(),
             seed=a.seed,
+            events=everywhere,
         )
     out["seriousness"] = ser
 
@@ -386,7 +411,9 @@ def analyze_paper2(
     ]
     reports = cur.reports[cur.reports["in_study_window"]]
     atyp = ms.scores["t2"]
-    frame = build_qc_safety_frame(reports, link.links, lot_df, scales, exposures, atypicality=atyp)
+    frame = build_qc_safety_frame(
+        reports, link.links, lot_df, scales, exposures, atypicality=atyp, recorded_events=cur.recorded_events
+    )
     outcomes = [o for o in [*qs.primary_outcomes, *qs.secondary_outcomes] if o in frame.data]
     out["qc_frame_summary"] = {
         "n_reports": len(frame.data),
@@ -398,7 +425,12 @@ def analyze_paper2(
         "reports_per_lot": frame.data.groupby("lot_key").size().describe().to_dict(),
     }
     primary_frame = build_qc_safety_frame(
-        reports, link.links, lot_df, scales, [*qs.primary_exposures, *qs.negative_control_exposures]
+        reports,
+        link.links,
+        lot_df,
+        scales,
+        [*qs.primary_exposures, *qs.negative_control_exposures],
+        recorded_events=cur.recorded_events,
     )
     # Prespecified family: primary outcomes x primary exposures (+ negative control),
     # exchangeable GEE; FDR controlled within the family.
@@ -435,7 +467,15 @@ def analyze_paper2(
         "keeping_temporally_implausible": {"drop_temporal_implausible": False},
     }
     for label, kw in sens_specs.items():
-        f = build_qc_safety_frame(reports, link.links, lot_df, scales, list(qs.primary_exposures), **kw)
+        f = build_qc_safety_frame(
+            reports,
+            link.links,
+            lot_df,
+            scales,
+            list(qs.primary_exposures),
+            recorded_events=cur.recorded_events,
+            **kw,
+        )
         g = gee_family(f, list(qs.primary_outcomes), cov_struct=qs.gee_cov_struct, adjust_set=[])
         g["sensitivity"] = label
         sens.append(g)
@@ -597,7 +637,7 @@ def run_pipeline(
     lots = ingest_lots_workbook(
         project, find_lots_workbook(input_dir, project.config.inputs.lots_file_pattern), norm, ctx
     )
-    cur = curate_aefi(aefi.staging, project, ctx)
+    cur = curate_aefi(aefi.staging, project, ctx, aefi.recorded_events)
     link = link_reports_to_lots(cur.reports, lots.lots, project, ctx)
     _save_local(project, ctx, cur, lots, link, aefi)
 

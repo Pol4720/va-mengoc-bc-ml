@@ -21,7 +21,7 @@ import pandas as pd
 from vamengoc.config import Project
 from vamengoc.provenance import RunContext
 
-__all__ = ["CuratedAEFI", "curate_aefi", "event_columns"]
+__all__ = ["CuratedAEFI", "curate_aefi", "event_columns", "events_recorded_everywhere", "recorded_mask"]
 
 OUTCOME_COLS = ("hospitalized", "recovered", "died", "sequelae")
 
@@ -42,6 +42,30 @@ class CuratedAEFI:
     history: pd.DataFrame
     outcomes: pd.DataFrame
     dedup_log: dict[str, Any] = field(default_factory=dict)
+    # Event columns present in each source file (empty mapping = every event recorded everywhere).
+    recorded_events: dict[str, list[str]] = field(default_factory=dict)
+
+
+def recorded_mask(df: pd.DataFrame, event: str, recorded: dict[str, list[str]]) -> pd.Series:
+    """True for the reports whose source file has a column for ``event``.
+
+    The notification form changed over time: an event that is not on a year's form is unknown
+    for every report of that year, not absent. Analyses of an event use only these reports.
+    Without file information (``recorded`` empty), or for a variable that is not an event
+    indicator (outcomes such as ``hospitalized`` are on every form), every report counts.
+    """
+    if not recorded or "source_file" not in df or not event.startswith("ev_"):
+        return pd.Series(True, index=df.index)
+    files = {f for f, evs in recorded.items() if event in evs}
+    return df["source_file"].isin(files)
+
+
+def events_recorded_everywhere(df: pd.DataFrame, events: list[str], recorded: dict[str, list[str]]) -> list[str]:
+    """Events whose column exists in every source file present in ``df``."""
+    if not recorded or "source_file" not in df:
+        return list(events)
+    present = [f for f in df["source_file"].dropna().unique() if f in recorded]
+    return [e for e in events if all(e in recorded[f] for f in present)]
 
 
 def _split(s: Any) -> list[str]:
@@ -296,10 +320,12 @@ def _relational(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFr
     administrations = pd.DataFrame.from_records(
         adm_rows, columns=["record_id", "position", "vaccine", "dose", "lot_exact", "manufacturer", "site", "route"]
     )
-    ev = event_columns(df)
+    # Indicators with no recorded value in any file (items of a form not present in the data)
+    # are left out of the long tables; a form change is documented by the conformance report.
+    ev = [c for c in event_columns(df) if df[c].notna().any()]
     events = df.melt(id_vars=["record_id"], value_vars=ev, var_name="event", value_name="present")
     events["present"] = events["present"].astype("boolean")
-    hc = history_columns(df)
+    hc = [c for c in history_columns(df) if df[c].notna().any()]
     history = df.melt(id_vars=["record_id"], value_vars=hc, var_name="condition", value_name="present")
     history["type"] = np.where(history["condition"].str.startswith("hist_personal"), "personal", "family")
     history["condition"] = history["condition"].str.replace(r"^hist_(personal|family)_", "", regex=True)
@@ -308,7 +334,12 @@ def _relational(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFr
     return administrations, events, history, outcomes
 
 
-def curate_aefi(staging: pd.DataFrame, project: Project, ctx: RunContext) -> CuratedAEFI:
+def curate_aefi(
+    staging: pd.DataFrame,
+    project: Project,
+    ctx: RunContext,
+    recorded_events: dict[str, list[str]] | None = None,
+) -> CuratedAEFI:
     dedup, log = _deduplicate(staging, ctx)
     reports = _derive(dedup, project)
     ctx.step(
@@ -326,4 +357,5 @@ def curate_aefi(staging: pd.DataFrame, project: Project, ctx: RunContext) -> Cur
         history=history,
         outcomes=outcomes,
         dedup_log=log,
+        recorded_events=dict(recorded_events or {}),
     )

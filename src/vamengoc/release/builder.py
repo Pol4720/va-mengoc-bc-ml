@@ -783,6 +783,34 @@ def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, s
     common.number("ReportsInWindow", w.small(dq["window"]["n_in_window"]))
     common.number("ReportsOutsideWindow", w.small(dq["window"]["n_outside_window"]))
     common.number("NFiles", len(dq["schema_reports"]))
+    # Change of notification form: events not recorded in every annual file (analysed only where
+    # recorded). The sentence is generated so that the text cannot misstate it.
+    partial = [str(e) for e in results["paper1"].get("events_partially_recorded", [])]
+    common.number("NEventsPartial", len(partial))
+    if partial:
+        evl = project.events["events"]
+        names = {
+            lang: join_words([lower_first(str(evl.get(e, {}).get(f"label_{lang}", e))) for e in partial], lang)
+            for lang in ("en", "es")
+        }
+        one = len(partial) == 1
+        common.bilingual(
+            "FormSentence",
+            f"The notification form changed during the study period: {len(partial)} event "
+            f"indicator{'' if one else 's'} ({names['en']}) {'was' if one else 'were'} not recorded in every "
+            f"annual file, and {'it was' if one else 'each was'} analysed only in the files that recorded "
+            f"{'it' if one else 'them'}",
+            f"El formulario de notificación cambió durante el período: {len(partial)} "
+            f"indicador{'' if one else 'es'} de evento ({names['es']}) no "
+            f"{'figuraba' if one else 'figuraban'} en todos los ficheros anuales y "
+            f"{'se analizó' if one else 'cada uno se analizó'} solo en los ficheros que lo registraban",
+        )
+    else:
+        common.bilingual(
+            "FormSentence",
+            "Every event indicator was recorded in all annual files",
+            "Todos los indicadores de evento figuraban en todos los ficheros anuales",
+        )
     rel = project.config.release
     for name, value, what in (
         ("ExtractionDate", rel.data_extraction_date, ("date of data extraction", "fecha de extracción de los datos")),

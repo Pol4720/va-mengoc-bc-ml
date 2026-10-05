@@ -40,6 +40,27 @@ events:
   ev_toxic_shock:           {label_en: "Toxic shock syndrome",            label_es: "Shock tóxico",                   domain: infectious,   class: serious, brighton: null, expected: false}
   ev_other:                 {label_en: "Other event",                     label_es: "Otro evento",                    domain: other,        class: common,  brighton: null, expected: false}
 
+  # Indicators of the notification form used from 2024 (recorded only in those files). The
+  # `expected` flag follows the reactogenicity documented for OMV vaccines (local pain,
+  # redness, induration, fever); it must be confirmed by the data owner (OPEN_QUESTIONS 11).
+  ev_pain:                  {label_en: "Injection-site pain",             label_es: "Dolor en el sitio de inyección", domain: local,       class: common,  brighton: null, expected: true}
+  ev_redness:               {label_en: "Injection-site redness",          label_es: "Enrojecimiento",                 domain: local,        class: common,  brighton: null, expected: true}
+  ev_induration:            {label_en: "Induration",                      label_es: "Induración",                     domain: local,        class: common,  brighton: Kohl2008, expected: true}
+  ev_abscess_unspecified:   {label_en: "Abscess (type not recorded)",     label_es: "Absceso (sin tipo)",             domain: local,        class: rare,    brighton: Kohl2007, expected: false}
+  ev_somnolence:            {label_en: "Somnolence",                      label_es: "Somnolencia",                    domain: systemic,     class: common,  brighton: null, expected: false}
+  ev_high_blood_pressure:   {label_en: "High blood pressure",             label_es: "Tensión arterial alta",          domain: systemic,     class: rare,    brighton: null, expected: false}
+  ev_malaise:               {label_en: "Malaise",                         label_es: "Decaimiento",                    domain: systemic,     class: common,  brighton: null, expected: false}
+  ev_headache:              {label_en: "Headache",                        label_es: "Cefalea",                        domain: systemic,     class: common,  brighton: null, expected: false}
+  ev_vasovagal:             {label_en: "Vasovagal reaction",              label_es: "Crisis vagal",                   domain: neurologic,   class: rare,    brighton: null, expected: false}
+  ev_erythema:              {label_en: "Erythema",                        label_es: "Eritema",                        domain: allergic,     class: common,  brighton: null, expected: false}
+  ev_anaphylaxis:           {label_en: "Anaphylaxis",                     label_es: "Anafilaxia",                     domain: allergic,     class: serious, brighton: Ruggeberg2007, expected: false}
+  ev_low_grade_fever:       {label_en: "Low-grade fever",                 label_es: "Febrícula",                      domain: systemic,     class: common,  brighton: Marcy2004, expected: true}
+  ev_fever_unspecified:     {label_en: "Fever (threshold not recorded)",  label_es: "Fiebre (sin umbral)",            domain: systemic,     class: common,  brighton: Marcy2004, expected: true}
+  ev_thrombocytopenia:      {label_en: "Thrombocytopenia",                label_es: "Trombocitopenia",                domain: haematologic, class: serious, brighton: Wise2007, expected: false}
+  ev_lip_oedema:            {label_en: "Lip oedema",                      label_es: "Edema labial",                   domain: allergic,     class: rare,    brighton: null, expected: false}
+  ev_facial_oedema:         {label_en: "Facial oedema",                   label_es: "Edema facial",                   domain: allergic,     class: rare,    brighton: null, expected: false}
+  ev_facial_palsy:          {label_en: "Facial palsy",                    label_es: "Parálisis facial",               domain: neurologic,   class: serious, brighton: null, expected: false}
+
 # Keyword taxonomy for the free-text "other" field (CUAL). Processed locally;
 # only category counts (after disclosure control) ever leave the local machine.
 other_text_categories:

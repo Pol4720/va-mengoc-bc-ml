@@ -140,8 +140,8 @@ the Supplementary Material), the RECORD-PE statement for routinely collected dat
 \cite{Langan2018} and, for the hospitalisation models, TRIPOD+AI \cite{Collins2024}.
 
 \subsection{Data sources and processing}\label{sec:data}
-The study used \VNFiles{} annual files of AEFI reports (\VStudyFirstYear--\VStudyLastYear) with
-61 variables per report: demographics, vaccines, doses, lots and manufacturers, dates of
+The study used \VNFiles{} annual files of AEFI reports (\VStudyFirstYear--\VStudyLastYear) recording,
+for each report, demographics, vaccines, doses, lots and manufacturers, dates of
 vaccination, onset and notification, \PONEventsScreened{} predefined event indicators, family history,
 hospitalisation and outcome. Annual doses of VA-MENGOC-BC administered came from the national
 immunization programme series, and the annual incidence of meningococcal disease
@@ -156,7 +156,7 @@ version \VCodeVersion, random seed \VSeed) that records the provenance of every 
 Because the structure of the files changed across years, column names were mapped to a
 versioned schema with alias matching and schema-drift reports, and every value was parsed with
 an explicit status (valid, recovered, invalid, missing) to support data-quality assessment
-following the harmonised framework of Kahn et al. \cite{Kahn2016}. Names and addresses were
+following the harmonised framework of Kahn et al. \cite{Kahn2016}. \VFormSentence. Names and addresses were
 replaced at ingestion by keyed hashes (HMAC-SHA-256) with a secret key stored outside the
 repository \cite{ENISA2019}; dates of birth were converted to age; free-text fields were
 processed locally and never released, in accordance with the Cuban data-protection law

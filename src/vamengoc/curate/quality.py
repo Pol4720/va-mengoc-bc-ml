@@ -130,9 +130,23 @@ def plausibility_table(reports: pd.DataFrame, by: str = "file_year") -> pd.DataF
 
 def conformance_table(parse_status: dict[str, dict[str, dict[str, int]]]) -> pd.DataFrame:
     """Parse outcomes (ok / recovered / invalid / missing / not applicable) by file and field."""
+
+    # Fields whose column is absent from every file (e.g. items of a form version not yet in
+    # the data) carry no information and are left out; a field absent from only some files is
+    # kept, so that its "absent column" count documents the change of form.
+    def absent_only(counts: dict[str, int]) -> bool:
+        return set(counts) <= {"absent_column"}
+
+    everywhere_absent = {
+        fld
+        for fld in {f for fields in parse_status.values() for f in fields}
+        if all(absent_only(fields.get(fld, {"absent_column": 0})) for fields in parse_status.values())
+    }
     rows = []
     for file, fields in parse_status.items():
         for fld, counts in fields.items():
+            if fld in everywhere_absent:
+                continue
             total = sum(counts.values())
             rows.append(
                 {"source_file": file, "field": fld, "n": total, **{f"n_{k}": int(v) for k, v in counts.items()}}

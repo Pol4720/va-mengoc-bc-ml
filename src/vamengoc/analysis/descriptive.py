@@ -104,7 +104,8 @@ def characteristics_table(df: pd.DataFrame, target: str) -> pd.DataFrame:
 def event_frequency_table(df: pd.DataFrame, target: str, labels: dict[str, dict[str, str]]) -> pd.DataFrame:
     """Frequency of each event indicator among reports of the target and of other vaccines."""
     rows = []
-    for ev in event_columns(df):
+    # Events with no recorded value at all (not on the form of any analysed file) are skipped.
+    for ev in [e for e in event_columns(df) if df[e].notna().any()]:
         for g, mask in (
             (target, df["has_target"]),
             ("Other vaccines", ~df["has_target"]),

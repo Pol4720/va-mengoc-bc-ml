@@ -111,6 +111,17 @@ def _parse_lots_sheet(
     col_of = match.field_to_column()
     quantitative = [f for f, t in ftype.items() if t == "quantitative" and f in col_of]
     qualitative = [f for f, t in ftype.items() if t == "qualitative" and f in col_of]
+    min_attr = int(sch.get("min_quality_attributes", 1))
+    if len(quantitative) < min_attr:
+        absent = [f for f, t in ftype.items() if t == "quantitative" and f not in col_of]
+        msg = (
+            f"Lots sheet: only {len(quantitative)} quality attributes recognised (minimum {min_attr}); "
+            f"not found: {absent}. Run `vamengoc schema-check` to see the sheet headers."
+        )
+        raise SchemaError(msg)
+    missing_attributes = [f for f, t in ftype.items() if t == "quantitative" and f not in col_of]
+    if missing_attributes:
+        ctx.step("lots_attributes_not_found", attributes=missing_attributes)
 
     # --- specification row --------------------------------------------------------
     fallback = {

@@ -202,12 +202,14 @@ def disproportionality_table(
     prior: MGPSPrior | None = None,
     criteria: dict[str, float] | None = None,
     primary: str = "ic",
+    recorded: dict[str, pd.Series] | None = None,
 ) -> pd.DataFrame:
     """One row per event with every measure and the signal criteria met.
 
     ``signal_primary`` applies the prespecified criterion (``primary``: ``ic``, ``ror``, ``prr``,
     ``ebgm`` or ``consensus2`` = at least two methods); ``signal_any`` (any method) is reported
-    as a sensitivity analysis only.
+    as a sensitivity analysis only. ``recorded`` maps an event to the reports whose form had its
+    column; the 2×2 table of that event is built on those reports only.
     """
     crit = {
         "min_reports": 3,
@@ -220,7 +222,11 @@ def disproportionality_table(
     crit.update(criteria or {})
     rows: list[dict[str, Any]] = []
     for ev in events:
-        t = two_by_two(target_mask, comparator_mask, reports[ev])
+        known = recorded.get(ev) if recorded else None
+        if known is None:
+            t = two_by_two(target_mask, comparator_mask, reports[ev])
+        else:
+            t = two_by_two(target_mask & known, comparator_mask & known, reports[ev])
         r, rlo, rhi = ror(t)
         p, plo, phi, chi2 = prr(t)
         ic, iclo, ichi = bcpnn_ic(t)
@@ -265,13 +271,31 @@ def disproportionality_table(
 
 
 def vaccine_event_counts(
-    administrations: pd.DataFrame, events_long: pd.DataFrame, record_ids: pd.Series
+    administrations: pd.DataFrame,
+    events_long: pd.DataFrame,
+    record_ids: pd.Series,
+    recorded: dict[str, set[Any]] | None = None,
 ) -> pd.DataFrame:
     """Counts N_ij (vaccine i, event j) and expected E_ij over all vaccine-event pairs.
 
     Reports with several vaccines contribute to each of them (standard practice
-    for suspected products); the expected count uses the report totals.
+    for suspected products); the expected count uses the report totals. With ``recorded``
+    (event -> record ids whose form had the event's column) each event is counted, and its
+    expected values computed, on those reports only.
     """
+    if recorded is not None:
+        parts = []
+        for event in sorted(events_long["event"].unique()):
+            ids = pd.Series(sorted(set(record_ids) & recorded.get(event, set())), dtype=object)
+            if ids.empty:
+                continue
+            sub = vaccine_event_counts(administrations, events_long[events_long["event"] == event], ids)
+            parts.append(sub[sub["event"] == event])
+        return (
+            pd.concat(parts, ignore_index=True)
+            if parts
+            else vaccine_event_counts(administrations, events_long, record_ids)
+        )
     keep = set(record_ids)
     adm = administrations[administrations["record_id"].isin(keep)][["record_id", "vaccine"]].drop_duplicates()
     ev = events_long[events_long["record_id"].isin(keep) & events_long["present"].fillna(False)]
@@ -289,12 +313,22 @@ def vaccine_event_counts(
 
 
 def cumulative_ic(
-    reports: pd.DataFrame, target_mask: pd.Series, comparator_mask: pd.Series, event: str, years: list[int]
+    reports: pd.DataFrame,
+    target_mask: pd.Series,
+    comparator_mask: pd.Series,
+    event: str,
+    years: list[int],
+    recorded: pd.Series | None = None,
 ) -> pd.DataFrame:
-    """IC and its credibility interval recomputed on data accumulated up to each year."""
+    """IC and its credibility interval recomputed on data accumulated up to each year.
+
+    ``recorded`` restricts the accumulation to reports whose form had the event's column.
+    """
     rows = []
     for y in years:
         upto = reports["analytic_year"] <= y
+        if recorded is not None:
+            upto = upto & recorded
         t = two_by_two(target_mask & upto, comparator_mask & upto, reports[event])
         ic, lo, hi = bcpnn_ic(t)
         rows.append({"event": event, "year": y, "a": t.a, "expected": t.expected, "ic": ic, "ic025": lo, "ic975": hi})
