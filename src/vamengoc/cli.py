@@ -159,6 +159,7 @@ def schema_check(
     from vamengoc.ingest.lots import _find_sheet, find_lots_workbook
     from vamengoc.io.excel import list_sheets, read_sheet
     from vamengoc.io.schema_registry import SchemaError, detect_header_row, fields_from_schema
+    from vamengoc.parsing.text import compact
 
     project = Project()
     src = input_dir or project.raw_dir
@@ -180,6 +181,7 @@ def schema_check(
         table.add_column(col, no_wrap=col == "file", overflow="fold")
     problems = 0
     recorded: dict[str, set[str]] = {}
+    unmatched_keys: dict[str, list[tuple[str, str]]] = {}
     files = discover_aefi_files(src, project.config.inputs.aefi_file_pattern)
     for _year, path in files:
         sheets = list_sheets(path)
@@ -199,6 +201,8 @@ def schema_check(
         problems += bool(m.missing_required)
         mapped = set(m.field_to_column())
         recorded[path.name] = {e for e in event_fields if e in mapped}
+        if m.unmatched:
+            unmatched_keys[path.name] = [(str(u["header"]), compact(u["header"])) for u in m.unmatched]
         review = [f"{f['header']}→{f['field']}" for f in m.fuzzy]
         table.add_row(
             path.name,
@@ -213,6 +217,11 @@ def schema_check(
         )
     console.print(table)
     console.print(f"{len(files)} AEFI files checked, {problems} with problems.")
+    if unmatched_keys:
+        # The matching key shows hidden differences (extra words, stray characters) in a title.
+        console.print("Unrecognised column titles and their matching keys:")
+        for fname, items in unmatched_keys.items():
+            console.print(f"  {fname}: " + "; ".join(f"{h!r} -> {k}" for h, k in items))
 
     # Change of form: events that are not on every file's form are analysed only where recorded.
     partial = [e for e in event_fields if recorded and 0 < sum(e in r for r in recorded.values()) < len(recorded)]

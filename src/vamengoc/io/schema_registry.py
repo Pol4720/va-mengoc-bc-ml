@@ -8,7 +8,9 @@ row. Matching is therefore data-driven and explicit:
    free); a pandas-style duplicate suffix (``ASMA.1``) is read as the second
    occurrence of ``ASMA``;
 2. exact alias matches are taken first, honouring ``occurrence`` for headers
-   that legitimately repeat (personal vs family history);
+   that legitimately repeat (personal vs family history). An alias written as
+   ``"TEXT#2"`` applies only to the second column with that title (two identical
+   "rate per 100 000" columns: incidence first, mortality second);
 3. remaining headers are tested against each field's ``patterns`` (regular
    expressions on the compact key, e.g. ``IGG``) and assigned only when exactly
    one field matches;
@@ -39,6 +41,15 @@ __all__ = [
 ]
 
 _DUP_SUFFIX = re.compile(r"^(?P<base>.*?)\.(?P<n>\d{1,2})$")
+_ALIAS_OCC = re.compile(r"^(?P<text>.*)#(?P<n>\d{1,2})$")
+
+
+def _alias(alias: str) -> tuple[str, int | None]:
+    """Compact key of an alias and the occurrence it is restricted to (``"TEXT#2"``), if any."""
+    m = _ALIAS_OCC.match(alias)
+    if m:
+        return compact(m.group("text")), int(m.group("n"))
+    return compact(alias), None
 
 
 class SchemaError(ValueError):
@@ -122,13 +133,15 @@ def match_headers(
 ) -> HeaderMatch:
     """Map header cells to canonical fields."""
     result = HeaderMatch()
-    alias_index: dict[str, list[FieldSpec]] = {}
+    # header key -> (field, occurrence required by this alias or, when None, the field's own)
+    alias_index: dict[str, list[tuple[FieldSpec, int]]] = {}
     for f in fields:
         for a in f.aliases:
-            key = compact(a)
+            key, occ_alias = _alias(a)
+            entry = (f, occ_alias if occ_alias is not None else f.occurrence)
             alias_index.setdefault(key, [])
-            if f not in alias_index[key]:
-                alias_index[key].append(f)
+            if entry not in alias_index[key]:
+                alias_index[key].append(entry)
 
     keys: list[tuple[str, int]] = []
     seen: Counter[str] = Counter()
@@ -146,10 +159,10 @@ def match_headers(
         if not key:
             result.blank_columns.append(col)
             continue
-        candidates = [f for f in alias_index.get(key, []) if f.name not in assigned]
-        exact = [f for f in candidates if f.occurrence == occ]
+        candidates = [(f, o) for f, o in alias_index.get(key, []) if f.name not in assigned]
+        exact = [f for f, o in candidates if o == occ]
         if not exact and candidates and occ == 1:
-            exact = [f for f in candidates if f.occurrence == 1]
+            exact = [f for f, o in candidates if o == 1]
         if exact:
             chosen = exact[0]
             result.columns[col] = chosen.name
@@ -185,7 +198,7 @@ def match_headers(
         for col in pending:
             result.unmatched.append({"column": col, "header": cell_to_str(headers[col])})
         pending = []
-    alias_keys = {f.name: [compact(a) for a in f.aliases] for f in fields}
+    alias_keys = {f.name: [_alias(a)[0] for a in f.aliases] for f in fields}
     for col in pending:
         key, occ = keys[col]
         scored: list[tuple[float, FieldSpec]] = []

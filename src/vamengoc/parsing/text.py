@@ -57,9 +57,17 @@ MISSING_TOKENS = frozenset(
 NOT_APPLICABLE_TOKENS = frozenset({"N", "NO", "N A", "NO PROCEDE", "NP", "NO APLICA"})
 
 
+# Cyrillic and Greek letters that look identical to Latin ones. Typed by mistake (keyboard layout,
+# copy-paste), they are invisible on screen but would otherwise be dropped from matching keys.
+_CONFUSABLES = str.maketrans(
+    "АВЕКМНОРСТХУаеорсухіІјЈΑΒΕΖΗΙΚΜΝΟΡΤΥΧοικνρτυχ",
+    "ABEKMHOPCTXYaeopcyxiIjJABEZHIKMNOPTYXoikvptux",
+)
+
+
 def strip_accents(s: str) -> str:
-    """Remove diacritics (á→a, ñ→n, ü→u) using Unicode decomposition."""
-    decomposed = unicodedata.normalize("NFKD", s)
+    """Remove diacritics (á→a, ñ→n, ü→u) and map Cyrillic/Greek look-alikes to Latin."""
+    decomposed = unicodedata.normalize("NFKD", s.translate(_CONFUSABLES))
     return "".join(ch for ch in decomposed if not unicodedata.combining(ch))
 
 

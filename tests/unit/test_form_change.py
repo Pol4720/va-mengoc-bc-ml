@@ -182,3 +182,27 @@ def test_released_schema_drift_never_uses_identifier_names_as_keys() -> None:
     rep = VerificationReport(root=Path())
     _walk_json({"schema_drift": out}, "$", forbidden, rep, "dq_summary.json")
     assert rep.ok, rep.errors
+
+
+def test_alias_restricted_to_second_occurrence() -> None:
+    fields = fields_from_schema(Project().lots_schema["incidence_sheet"]["fields"])
+    header = ["Año", "Casos", "Tasax100000 habitantes", "Defunsiones", "Tasax100000 habitantes", "Fuentes"]
+    m = match_headers(header, fields)
+    assert m.field_to_column() == {
+        "year": 0,
+        "cases": 1,
+        "incidence_rate": 2,
+        "deaths": 3,
+        "mortality_rate": 4,
+        "source_text": 5,
+    }
+    assert not m.unmatched and not m.fuzzy
+
+
+def test_lookalike_letters_and_local_reaction_patterns(aefi_fields: list[FieldSpec]) -> None:
+    from vamengoc.parsing.text import compact
+
+    assert compact("DОLOR") == "DOLOR"  # Cyrillic capital O typed instead of the Latin one
+    header = ["SEXO", "PROVINCIAS", "F.VACUNACION", "TIPO DE VACUNA", "DОLOR", "ENROJECIMIENTO ", "INDURACIÓN LOCAL"]
+    f2c = match_headers(header, aefi_fields).field_to_column()
+    assert (f2c["ev_pain"], f2c["ev_redness"], f2c["ev_induration"]) == (4, 5, 6)

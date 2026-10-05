@@ -101,9 +101,12 @@ fields:
   # Recorded only in the files that carry them; every analysis of an event is restricted to
   # the files in which its column exists (see docs/OPEN_QUESTIONS.md, question 11, for the
   # correspondence with the earlier indicators, which only the data owner can confirm).
-  ev_pain:                   {kind: event, type: yes_no, required: false, aliases: ["DOLOR"]}
-  ev_redness:                {kind: event, type: yes_no, required: false, aliases: ["ENROJECIMIENTO"]}
-  ev_induration:             {kind: event, type: yes_no, required: false, aliases: ["INDURACION", "INDURACIÓN"]}
+  ev_pain:                   {kind: event, type: yes_no, required: false, aliases: ["DOLOR", "DOLOR LOCAL"],
+                              patterns: ["^DOLOR"]}
+  ev_redness:                {kind: event, type: yes_no, required: false, aliases: ["ENROJECIMIENTO", "RUBOR"],
+                              patterns: ["ENROJEC", "ENROJES"]}
+  ev_induration:             {kind: event, type: yes_no, required: false, aliases: ["INDURACION", "INDURACIÓN"],
+                              patterns: ["INDURAC", "INDURAS"]}
   ev_abscess_unspecified:    {kind: event, type: yes_no, required: false, aliases: ["ABSCESO"]}
   ev_somnolence:             {kind: event, type: yes_no, required: false, aliases: ["SOMNOLENCIA"]}
   ev_high_blood_pressure:    {kind: event, type: yes_no, required: false,

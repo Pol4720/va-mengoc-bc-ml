@@ -93,10 +93,14 @@ incidence_sheet:
   fields:
     year:              {type: integer, required: true, aliases: ["AÑO", "ANO", "AÑOS"]}
     cases:             {type: quantitative, required: true, aliases: ["CASOS", "NO. CASOS"]}
-    incidence_rate:    {type: quantitative, required: false, aliases: ["TASA X 100 000 HAB.", "TASA X 100000 HAB", "TASA", "TASA DE INCIDENCIA"]}
-    deaths:            {type: quantitative, required: false, aliases: ["DEFUNCIONES", "FALLECIDOS", "MUERTES"]}
+    incidence_rate:    {type: quantitative, required: false, aliases: ["TASA X 100 000 HAB.", "TASA X 100000 HAB", "TASA", "TASA DE INCIDENCIA",
+                                                                    "TASA X 100000 HABITANTES", "TASA X 100 000 HABITANTES"]}
+    deaths:            {type: quantitative, required: false, aliases: ["DEFUNCIONES", "DEFUNSIONES", "FALLECIDOS", "MUERTES"]}
     mortality_rate:    {type: quantitative, required: false,
-                        aliases: ["TASA DE DEFUNCIONES X 100 000 HAB.", "TASA DE DEFUNCIONES", "TASA DE MORTALIDAD"]}
+                        aliases: ["TASA DE DEFUNCIONES X 100 000 HAB.", "TASA DE DEFUNCIONES", "TASA DE MORTALIDAD",
+                                  # the second "rate per 100 000" column follows the deaths column
+                                  "TASA X 100000 HABITANTES#2", "TASA X 100 000 HABITANTES#2",
+                                  "TASA X 100 000 HAB.#2", "TASA X 100000 HAB#2", "TASA#2"]}
     source_text:       {type: text, required: false, aliases: ["FUENTE", "FUENTES", "REFERENCIA", "REFERENCIAS"]}
 
 coverage_sheet:
