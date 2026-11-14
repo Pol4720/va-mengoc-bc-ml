@@ -25,21 +25,52 @@ from vamengoc.analysis.changepoint import pelt_l2
 __all__ = ["incidence_its", "monthly_changepoints", "monthly_series"]
 
 
-def monthly_series(reports: pd.DataFrame, mask: pd.Series | None = None) -> pd.DataFrame:
-    """Counts per calendar month of vaccination (complete month grid)."""
+def monthly_series(
+    reports: pd.DataFrame, mask: pd.Series | None = None, coverage: pd.DataFrame | None = None
+) -> pd.DataFrame:
+    """Counts per calendar month of vaccination (complete month grid).
+
+    With ``coverage`` (from :func:`vamengoc.curate.rules.month_coverage`), months that no
+    workbook covers (2023 after July, the months of the current year not yet delivered) are
+    returned as missing (``count`` NA, ``observed`` False) rather than as zero.
+    """
     d = reports if mask is None else reports[mask]
     d = d.dropna(subset=["vaccination_date"])
     if d.empty:
-        return pd.DataFrame(columns=["month", "count"])
+        return pd.DataFrame(columns=["month", "count", "observed"])
     per = d["vaccination_date"].dt.to_period("M")
     counts = per.value_counts().sort_index()
     full = pd.period_range(counts.index.min(), counts.index.max(), freq="M")
     counts = counts.reindex(full, fill_value=0)
-    return pd.DataFrame({"month": counts.index.astype(str), "count": counts.to_numpy(dtype=int)})
+    observed = pd.Series(True, index=full)
+    if coverage is not None and not coverage.empty:
+        cov = {(int(r.year), int(r.month)): bool(r.observed) for r in coverage.itertuples(index=False)}
+        years = {y for y, _ in cov}
+        # A month is missing only when its year has a workbook that does not cover it; months of
+        # years without a workbook (late reports of an earlier year) keep their counts.
+        observed = pd.Series([cov.get((p.year, p.month), p.year not in years) for p in full], index=full)
+    out = pd.DataFrame(
+        {
+            "month": full.astype(str),
+            "count": pd.array(np.where(observed, counts.to_numpy(dtype=int), 0), dtype="Int64"),
+            "observed": observed.to_numpy(dtype=bool),
+        }
+    )
+    out.loc[~out["observed"], "count"] = pd.NA
+    # Trim leading/trailing unobserved months (the series starts and ends with data).
+    obs_idx = np.flatnonzero(out["observed"].to_numpy())
+    if len(obs_idx):
+        out = out.iloc[obs_idx[0] : obs_idx[-1] + 1].reset_index(drop=True)
+    return out
 
 
 def monthly_changepoints(series: pd.DataFrame, *, min_size: int = 6) -> dict[str, Any]:
-    """PELT on the Anscombe-transformed monthly counts (unit variance; BIC-type penalty)."""
+    """PELT on the Anscombe-transformed monthly counts (unit variance; BIC-type penalty).
+
+    Unobserved months are left out (the series is scanned over the observed months in order).
+    """
+    if "observed" in series:
+        series = series[series["observed"].astype(bool)].reset_index(drop=True)
     y = series["count"].to_numpy(dtype=float)
     n = len(y)
     if n < 2 * min_size:

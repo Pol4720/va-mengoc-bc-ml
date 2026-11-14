@@ -54,8 +54,10 @@ vaccines:
     confidence: inferred
     patterns: ['TT', 'TOXOIDE TETANICO', 'ANTITETANICA']
   AT:
-    label_en: "Tetanus toxoid (booster, AT)"
-    label_es: "Antitetánica (AT)"
+    # Cuban schedule material lists "AT(vi)" among the inactivated vaccines: anti-typhoid Vi
+    # polysaccharide (vax-TyVi, Finlay). Kept as its own code until the data owner confirms.
+    label_en: "Typhoid Vi polysaccharide (AT)"
+    label_es: "Antitifoídica Vi (AT)"
     manufacturer: FINLAY
     confidence: inferred
     patterns: ['AT']
@@ -107,15 +109,35 @@ vaccines:
     manufacturer: FINLAY
     confidence: inferred
     patterns: ['VI', 'TIFOIDICA', 'ANTITIFOIDICA', 'VAX ?TYVI', 'TYVI', 'AT VI']
-  PCV:
-    label_en: "Pneumococcal conjugate"
-    label_es: "Antineumocócica conjugada"
+  PCV7-TT:
+    label_en: "Pneumococcal conjugate, 7-valent (Quimi-Vio)"
+    label_es: "Antineumocócica conjugada heptavalente (Quimi-Vio)"
     manufacturer: FINLAY
     confidence: inferred
-    patterns: ['PCV\d*', 'QUIMI ?VIO', 'NEUMO\w*', 'ANTINEUMOCOCICA']
+    patterns: ['QUIMI ?VIO', 'PCV ?7( ?TT)?']
+  PCV:
+    # PCV-10 in the 2024-2025 files: Pneumosil-10 (Serum Institute of India), introduced in the
+    # schedule in 2024 (2, 4 and 11 months). Not a Finlay product.
+    label_en: "Pneumococcal conjugate (PCV-10, Pneumosil)"
+    label_es: "Antineumocócica conjugada (PCV-10, Pneumosil)"
+    manufacturer: SII
+    confidence: inferred
+    patterns: ['PCV ?\d*', 'PNEUMOSIL\w*', 'NEUMO\w*', 'ANTINEUMOCOCICA']
+  SOBERANA:
+    label_en: "COVID-19, SOBERANA 02 / SOBERANA Plus (Finlay)"
+    label_es: "COVID-19, SOBERANA 02 / SOBERANA Plus (Finlay)"
+    manufacturer: FINLAY
+    confidence: confirmed
+    patterns: ['SOBERANA\w*', 'SOBERANA ?PLUS', 'SOBERANA ?0?[12]', 'SOB ?PLUS']
+  ABDALA:
+    label_en: "COVID-19, Abdala (CIGB)"
+    label_es: "COVID-19, Abdala (CIGB)"
+    manufacturer: CIGB
+    confidence: confirmed
+    patterns: ['ABDALA']
   COVID-19:
-    label_en: "COVID-19 (any)"
-    label_es: "COVID-19 (cualquiera)"
+    label_en: "COVID-19 (other or unspecified)"
+    label_es: "COVID-19 (otra o no especificada)"
     manufacturer: OTHER
     confidence: inferred
-    patterns: ['SOBERANA\w*', 'ABDALA', 'COVID\w*', 'SOBERANA ?PLUS', 'SOBERANA ?0?2']
+    patterns: ['COVID\w*', 'SINOPHARM?', 'SINOPHAR']

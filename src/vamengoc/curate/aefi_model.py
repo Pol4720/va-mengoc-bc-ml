@@ -19,6 +19,13 @@ import numpy as np
 import pandas as pd
 
 from vamengoc.config import Project
+from vamengoc.curate.rules import (
+    apply_comparator,
+    apply_schedule,
+    comparator_products,
+    month_coverage,
+    resolve_last_year,
+)
 from vamengoc.provenance import RunContext
 
 __all__ = ["CuratedAEFI", "curate_aefi", "event_columns", "events_recorded_everywhere", "recorded_mask"]
@@ -44,6 +51,20 @@ class CuratedAEFI:
     dedup_log: dict[str, Any] = field(default_factory=dict)
     # Event columns present in each source file (empty mapping = every event recorded everywhere).
     recorded_events: dict[str, list[str]] = field(default_factory=dict)
+    # Analysed years after resolving an open-ended window, months covered by each workbook and
+    # the comparator products of Paper 1.
+    study_years: tuple[int, int] = (0, 0)
+    month_coverage: pd.DataFrame = field(default_factory=pd.DataFrame)
+    comparator_products: list[str] = field(default_factory=list)
+
+    def partial_years(self) -> list[int]:
+        """Analysed years with fewer than 12 observed months."""
+        mc = self.month_coverage
+        if mc.empty:
+            return []
+        obs = mc.groupby("year")["observed"].sum()
+        lo, hi = self.study_years
+        return sorted(int(y) for y, n in obs.items() if n < 12 and lo <= int(y) <= hi)
 
 
 def recorded_mask(df: pd.DataFrame, event: str, recorded: dict[str, list[str]]) -> pd.Series:
@@ -219,7 +240,8 @@ def _derive(df: pd.DataFrame, project: Project) -> pd.DataFrame:
     else:
         df["analytic_year"] = df["file_year"].astype("Int64")
         df["analytic_year_source"] = "file_year"
-    df["in_study_window"] = df["analytic_year"].between(*a.study_years).fillna(False).astype(bool)
+    last = resolve_last_year(a.study_years[1], df["file_year"])
+    df["in_study_window"] = df["analytic_year"].between(a.study_years[0], last).fillna(False).astype(bool)
     df["year_differs_from_file"] = (df["analytic_year"] != df["file_year"]).fillna(False).astype(bool)
 
     tf = pd.DataFrame([_target_fields(r, a.target_vaccine) for _, r in df.iterrows()], index=df.index)
@@ -228,6 +250,13 @@ def _derive(df: pd.DataFrame, project: Project) -> pd.DataFrame:
     df["target_only"] = df["has_target"] & ~df["coadministered"]
     df["target_dose_number"] = df["target_dose_number"].astype("Int64")
     df["target_booster"] = df["target_booster"].astype("boolean")
+    df = apply_schedule(df, a)
+    df = apply_comparator(df, comparator_products(project))
+    # Paper 1 population: target reports with a valid administration and reports of the other
+    # comparator products (no target). Other vaccines enter only as concomitants.
+    df["p1_population"] = df["in_study_window"] & (
+        (df["has_target"] & ~df["schedule_invalid"]) | df["finlay_comparator"]
+    )
 
     ev_frame = df[ev].astype("boolean")
     df["n_events"] = ev_frame.fillna(False).sum(axis=1).astype(int)
@@ -277,6 +306,14 @@ def _derive(df: pd.DataFrame, project: Project) -> pd.DataFrame:
     df["dq_no_event_marked"] = df["n_events"].eq(0) & df["other_categories"].isna()
     df["dq_unmapped_vaccine"] = df["vaccines"].fillna("").str.contains("X:", regex=False)
     df["dq_target_lot_missing"] = df["has_target"] & df["target_lots"].isna()
+    df["dq_schedule_invalid"] = df["schedule_invalid"]
+    for col, flag in (
+        ("vaccination_date_rule", "dq_vaccination_year_imputed"),
+        ("notification_date_rule", "dq_notification_year_imputed"),
+    ):
+        rule = df[col] if col in df else pd.Series("kept", index=df.index)
+        df[flag] = rule.eq("imputed_year").fillna(False).astype(bool)
+        df[flag.replace("imputed", "dropped")] = rule.eq("dropped_impossible").fillna(False).astype(bool)
     month_ref = df["vaccination_date"].dt.month
     df["dq_month_mismatch"] = (
         (
@@ -350,6 +387,7 @@ def curate_aefi(
         target_reports=int(reports["has_target"].sum()),
     )
     administrations, events, history, outcomes = _relational(reports)
+    a = project.config.analysis
     return CuratedAEFI(
         reports=reports,
         administrations=administrations,
@@ -358,4 +396,7 @@ def curate_aefi(
         outcomes=outcomes,
         dedup_log=log,
         recorded_events=dict(recorded_events or {}),
+        study_years=(a.study_years[0], resolve_last_year(a.study_years[1], reports["file_year"])),
+        month_coverage=month_coverage(reports),
+        comparator_products=comparator_products(project),
     )

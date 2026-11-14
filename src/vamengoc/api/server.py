@@ -279,6 +279,10 @@ def create_app(project_root: Path | None = None, token: str | None = None) -> Fa
             node: Any = cfg
             for p in path.split("."):
                 node = node[p]
+            # An open-ended window (null last year = follow the data) is shown as the current year;
+            # it is sent back as an override only if the user changes it.
+            if isinstance(node, list) and len(node) == 2 and node[1] is None:
+                node = [node[0], dt.datetime.now(dt.UTC).year]
             return node
 
         return {"tunables": [{**t, "value": get(t["path"])} for t in TUNABLES]}

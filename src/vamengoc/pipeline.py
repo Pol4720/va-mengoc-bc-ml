@@ -72,13 +72,67 @@ def is_synthetic_dir(directory: Path) -> bool:
     return (directory / MARKER_FILE).is_file()
 
 
+def population_flow(window: pd.DataFrame, products: list[str], target: str) -> dict[str, Any]:
+    """Counts behind the Paper 1 flow diagram (reports of the study window)."""
+    t = window["has_target"].astype(bool)
+    comp = window["finlay_comparator"].astype(bool)
+    inv = window["schedule_invalid"].astype(bool)
+    return {
+        "target": target,
+        "n_window": len(window),
+        "n_target": int(t.sum()),
+        "n_target_schedule_invalid": int((t & inv).sum()),
+        "n_target_analysed": int((t & ~inv).sum()),
+        "n_target_coadministered": int((t & ~inv & window["coadministered"].astype(bool)).sum()),
+        "n_finlay_comparator": int(comp.sum()),
+        "n_non_finlay_only": int((~t & ~comp).sum()),
+        "n_population": int(((t & ~inv) | comp).sum()),
+        "comparator_products": list(products),
+    }
+
+
+def comparator_product_counts(rep: pd.DataFrame, products: list[str]) -> pd.DataFrame:
+    """Reports of each comparator product (a report with two products counts for both)."""
+    comp = rep[rep["finlay_comparator"]]
+    rows = []
+    for code in products:
+        n = int(comp["vaccines"].fillna("").map(lambda v, c=code: c in v.split("|")).sum())
+        if n:
+            rows.append({"vaccine": code, "n": n})
+    return pd.DataFrame.from_records(rows, columns=["vaccine", "n"])
+
+
+def schedule_summary(window: pd.DataFrame) -> dict[str, Any]:
+    """Schedule categories of the target reports, overall and by analytic year."""
+    t = window[window["has_target"]]
+    st = t["schedule_status"].fillna("unknown")
+    by_year = (
+        t.assign(_s=st)
+        .groupby(["analytic_year", "_s"])
+        .size()
+        .rename("n")
+        .reset_index()
+        .rename(columns={"_s": "status"})
+    )
+    return {
+        "counts": {k: int(v) for k, v in st.value_counts().items()},
+        "by_year": by_year,
+        "n_invalid": int(t["schedule_invalid"].sum()),
+        "n_target": len(t),
+    }
+
+
 # ---------------------------------------------------------------------------------------
 # Paper 1 — national pharmacovigilance of VA-MENGOC-BC
 # ---------------------------------------------------------------------------------------
 def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, ctx: RunContext) -> dict[str, Any]:
     a = project.config.analysis
     target = a.target_vaccine
-    rep = cur.reports[cur.reports["in_study_window"]].copy()
+    window = cur.reports[cur.reports["in_study_window"]]
+    # Population: VA-MENGOC-BC reports with a valid administration and reports of the other
+    # Finlay products (agreed comparator); other vaccines enter only as concomitants.
+    rep = cur.reports[cur.reports["p1_population"]].copy()
+    rep_with_errors = window[window["has_target"] | window["finlay_comparator"]].copy()
     rec_files = cur.recorded_events
     # Events on the notification form of at least one analysed file. An event that is not on a
     # year's form is unknown for that year: each event is analysed on the reports that recorded it.
@@ -87,6 +141,12 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
     out_partial = sorted(e for e in ev_cols if not bool(known[e].all()))
     labels = project.events["events"]
     out: dict[str, Any] = {}
+    partial = cur.partial_years()
+    out["population"] = population_flow(window, cur.comparator_products, target)
+    out["comparator_products"] = comparator_product_counts(rep, cur.comparator_products)
+    out["schedule"] = schedule_summary(window)
+    out["partial_years"] = partial
+    out["month_coverage"] = cur.month_coverage
     out["events_partially_recorded"] = out_partial
     out["events_recorded_by_year"] = {
         e: sorted(int(y) for y in rep.loc[known[e], "analytic_year"].dropna().unique()) for e in out_partial
@@ -101,7 +161,7 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
     by_year = out["reports_by_year"]
     doses = lots.coverage.rename(columns={"doses_administered": "doses_administered"})
     out["rates_all_target"] = rates.annual_reporting_rates(
-        by_year, doses, count_col="n_target", expected_rate=a.expected_national_rate_per_100k
+        by_year, doses, count_col="n_target", expected_rate=a.expected_national_rate_per_100k, partial_years=partial
     )
     out["rates_trend"] = rates.rate_trend(out["rates_all_target"])
     ev_year = []
@@ -124,7 +184,7 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
             .rename("count")
             .reset_index()
         )
-        r = rates.annual_reporting_rates(cnt, doses, count_col="count")
+        r = rates.annual_reporting_rates(cnt, doses, count_col="count", partial_years=partial)
         r["event"] = ev
         ev_year.append(r)
     out["rates_by_event"] = pd.concat(ev_year, ignore_index=True) if ev_year else pd.DataFrame()
@@ -136,20 +196,27 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
         .rename("count")
         .reset_index()
     )
-    out["rates_hospitalized"] = rates.annual_reporting_rates(hosp, doses, count_col="count")
+    out["rates_hospitalized"] = rates.annual_reporting_rates(hosp, doses, count_col="count", partial_years=partial)
 
     # Disproportionality under the primary and sensitivity comparators.
     dp = a.disproportionality
     crit = dp.model_dump()
     primary_criterion = str(crit.pop("primary_criterion"))
     is_t = rep["has_target"]
-    vac = rep["vaccines"].fillna("")
+    comp = rep["finlay_comparator"]
     infant = rep["age_months"].astype("Float64").lt(a.infant_comparator_max_age_months + 1).fillna(False)
     designs = {
-        "primary_all_other_vaccines": (is_t, ~is_t),
-        "infant_active_comparator": (is_t & infant, ~is_t & infant),
-        "excluding_coadministration": (rep["target_only"], ~is_t & ~rep["coadministered"]),
-        "excluding_pentavalent_masking": (is_t, ~is_t & ~vac.str.contains("PENTA-L", regex=False)),
+        "primary_finlay_vaccines": (rep, is_t, comp),
+        "infant_finlay_comparator": (rep, is_t & infant, comp & infant),
+        "excluding_coadministration": (rep, rep["target_only"], comp & ~rep["coadministered"]),
+        # Influence of concomitant vaccines: VA-MENGOC-BC given with other vaccines vs alone.
+        "concomitant_influence": (rep, is_t & rep["coadministered"], rep["target_only"]),
+        # Sensitivity: keep the target doses that violate the schedule (recording errors).
+        "primary_including_schedule_errors": (
+            rep_with_errors,
+            rep_with_errors["has_target"],
+            rep_with_errors["finlay_comparator"],
+        ),
     }
     rec_ids = {e: set(rep.loc[known[e], "record_id"]) for e in ev_cols}
     events_long = cur.events[cur.events["event"].isin(ev_cols)]
@@ -169,16 +236,17 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
         "n_cells": len(counts),
     }
     tables = []
-    for name, (t_mask, c_mask) in designs.items():
+    for name, (frame, t_mask, c_mask) in designs.items():
+        kn = known if frame is rep else {e: recorded_mask(frame, e, rec_files) for e in ev_cols}
         tab = disproportionality.disproportionality_table(
-            rep,
+            frame,
             t_mask,
             c_mask,
             ev_cols,
             prior=prior if name.startswith("primary") else None,
             criteria=crit,
             primary=primary_criterion,
-            recorded=known if out_partial else None,
+            recorded=kn if out_partial else None,
         )
         tab["design"] = name
         tables.append(tab)
@@ -186,16 +254,16 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
     years = sorted(int(y) for y in rep["analytic_year"].dropna().unique())
     top = (
         out["disproportionality"]
-        .query("design == 'primary_all_other_vaccines'")
+        .query("design == 'primary_finlay_vaccines'")
         .sort_values("a", ascending=False)["event"]
         .head(4)
         .tolist()
     )
-    prim_tab = out["disproportionality"].query("design == 'primary_all_other_vaccines'")
+    prim_tab = out["disproportionality"].query("design == 'primary_finlay_vaccines'")
     top += [e for e in prim_tab.loc[prim_tab["signal_primary"].astype(bool), "event"] if e not in top]
     out["cumulative_ic"] = (
         pd.concat(
-            [disproportionality.cumulative_ic(rep, is_t, ~is_t, e, years, recorded=known[e]) for e in top],
+            [disproportionality.cumulative_ic(rep, is_t, comp, e, years, recorded=known[e]) for e in top],
             ignore_index=True,
         )
         if top
@@ -221,7 +289,7 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
     out["lca_bootstrap_ari_median"] = sel["bootstrap_ari_median"]
     out["lca_profiles"] = lca.class_profiles(fit, items)
     rep["lca_class"] = fit.assign() + 1
-    group = np.where(is_t, target, "Other vaccines")
+    group = np.where(is_t, target, "Other Finlay vaccines")
     ct = pd.crosstab(rep["lca_class"], group)
     out["lca_by_group"] = ct.reset_index().melt(id_vars="lca_class", var_name="group", value_name="n")
     from scipy.stats import chi2_contingency
@@ -239,7 +307,7 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
         ser = seriousness.fit_seriousness(
             rep,
             train_years=(sm_cfg.train_years[0], sm_cfg.train_years[1]),
-            test_years=(sm_cfg.test_years[0], sm_cfg.test_years[1]),
+            test_years=(sm_cfg.test_years[0], sm_cfg.test_years[1] or cur.study_years[1]),
             params=sm_cfg.model_dump(),
             seed=a.seed,
             events=everywhere,
@@ -253,8 +321,10 @@ def analyze_paper1(project: Project, cur: CuratedAEFI, lots: LotsIngestResult, c
         .describe(percentiles=[0.25, 0.5, 0.75, 0.9])
         .reset_index()
     )
-    ms_all = timeseries.monthly_series(rep)
-    ms_t = timeseries.monthly_series(rep, is_t)
+    # Monthly series: the system-level series uses every report of the window (context of the
+    # surveillance system, not a comparison); months a workbook does not cover are missing.
+    ms_all = timeseries.monthly_series(window, coverage=cur.month_coverage)
+    ms_t = timeseries.monthly_series(rep, is_t, coverage=cur.month_coverage)
     out["monthly_all"] = ms_all
     out["monthly_target"] = ms_t
     out["monthly_changepoints_all"] = timeseries.monthly_changepoints(ms_all)
@@ -283,6 +353,56 @@ def capability_periods(
     if first >= study_start or last < study_start:
         return []
     return [(first, study_start - 1), (study_start, last)]
+
+
+def p2_feasibility(link: LinkageResult, window: pd.DataFrame, cfg: Any) -> dict[str, Any]:
+    """Decide whether the lot-level analysis is supported, from the share of impossible lots.
+
+    A report whose recorded lot was expired or not yet released at vaccination carries a
+    copied LOTE cell. Their share among the reports whose lot can be dated is a lower bound
+    of the error rate of the lot field (errors within the validity window are invisible).
+    Above ``max_inconsistent_share`` the exposure of Paper 2 is too misclassified to support
+    lot-level conclusions; above ``caution_share`` it is supported with a stated limitation.
+    The analysis also needs enough valid linked reports and lots.
+    """
+    links = link.links
+    ok_ids = set(window.loc[~window["schedule_invalid"], "record_id"])
+    st = links["lot_status"].fillna("not_assessable") if "lot_status" in links else pd.Series(dtype=str)
+    valid_linked = links[links["lot_key"].notna() & st.ne("expired") & st.ne("before_release")]
+    valid_linked = valid_linked[valid_linked["record_id"].isin(ok_ids)]
+    assessable = int(st.ne("not_assessable").sum())
+    bad = int(st.isin(["expired", "before_release"]).sum())
+    share = bad / assessable if assessable else None
+    n_rep, n_lots = len(valid_linked), int(valid_linked["lot_key"].nunique())
+    reasons = []
+    if share is not None and share > cfg.max_inconsistent_share:
+        reasons.append("inconsistent_share")
+    if n_rep < cfg.min_linked_reports:
+        reasons.append("too_few_linked_reports")
+    if n_lots < cfg.min_linked_lots:
+        reasons.append("too_few_linked_lots")
+    if reasons:
+        verdict = "insufficient"
+    elif share is not None and share > cfg.caution_share:
+        verdict = "limited"
+    elif share is None:
+        verdict = "limited"
+        reasons.append("lot_validity_not_assessable")
+    else:
+        verdict = "adequate"
+    return {
+        "verdict": verdict,
+        "reasons": reasons,
+        "n_assessable": assessable,
+        "n_inconsistent": bad,
+        "inconsistent_share": share,
+        "n_valid_linked_reports": n_rep,
+        "n_valid_linked_lots": n_lots,
+        "max_inconsistent_share": cfg.max_inconsistent_share,
+        "caution_share": cfg.caution_share,
+        "min_linked_reports": cfg.min_linked_reports,
+        "min_linked_lots": cfg.min_linked_lots,
+    }
 
 
 def analyze_paper2(
@@ -399,9 +519,11 @@ def analyze_paper2(
     okrows = np.all(np.isfinite(wmat), axis=1)
     out["energy_test"] = energy_test(wmat[okrows & nat], wmat[okrows & ~nat], n_perm=499, seed=a.seed)
 
-    # Linkage and quality-safety models.
+    # Linkage, lot validity and the feasibility of the lot-level analysis.
     out["linkage_summary"] = link.summary
     out["linkage_bias"] = link.bias_table
+    window = cur.reports[cur.reports["in_study_window"]]
+    out["p2_feasibility"] = p2_feasibility(link, window, a.p2_feasibility)
     qs = a.qc_safety
     exposures = [
         *qs.primary_exposures,
@@ -409,7 +531,8 @@ def analyze_paper2(
         *qs.negative_control_exposures,
         "atypicality_t2",
     ]
-    reports = cur.reports[cur.reports["in_study_window"]]
+    # Target doses outside the schedule are recording errors: excluded here as in Paper 1.
+    reports = window[~window["schedule_invalid"]]
     atyp = ms.scores["t2"]
     frame = build_qc_safety_frame(
         reports, link.links, lot_df, scales, exposures, atypicality=atyp, recorded_events=cur.recorded_events
@@ -464,7 +587,7 @@ def analyze_paper2(
     sens_specs: dict[str, dict[str, Any]] = {
         "exact_links_only": {"restrict_levels": ("exact",)},
         "excluding_coadministration": {"exclude_coadministered": True},
-        "keeping_temporally_implausible": {"drop_temporal_implausible": False},
+        "keeping_inconsistent_lots": {"drop_temporal_implausible": False},
     }
     for label, kw in sens_specs.items():
         f = build_qc_safety_frame(
@@ -681,6 +804,9 @@ def run_pipeline(
                 "n_in_window": int(cur.reports["in_study_window"].sum()),
                 "n_outside_window": int((~cur.reports["in_study_window"]).sum()),
                 "n_year_differs_from_file": int(cur.reports["year_differs_from_file"].sum()),
+                "study_years": list(cur.study_years),
+                "partial_years": cur.partial_years(),
+                "file_years": sorted(int(y) for y in cur.reports["file_year"].dropna().unique()),
             },
         },
     }

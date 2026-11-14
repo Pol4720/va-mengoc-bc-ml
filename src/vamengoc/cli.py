@@ -104,6 +104,74 @@ def synth(
     )
 
 
+def _count(v: Any, min_cell: int) -> str:
+    """Counts shown on screen follow the release rule (small counts as '<min_cell')."""
+    try:
+        x = int(v)
+    except (TypeError, ValueError):
+        return str(v)
+    return f"<{min_cell}" if 0 < x < min_cell else str(x)
+
+
+def _print_data_issues(results: dict[str, Any], min_cell: int) -> None:
+    """Summary of the known data problems and of the decision on Paper 2 (aggregates only)."""
+    dq, p1, p2 = results["data_quality"], results["paper1"], results["paper2"]
+    win = dq["window"]
+
+    def c(v: Any) -> str:
+        return _count(v, min_cell)
+
+    table = Table(title="Data problems handled in this run")
+    table.add_column("check")
+    table.add_column("result", overflow="fold")
+    table.add_row("analysed years", f"{win['study_years'][0]}-{win['study_years'][1]}")
+    if win.get("partial_years"):
+        table.add_row("partial years (no annual rate)", ", ".join(str(y) for y in win["partial_years"]))
+    pl = dq["plausibility"]
+    for flag, label in (
+        ("dq_vaccination_year_imputed", "vaccination year corrected"),
+        ("dq_vaccination_year_dropped", "vaccination date impossible (dropped)"),
+        ("dq_notification_year_imputed", "notification year corrected"),
+        ("dq_notification_year_dropped", "notification date impossible (dropped)"),
+    ):
+        n = int(pl.loc[pl["check"] == flag, "n_flagged"].sum()) if len(pl) else 0
+        table.add_row(label, c(n))
+    pop = p1.get("population", {})
+    sch = p1.get("schedule", {})
+    table.add_row(
+        "VA-MENGOC-BC doses outside the schedule (excluded)",
+        f"{c(sch.get('n_invalid'))} of {c(sch.get('n_target'))}: "
+        + ", ".join(f"{k} {c(v)}" for k, v in sorted(sch.get("counts", {}).items())),
+    )
+    table.add_row(
+        "Paper 1 comparator (Finlay products)",
+        f"{c(pop.get('n_finlay_comparator'))} reports; other vaccines only (not compared): "
+        f"{c(pop.get('n_non_finlay_only'))}",
+    )
+    ls = p2["linkage_summary"]
+    share = ls.get("lot_inconsistent_share")
+    table.add_row(
+        "reports with an expired / not-yet-released lot",
+        f"{c(ls.get('n_lot_inconsistent'))} of {c(ls.get('n_lot_assessable'))} datable"
+        + (f" ({100 * share:.1f} %)" if share is not None else "")
+        + f"; code rule: {ls.get('code_rule') or 'not validated'}",
+    )
+    fz = p2.get("p2_feasibility", {})
+    colour = {"adequate": "green", "limited": "yellow", "insufficient": "red"}.get(fz.get("verdict", ""), "white")
+    table.add_row(
+        "Paper 2 (lot level)",
+        f"[{colour}]{fz.get('verdict', '?')}[/{colour}]"
+        + (f" ({', '.join(fz.get('reasons', []))})" if fz.get("reasons") else ""),
+    )
+    console.print(table)
+    if fz.get("verdict") == "insufficient":
+        console.print(
+            "[red]The share of impossible lots is too high (or too few valid links): the data do not support "
+            "lot-level conclusions for Paper 2. The manuscript states this automatically; see "
+            "docs/DATA_ISSUES.md.[/red]"
+        )
+
+
 @app.command()
 def run(
     input_dir: Annotated[Path | None, typer.Option("--input", help="Directory with the raw files.")] = None,
@@ -118,6 +186,7 @@ def run(
     src = input_dir or project.raw_dir
     outputs = run_pipeline(project, src, build_release=not no_release)
     console.print(f"[green]Run {outputs.run.run_id} finished.[/green] Manifest: {outputs.run.run_dir}")
+    _print_data_issues(outputs.results, project.config.sdc.min_cell)
     if outputs.release_dir is not None:
         rep = verify_release(project, outputs.release_dir)
         _report_verification(rep)
@@ -139,6 +208,7 @@ def demo(
     project = Project(overrides=_parse_overrides(set_))
     generate_synthetic_dataset(project.synthetic_dir, scale=scale, seed=seed)
     outputs = run_pipeline(project, project.synthetic_dir, command="demo")
+    _print_data_issues(outputs.results, project.config.sdc.min_cell)
     assert outputs.release_dir is not None
     rep = verify_release(project, outputs.release_dir)
     _report_verification(rep)
@@ -155,9 +225,9 @@ def schema_check(
     Prints column titles only, never cell values. Checks the annual AEFI files, the event
     indicators each year's form carries, and the three sheets of the lot-release workbook.
     """
-    from vamengoc.ingest.aefi import discover_aefi_files
+    from vamengoc.ingest.aefi import _choose_sheets, discover_aefi_files
     from vamengoc.ingest.lots import _find_sheet, find_lots_workbook
-    from vamengoc.io.excel import list_sheets, read_sheet
+    from vamengoc.io.excel import read_sheet
     from vamengoc.io.schema_registry import SchemaError, detect_header_row, fields_from_schema
     from vamengoc.parsing.text import compact
 
@@ -184,39 +254,42 @@ def schema_check(
     unmatched_keys: dict[str, list[tuple[str, str]]] = {}
     files = discover_aefi_files(src, project.config.inputs.aefi_file_pattern)
     for _year, path in files:
-        sheets = list_sheets(path)
-        sheet = next((s for s in sheets if s.strip().upper() == project.config.inputs.aefi_preferred_sheet), sheets[0])
-        grid = read_sheet(path, sheet)
         try:
-            idx, m = detect_header_row(
-                grid.rows,
-                fields,
-                max_rows=project.config.inputs.header_search_rows,
-                min_matches=project.config.inputs.min_header_matches,
-            )
+            chosen = _choose_sheets(path, project.config.inputs.aefi_preferred_sheet, fields, project)
         except SchemaError as exc:
-            table.add_row(path.name, sheet, "-", "-", "-", "-", "-", "-", str(exc))
+            table.add_row(path.name, "-", "-", "-", "-", "-", "-", "-", str(exc))
             problems += 1
             continue
-        problems += bool(m.missing_required)
-        mapped = set(m.field_to_column())
-        recorded[path.name] = {e for e in event_fields if e in mapped}
-        if m.unmatched:
-            unmatched_keys[path.name] = [(str(u["header"]), compact(u["header"])) for u in m.unmatched]
-        review = [f"{f['header']}→{f['field']}" for f in m.fuzzy]
-        table.add_row(
-            path.name,
-            sheet,
-            str(idx + 1),
-            str(m.n_matched),
-            f"{len(recorded[path.name])}/{len(event_fields)}",
-            ", ".join(sorted(pii & mapped)) or "-",
-            ", ".join(review) or "-",
-            ", ".join(str(u["header"]) for u in m.unmatched) or "-",
-            ", ".join(m.missing_required) or "-",
-        )
+        for grid, idx, m, role in chosen:
+            name = path.name if role == "master" else f"{path.name}#{grid.sheet}"
+            problems += bool(m.missing_required)
+            mapped = set(m.field_to_column())
+            recorded[name] = {e for e in event_fields if e in mapped}
+            if m.unmatched:
+                unmatched_keys[name] = [(str(u["header"]), compact(u["header"])) for u in m.unmatched]
+            review = [f"{f['header']}→{f['field']}" for f in m.fuzzy]
+            table.add_row(
+                path.name,
+                grid.sheet + ("" if role == "master" else " (extra)"),
+                str(idx + 1),
+                str(m.n_matched),
+                f"{len(recorded[name])}/{len(event_fields)}",
+                ", ".join(sorted(pii & mapped)) or "-",
+                ", ".join(review) or "-",
+                ", ".join(str(u["header"]) for u in m.unmatched) or "-",
+                ", ".join(m.missing_required) or "-",
+            )
     console.print(table)
     console.print(f"{len(files)} AEFI files checked, {problems} with problems.")
+    by_year: dict[int, list[str]] = {}
+    for year, path in files:
+        by_year.setdefault(year, []).append(path.name)
+    for year, names in sorted(by_year.items()):
+        if len(names) > 1:
+            console.print(
+                f"[yellow]{year}: {len(names)} files ({', '.join(names)}). Monthly deliveries are combined and "
+                "repeated rows removed; if these are successive cumulative versions, keep only the latest.[/yellow]"
+            )
     if unmatched_keys:
         # The matching key shows hidden differences (extra words, stray characters) in a title.
         console.print("Unrecognised column titles and their matching keys:")

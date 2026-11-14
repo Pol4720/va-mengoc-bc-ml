@@ -15,6 +15,31 @@ import pandas as pd
 __all__ = ["DQ_CHECKS", "completeness_table", "conformance_table", "plausibility_table"]
 
 DQ_CHECKS: dict[str, dict[str, str]] = {
+    "dq_vaccination_year_imputed": {
+        "category": "plausibility/temporal",
+        "en": "Vaccination year mistyped, corrected from the notification date and workbook year",
+        "es": "Año de vacunación mal tecleado, corregido con la fecha de notificación y el año del libro",
+    },
+    "dq_vaccination_year_dropped": {
+        "category": "plausibility/temporal",
+        "en": "Impossible vaccination date that could not be corrected (not used)",
+        "es": "Fecha de vacunación imposible y no corregible (no utilizada)",
+    },
+    "dq_notification_year_imputed": {
+        "category": "plausibility/temporal",
+        "en": "Notification year mistyped, corrected from the vaccination date and workbook year",
+        "es": "Año de notificación mal tecleado, corregido con la fecha de vacunación y el año del libro",
+    },
+    "dq_notification_year_dropped": {
+        "category": "plausibility/temporal",
+        "en": "Impossible notification date that could not be corrected (not used)",
+        "es": "Fecha de notificación imposible y no corregible (no utilizada)",
+    },
+    "dq_schedule_invalid": {
+        "category": "plausibility/schedule",
+        "en": "VA-MENGOC-BC dose outside the schedule (below minimum age or non-existent dose)",
+        "es": "Dosis de VA-MENGOC-BC fuera del esquema (por debajo de la edad mínima o dosis inexistente)",
+    },
     "dq_notification_before_vaccination": {
         "category": "plausibility/temporal",
         "en": "Notification date before vaccination date",

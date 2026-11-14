@@ -13,7 +13,7 @@ __all__ = ["characteristics_table", "event_frequency_table", "reports_by_year"]
 
 
 def _group_label(df: pd.DataFrame, target: str) -> pd.Series:
-    return pd.Series(np.where(df["has_target"], target, "Other vaccines"), index=df.index)
+    return pd.Series(np.where(df["has_target"], target, "Other Finlay vaccines"), index=df.index)
 
 
 def dose_category(doses: pd.Series) -> pd.Series:
@@ -39,7 +39,7 @@ def characteristics_table(df: pd.DataFrame, target: str) -> pd.DataFrame:
     d = df.copy()
     d["group"] = _group_label(d, target)
     rows: list[dict[str, Any]] = []
-    groups = [target, "Other vaccines", "All"]
+    groups = [target, "Other Finlay vaccines", "All"]
 
     def add(variable: str, series: pd.Series, dropna: bool = False) -> None:
         for g in groups:
@@ -108,7 +108,7 @@ def event_frequency_table(df: pd.DataFrame, target: str, labels: dict[str, dict[
     for ev in [e for e in event_columns(df) if df[e].notna().any()]:
         for g, mask in (
             (target, df["has_target"]),
-            ("Other vaccines", ~df["has_target"]),
+            ("Other Finlay vaccines", ~df["has_target"]),
             ("All", pd.Series(True, index=df.index)),
         ):
             s = df.loc[mask, ev].astype("boolean")

@@ -87,6 +87,15 @@ class PathsConfig(_Frozen):
 class InputsConfig(_Frozen):
     aefi_file_pattern: str
     aefi_preferred_sheet: str
+    # Master sheet of each workbook: names matching this regex are preferred; among several
+    # candidates the one with the most data rows wins (the 2021-2024 workbooks also hold
+    # product sheets such as ABDALA or SOBERANA that share the AEFI layout).
+    aefi_master_sheet_pattern: str = "(?i)total"
+    # Sheets ingested in addition to the master sheet (e.g. 2018 "Casos que no entraron en el
+    # cierre": late cases with the same layout). Their rows are deduplicated against the master.
+    aefi_extra_sheet_patterns: list[str] = Field(default_factory=list)
+    # Sheets never read as AEFI tables (product extracts duplicated from the master sheet).
+    aefi_excluded_sheet_patterns: list[str] = Field(default_factory=list)
     lots_file_pattern: str
     sheet_patterns: dict[str, str]
     header_search_rows: int = Field(ge=1)
@@ -132,7 +141,7 @@ class LCAConfig(_Frozen):
 
 class SeriousnessConfig(_Frozen):
     train_years: tuple[int, int]
-    test_years: tuple[int, int]
+    test_years: tuple[int, int | None]  # null last year = latest analysed year
     n_estimators: int
     learning_rate: float
     num_leaves: int
@@ -165,13 +174,60 @@ class QCSafetyConfig(_Frozen):
 class LinkageConfig(_Frozen):
     fuzzy_threshold: float
     allow_fuzzy: bool
-    max_years_after_production: int = Field(ge=0)
+    # Shelf life of a released lot: a lot produced in year Y expires at the latest on
+    # 31 December of Y + shelf_life_years. A dose recorded after that date, or before the
+    # production year, cannot come from that lot (copy-paste error in the LOTE cell).
+    shelf_life_years: int = Field(default=3, ge=0)
+    # Candidate rules relating the lot code to its production year, checked against the lots
+    # workbook (which records both). A rule is used to date lots absent from the workbook only
+    # if it reproduces the recorded year for at least `code_year_min_agreement` of the lots.
+    code_year_rules: list[str] = Field(
+        default_factory=lambda: ["digits_first1", "digits_first2", "digits_last1", "digits_last2"]
+    )
+    code_year_min_agreement: float = Field(default=0.95, gt=0, le=1)
+    # Shape of a VA-MENGOC-BC lot code (999A, A999, A999A, 999AA): only tokens with this shape are
+    # dated from the code, so that lots of co-administered vaccines are never misread.
+    target_lot_pattern: str = r"^[A-Z]?\d{3}[A-Z]{0,2}$"
+
+
+class ComparatorConfig(_Frozen):
+    """Paper 1 comparator (agreed with the VA-MENGOC-BC project lead).
+
+    Other vaccines are compared only when they are products of the Finlay Vaccine Institute;
+    any vaccine given in the same session is analysed as a concomitant exposure.
+    """
+
+    manufacturer: str = "FINLAY"
+    # Explicit product codes; null = every vaccine whose dictionary manufacturer is `manufacturer`.
+    products: list[str] | None = None
+
+
+class ScheduleDose(_Frozen):
+    minimum_months: float = Field(ge=0)  # below this age the dose is not valid (data error)
+    routine_months: tuple[float, float]  # recommended age window [from, to)
+
+
+class ScheduleConfig(_Frozen):
+    """Age rules of the target vaccine in the national schedule."""
+
+    doses: dict[str, ScheduleDose]
+    max_age_years: float = Field(gt=0)  # upper age of the licensed indication
+    booster_in_schedule: bool = False
+
+
+class P2FeasibilityConfig(_Frozen):
+    """Decision rule for Paper 2 given the share of reports whose recorded lot is impossible."""
+
+    max_inconsistent_share: float = Field(default=0.20, gt=0, lt=1)  # above: insufficient
+    caution_share: float = Field(default=0.10, gt=0, lt=1)  # above: limited (caveat)
+    min_linked_reports: int = Field(default=200, ge=1)
+    min_linked_lots: int = Field(default=30, ge=2)
 
 
 class AnalysisConfig(_Frozen):
     seed: int
     analytic_year_from: Literal["vaccination_date", "notification_date", "file_year"]
-    study_years: tuple[int, int]
+    study_years: tuple[int, int | None]  # null last year = latest year present in the data
     target_vaccine: str
     target_manufacturer: str
     infant_comparator_max_age_months: int
@@ -184,11 +240,14 @@ class AnalysisConfig(_Frozen):
     qc: QCConfig
     qc_safety: QCSafetyConfig
     linkage: LinkageConfig
+    comparator: ComparatorConfig = Field(default_factory=ComparatorConfig)
+    schedule: ScheduleConfig
+    p2_feasibility: P2FeasibilityConfig = Field(default_factory=P2FeasibilityConfig)
 
     @field_validator("study_years")
     @classmethod
-    def _ordered(cls, v: tuple[int, int]) -> tuple[int, int]:
-        if v[0] > v[1]:
+    def _ordered(cls, v: tuple[int, int | None]) -> tuple[int, int | None]:
+        if v[1] is not None and v[0] > v[1]:
             msg = "study_years must be [first, last]"
             raise ValueError(msg)
         return v

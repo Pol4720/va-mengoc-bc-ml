@@ -23,19 +23,29 @@ PER = 100_000.0
 
 
 def annual_reporting_rates(
-    counts: pd.DataFrame, doses: pd.DataFrame, *, count_col: str, expected_rate: float | None = None
+    counts: pd.DataFrame,
+    doses: pd.DataFrame,
+    *,
+    count_col: str,
+    expected_rate: float | None = None,
+    partial_years: list[int] | None = None,
 ) -> pd.DataFrame:
     """Join annual counts with doses administered and compute exact-CI rates.
 
     ``counts`` needs ``analytic_year`` and ``count_col``; ``doses`` needs ``year``
-    and ``doses_administered``. Years without doses are kept with NaN rates.
+    and ``doses_administered``. Years without doses are kept with NaN rates. Years in
+    ``partial_years`` (fewer than 12 observed months) keep their count but get no rate: a
+    partial count over a whole year's doses would understate the rate.
     """
+    partial = set(partial_years or [])
     d = counts[["analytic_year", count_col]].rename(columns={"analytic_year": "year", count_col: "count"})
     d = d.merge(doses[["year", "doses_administered"]], on="year", how="left")
     rows = []
     for r in d.itertuples(index=False):
         k = int(r.count)
         dose = float(r.doses_administered) if pd.notna(r.doses_administered) else np.nan
+        if int(r.year) in partial:
+            dose = np.nan
         lo, hi = poisson_exact_ci(k)
         rate = k / dose * PER if dose and not np.isnan(dose) else np.nan
         rows.append(
@@ -47,6 +57,7 @@ def annual_reporting_rates(
                 "rate_lo": lo / dose * PER if dose and not np.isnan(dose) else np.nan,
                 "rate_hi": hi / dose * PER if dose and not np.isnan(dose) else np.nan,
                 "ratio_to_expected": rate / expected_rate if expected_rate and not np.isnan(rate) else np.nan,
+                "partial_year": int(r.year) in partial,
             }
         )
     return pd.DataFrame.from_records(rows)

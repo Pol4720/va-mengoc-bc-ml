@@ -17,6 +17,14 @@ inputs:
   # File discovery is pattern based so that renamed or extra files are handled.
   aefi_file_pattern: '(?i)^EA[ _-]*(?P<year>(19|20)\d{2}).*\.(xlsx|xlsm|xls)$'
   aefi_preferred_sheet: TOTAL
+  # Master sheet: preferred names first, then the schema-matching sheet with the most rows.
+  aefi_master_sheet_pattern: '(?i)total'
+  # Extra sheets with the master layout that hold reports left out of the master sheet
+  # (2018: "Casos que no entraron en el cierre"). Exact repeats are removed by deduplication.
+  aefi_extra_sheet_patterns: ['(?i)no\s*entr', '(?i)cierre']
+  # Product extracts copied from the master sheet (COVID-19 vaccines 2021-2024) are never read.
+  aefi_excluded_sheet_patterns:
+    - '(?i)abdala|soberana|sinophar|covid|mayabeque|adultos|ni(n|ñ)os|a(n|ñ)os\b'
   lots_file_pattern: '(?i)^BD.*lote.*\.(xlsx|xlsm|xls)$'
   sheet_patterns:
     lots: '(?i)lote'
@@ -41,7 +49,10 @@ analysis:
   seed: 20260930
   # Which date defines the analytic year of an AEFI report.
   analytic_year_from: vaccination_date   # vaccination_date | notification_date | file_year
-  study_years: [2017, 2025]              # inclusive window on the analytic year
+  # Inclusive window on the analytic year. A null last year follows the data: new monthly
+  # deliveries (2026 onwards) enter the analysis without editing this file. Years with fewer
+  # than 12 observed months are kept but flagged as partial and left out of annual trends.
+  study_years: [2017, null]
   target_vaccine: AM-BC                  # canonical code of VA-MENGOC-BC in the AEFI files
   target_manufacturer: FINLAY
   infant_comparator_max_age_months: 11   # active-comparator restriction (Paper 1)
@@ -69,7 +80,7 @@ analysis:
     bootstrap: 50
   seriousness_model:
     train_years: [2017, 2022]
-    test_years: [2023, 2025]
+    test_years: [2023, null]             # null = latest analysed year
     n_estimators: 300
     learning_rate: 0.05
     num_leaves: 15
@@ -94,7 +105,34 @@ analysis:
   linkage:
     fuzzy_threshold: 92                  # rapidfuzz ratio for fuzzy lot matching
     allow_fuzzy: true
-    max_years_after_production: 4        # shelf life + distribution window (plausibility)
+    # The first digit of a lot code is the last digit of its release year (lot of 2011 -> "1..."),
+    # and a lot is valid for 3 years. A dose recorded outside [release year, release year + 3]
+    # cannot come from that lot: it is a copy-paste error of the LOTE cell (see docs/DATA_ISSUES.md).
+    shelf_life_years: 3
+    code_year_rules: [digits_first1]     # rule confirmed by the data owner; checked against the workbook
+    code_year_min_agreement: 0.90
+  comparator:
+    # Paper 1 compares VA-MENGOC-BC only with other Finlay Vaccine Institute products; any other
+    # vaccine enters only as a concomitant (same-session) exposure. Agreed with the project lead.
+    manufacturer: FINLAY
+    products: null                       # null = vaccines whose dictionary manufacturer is FINLAY
+  schedule:
+    # VA-MENGOC-BC in the Cuban schedule: dose 1 at 3 months, dose 2 at 5 months; package insert:
+    # valid from 3 months of age, two doses 6-8 weeks apart, no booster in routine use (a booster
+    # is allowed in campaigns). Minimum ages include the usual 4-day grace period.
+    doses:
+      '1': {minimum_months: 2.87, routine_months: [3, 4]}
+      '2': {minimum_months: 4.25, routine_months: [5, 6]}
+    max_age_years: 110                   # no upper age in the indication
+    booster_in_schedule: false
+  p2_feasibility:
+    # Paper 2 needs the recorded lot to be right. Reports whose lot is impossible (expired or not
+    # yet released at vaccination) measure the copy-paste error rate; it is a lower bound because
+    # errors within the validity window cannot be detected.
+    max_inconsistent_share: 0.20         # above: lot-level analysis not supported (insufficient)
+    caution_share: 0.10                  # above: supported with a stated limitation
+    min_linked_reports: 200
+    min_linked_lots: 30
 
 sdc:
   # Statistical disclosure control applied to every released table.
