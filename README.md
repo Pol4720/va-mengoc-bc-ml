@@ -5,7 +5,8 @@ Código reproducible, manuscritos y material de socialización de la línea de i
 Investigaciones Clínicas y Evaluación de Impacto (DICEI) — grupo de ciencia de datos.
 
 > **English summary.** Reproducible analytics for the Cuban outer-membrane-vesicle meningococcal B–C vaccine
-> VA-MENGOC-BC: national passive AEFI surveillance 2017–2025 (reporting rates, READUS-PV disproportionality,
+> VA-MENGOC-BC: national passive AEFI surveillance from 2017, updated monthly (reporting rates, READUS-PV disproportionality against
+> the manufacturer's other vaccines,
 > latent reactogenicity phenotypes, hospitalisation models) and 15 years of lot-release quality control
 > (capability, multivariate SPC, change points, destination equivalence) linked to post-marketing
 > reactogenicity with a case-only, lot-clustered design. Restricted data never leave the controlled
@@ -15,8 +16,8 @@ Investigaciones Clínicas y Evaluación de Impacto (DICEI) — grupo de ciencia 
 
 | Paper | Pregunta | Diseño y métodos | Guía de reporte |
 |---|---|---|---|
-| **P1** — Vigilancia poscomercialización nacional (2017–2025) | ¿Cuál es el perfil de seguridad notificado de VA-MENGOC-BC en Cuba y ha cambiado en el tiempo? | Tasas de notificación por 100 000 dosis con IC exactos y tendencia (quasi-Poisson/BN); desproporcionalidad (ROR, PRR, IC-BCPNN, EBGM-MGPS) con comparador activo en lactantes y análisis de sensibilidad (coadministración, enmascaramiento); fenotipos latentes de reactogenicidad (LCA); correlatos de hospitalización (logística + LightGBM/SHAP con validación temporal) | READUS-PV, RECORD-PE |
-| **P2** — Calidad de lote y reactogenicidad | ¿La variabilidad dentro de especificación de los lotes liberados se asocia al perfil de eventos notificados? | Capacidad de proceso (Ppk, IC bootstrap), gráficos EWMA y reglas de Nelson, PELT exacto, MSPC robusto (T² de Hotelling, SPE), equivalencia nacional/exportación (TOST, distancia energía); enlace notificación–lote; diseño *case-only* con GEE por lote, modelo mixto bayesiano, exposición control negativo, OR mínimo detectable y prueba de valor incremental por permutación | STROBE / RECORD-PE, TRIPOD+AI (componente ML) |
+| **P1** — Vigilancia poscomercialización nacional (2017 en adelante, entregas mensuales) | ¿Cuál es el perfil de seguridad notificado de VA-MENGOC-BC en Cuba y ha cambiado en el tiempo? | Tasas de notificación por 100 000 dosis con IC exactos y tendencia (quasi-Poisson/BN); desproporcionalidad (ROR, PRR, IC-BCPNN, EBGM-MGPS) frente a las demás vacunas del Instituto Finlay, con diseños en lactantes, de una sola vacuna y con dosis fuera de esquema, e influencia de las vacunas concomitantes; fenotipos latentes de reactogenicidad (LCA); correlatos de hospitalización (logística + LightGBM/SHAP con validación temporal) | READUS-PV, RECORD-PE |
+| **P2** — Calidad de lote y reactogenicidad | ¿La variabilidad dentro de especificación de los lotes liberados se asocia al perfil de eventos notificados? | Capacidad de proceso (Ppk, IC bootstrap), gráficos EWMA y reglas de Nelson, PELT exacto, MSPC robusto (T² de Hotelling, SPE), equivalencia nacional/exportación (TOST, distancia energía); enlace notificación–lote con detección de lotes vencidos (código = año de liberación, vigencia 3 años) y regla de factibilidad; diseño *case-only* con GEE por lote, modelo mixto bayesiano, exposición control negativo, OR mínimo detectable y prueba de valor incremental por permutación | STROBE / RECORD-PE, TRIPOD+AI (componente ML) |
 
 ## Estructura
 
@@ -45,6 +46,11 @@ tools/              guardas del repositorio (datos, releases, LaTeX)
    uv run vamengoc run                # ingesta → curación → análisis → release/public
    uv run vamengoc release verify public
    ```
+
+   Guía completa (entregas mensuales, años parciales, cómo subir `release/public/` para cerrar la
+   redacción): [`docs/RUN_LOCAL.md`](docs/RUN_LOCAL.md). Problemas conocidos de los datos y reglas
+   aplicadas (lotes vencidos, edades fuera de esquema, fechas imposibles, comparador Finlay):
+   [`docs/DATA_ISSUES.md`](docs/DATA_ISSUES.md).
 
 2. **Fase 2 — pública**: manuscritos, informes, presentaciones y web se construyen solo desde
    `release/public/` (revisado y confirmado por el responsable de datos). Mientras no exista, todo se
