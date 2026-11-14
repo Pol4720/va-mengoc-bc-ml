@@ -4,7 +4,7 @@
 
 import { bool, num, object, sum, table, type Bundle } from "./bundle";
 
-export const PRIMARY_DESIGN = "primary_all_other_vaccines";
+export const PRIMARY_DESIGN = "primary_finlay_vaccines";
 export const FDR_ALPHA = 0.05;
 
 export interface RatesTrend {

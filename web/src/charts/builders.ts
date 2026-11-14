@@ -221,7 +221,11 @@ export function forestAxis(points: ForestPoint[], wantLog: boolean, extra: numbe
     return { log: true, min: inv(Math.floor(min / step) * step), max: inv(Math.ceil(max / step) * step) };
   }
   const step = niceStep((max - min) / 5);
-  return { log: false, min: Math.floor(min / step) * step, max: Math.ceil(max / step) * step };
+  // Round to the precision of the step: 19 * 0.05 is 0.9500000000000001 in floating point, and
+  // ECharts rejects bounds that are not aligned with its tick interval.
+  const digits = Math.max(0, -Math.floor(Math.log10(step))) + 2;
+  const snap = (v: number) => Number(v.toFixed(digits));
+  return { log: false, min: snap(Math.floor(min / step) * step), max: snap(Math.ceil(max / step) * step) };
 }
 
 export function forest(t: Tokens, lang: Lang, d: ForestInput): EChartsOption {

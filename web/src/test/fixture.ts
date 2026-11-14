@@ -31,11 +31,11 @@ export function fixtureBundle(): Bundle {
         { analytic_year: 2018, n_reports: 120, n_target: "<5" },
       ],
       p1_disproportionality: [
-        { design: "primary_all_other_vaccines", event: "ev_fever_39", a: 50, ror: 2, ror_lo: 1.5, ror_hi: 2.6, prr: 2.1, chi2_yates: 20, ic: 0.8, ic025: 0.4, ic975: 1.1, ebgm: 1.9, eb05: 1.5, signal_primary: true },
-        { design: "primary_all_other_vaccines", event: "ev_abscess", a: 8, ror: 5, ror_lo: 2, ror_hi: 12, prr: 4.9, chi2_yates: 9, ic: 1.4, ic025: 0.3, ic975: 2.2, ebgm: 3.5, eb05: 2.1, signal_primary: true },
-        { design: "primary_all_other_vaccines", event: "ev_rash", a: "<5", ror: null, ror_lo: null, ror_hi: null, prr: null, chi2_yates: null, ic: null, ic025: null, ic975: null, ebgm: null, eb05: null, signal_primary: false },
-        { design: "infant_active_comparator", event: "ev_fever_39", a: 45, ror: 1.8, ror_lo: 1.3, ror_hi: 2.4, prr: 1.7, chi2_yates: 12, ic: 0.6, ic025: 0.2, ic975: 0.9, ebgm: 1.7, eb05: 1.3, signal_primary: true },
-        { design: "infant_active_comparator", event: "ev_abscess", a: 6, ror: 1.4, ror_lo: 0.6, ror_hi: 3, prr: 1.4, chi2_yates: 0.5, ic: 0.3, ic025: -0.6, ic975: 1.1, ebgm: 1.2, eb05: 0.7, signal_primary: false },
+        { design: "primary_finlay_vaccines", event: "ev_fever_39", a: 50, ror: 2, ror_lo: 1.5, ror_hi: 2.6, prr: 2.1, chi2_yates: 20, ic: 0.8, ic025: 0.4, ic975: 1.1, ebgm: 1.9, eb05: 1.5, signal_primary: true },
+        { design: "primary_finlay_vaccines", event: "ev_abscess", a: 8, ror: 5, ror_lo: 2, ror_hi: 12, prr: 4.9, chi2_yates: 9, ic: 1.4, ic025: 0.3, ic975: 2.2, ebgm: 3.5, eb05: 2.1, signal_primary: true },
+        { design: "primary_finlay_vaccines", event: "ev_rash", a: "<5", ror: null, ror_lo: null, ror_hi: null, prr: null, chi2_yates: null, ic: null, ic025: null, ic975: null, ebgm: null, eb05: null, signal_primary: false },
+        { design: "infant_finlay_comparator", event: "ev_fever_39", a: 45, ror: 1.8, ror_lo: 1.3, ror_hi: 2.4, prr: 1.7, chi2_yates: 12, ic: 0.6, ic025: 0.2, ic975: 0.9, ebgm: 1.7, eb05: 1.3, signal_primary: true },
+        { design: "infant_finlay_comparator", event: "ev_abscess", a: 6, ror: 1.4, ror_lo: 0.6, ror_hi: 3, prr: 1.4, chi2_yates: 0.5, ic: 0.3, ic025: -0.6, ic975: 1.1, ebgm: 1.2, eb05: 0.7, signal_primary: false },
       ],
       p2_gee_primary: [
         { outcome: "ev_fever_39", exposure: "endotoxin", model: "single", negative_control: false, or_per_sd: 1.3, or_lo: 1.1, or_hi: 1.5, p_value: 0.001, p_bh: 0.004 },

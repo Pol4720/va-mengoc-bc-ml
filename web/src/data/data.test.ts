@@ -73,10 +73,10 @@ describe("formatting", () => {
 
 describe("signal re-thresholding", () => {
   const rows = fixtureBundle().tables.p1_disproportionality ?? [];
-  const primary = rows.filter((r) => r.design === "primary_all_other_vaccines");
+  const primary = rows.filter((r) => r.design === "primary_finlay_vaccines");
 
   it("reproduces the prespecified IC criterion", () => {
-    const ev = evaluateDesign(rows, "primary_all_other_vaccines", "ic", DEFAULT_THRESHOLDS);
+    const ev = evaluateDesign(rows, "primary_finlay_vaccines", "ic", DEFAULT_THRESHOLDS);
     expect(ev.map((e) => e.signal)).toEqual(ev.map((e) => e.pipelineSignal));
   });
 

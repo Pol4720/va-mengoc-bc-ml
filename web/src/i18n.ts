@@ -42,12 +42,16 @@ export function saveLang(lang: Lang): void {
 
 /** Comparator designs of the disproportionality analysis (same wording as the manuscripts). */
 export const DESIGN_LABELS: Record<string, [string, string]> = {
-  primary_all_other_vaccines: ["Principal: resto de vacunas", "Primary: all other vaccines"],
-  infant_active_comparator: ["Lactantes <12 meses, comparador activo", "Infants <12 months, active comparator"],
+  primary_finlay_vaccines: ["Principal: otras vacunas Finlay", "Primary: other Finlay vaccines"],
+  infant_finlay_comparator: ["Lactantes <12 meses, comparador Finlay", "Infants <12 months, Finlay comparator"],
   excluding_coadministration: ["Solo notificaciones de una vacuna", "Single-vaccine reports only"],
-  excluding_pentavalent_masking: [
-    "Comparador sin PENTA-L (enmascaramiento)",
-    "Comparator without PENTA-L (masking)",
+  concomitant_influence: [
+    "Vacunas concomitantes: con frente a sin",
+    "Concomitant vaccines: with vs without",
+  ],
+  primary_including_schedule_errors: [
+    "Principal, conservando dosis fuera del esquema",
+    "Primary, keeping doses outside the schedule",
   ],
 };
 
@@ -55,7 +59,7 @@ export const SENSITIVITY_LABELS: Record<string, [string, string]> = {
   primary: ["GEE principal", "Primary GEE"],
   exact_links_only: ["Solo enlaces exactos", "Exact lot links only"],
   excluding_coadministration: ["Excluyendo coadministración", "Excluding co-administration"],
-  keeping_temporally_implausible: ["Conservando fechas inverosímiles", "Keeping implausible dates"],
+  keeping_inconsistent_lots: ["Conservando lotes vencidos", "Keeping expired lots"],
   mixed: ["Bayesiano, intercepto aleatorio", "Bayesian random intercept"],
   lot_level: ["Cuasibinomial por lote", "Lot-level quasi-binomial"],
 };

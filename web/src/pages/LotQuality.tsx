@@ -216,7 +216,11 @@ export function LotQuality() {
           {
             name: tr("Notificaciones enlazadas", "Linked reports"),
             color: t.s1,
-            values: lby.map((r) => (num(r.n_reports) > 0 ? (num(r.n_linked) / num(r.n_reports)) * 100 : null)),
+            // Suppressed cells ("<5", "[c]") are gaps, never NaN (which would break the axis).
+            values: lby.map((r) => {
+              const v = (num(r.n_linked) / num(r.n_reports)) * 100;
+              return num(r.n_reports) > 0 && Number.isFinite(v) ? v : null;
+            }),
           },
         ],
         digits: 1,

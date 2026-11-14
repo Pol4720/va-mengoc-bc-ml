@@ -18,6 +18,11 @@ describe("chart helpers", () => {
     expect(niceStep(0)).toBe(1);
   });
 
+  it("returns forest bounds without floating-point residue", () => {
+    const ax = forestAxis([{ cat: 0, est: 1.1, lo: 0.97, hi: 1.28 }], false, [1]);
+    for (const v of [ax.min, ax.max]) expect(String(v).length).toBeLessThan(8);
+  });
+
   it("uses a linear axis for narrow odds-ratio ranges and a log axis for wide ones", () => {
     const narrow = forestAxis([{ cat: 0, est: 1.2, lo: 1.05, hi: 1.4 }], true, [1]);
     expect(narrow.log).toBe(false);

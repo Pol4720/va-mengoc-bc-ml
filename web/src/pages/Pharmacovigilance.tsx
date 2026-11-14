@@ -246,7 +246,7 @@ export function Pharmacovigilance() {
         suffix: lang === "es" ? " %" : "%",
         series: [
           { name: "VA-MENGOC-BC", color: t.s1, values: freqData.target },
-          { name: tr("Otras vacunas", "Other vaccines"), color: t.s2, values: freqData.other },
+          { name: tr("Otras vacunas Finlay", "Other Finlay vaccines"), color: t.s2, values: freqData.other },
         ],
       }),
     [t, lang, freqData, tr],
@@ -577,7 +577,7 @@ export function Pharmacovigilance() {
             <Legend
               items={[
                 { label: "VA-MENGOC-BC", color: t.s1, shape: "rect" },
-                { label: tr("Otras vacunas", "Other vaccines"), color: t.s2, shape: "rect" },
+                { label: tr("Otras vacunas Finlay", "Other Finlay vaccines"), color: t.s2, shape: "rect" },
               ]}
             />
           }
@@ -586,7 +586,7 @@ export function Pharmacovigilance() {
             columns: [
               { key: "event", label: tr("Evento", "Event") },
               { key: "t", label: "VA-MENGOC-BC", numeric: true },
-              { key: "o", label: tr("Otras vacunas", "Other vaccines"), numeric: true },
+              { key: "o", label: tr("Otras vacunas Finlay", "Other Finlay vaccines"), numeric: true },
             ],
             rows: freqData.categories.map((c, i) => ({
               event: c,

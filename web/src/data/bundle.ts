@@ -13,6 +13,7 @@ export interface BundleMeta {
   git_commit: string | null;
   seed: number;
   study_years: [number, number];
+  partial_years?: number[];
   target_vaccine: string;
   sdc: { min_cell: number; token: string; secondary_suppression: boolean; release_lot_values: string };
   lab_job?: string;
