@@ -43,6 +43,7 @@ events:
   # Indicators of the notification form used from 2024 (recorded only in those files). The
   # `expected` flag follows the reactogenicity documented for OMV vaccines (local pain,
   # redness, induration, fever); it must be confirmed by the data owner (OPEN_QUESTIONS 11).
+  ev_local_reaction:        {label_en: "Pain, redness or induration",     label_es: "Dolor, enrojecimiento o induración", domain: local, class: common, brighton: null, expected: true}
   ev_pain:                  {label_en: "Injection-site pain",             label_es: "Dolor en el sitio de inyección", domain: local,       class: common,  brighton: null, expected: true}
   ev_redness:               {label_en: "Injection-site redness",          label_es: "Enrojecimiento",                 domain: local,        class: common,  brighton: null, expected: true}
   ev_induration:            {label_en: "Induration",                      label_es: "Induración",                     domain: local,        class: common,  brighton: Kohl2008, expected: true}

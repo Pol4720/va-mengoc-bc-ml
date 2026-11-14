@@ -101,12 +101,18 @@ fields:
   # Recorded only in the files that carry them; every analysis of an event is restricted to
   # the files in which its column exists (see docs/OPEN_QUESTIONS.md, question 11, for the
   # correspondence with the earlier indicators, which only the data owner can confirm).
+  # 2024-2025 forms carry one combined column "DOLOR, ENROJECIMIENTO, INDURACION"; separate
+  # columns are recognised too in case a later form splits them.
+  ev_local_reaction:         {kind: event, type: yes_no, required: false,
+                              aliases: ["DOLOR, ENROJECIMIENTO, INDURACION", "DOLOR,ENROJECIMIENTO,INDURACION",
+                                        "DOLOR ENROJECIMIENTO INDURACION", "DOLOR,ENROJEC.INDURACION"],
+                              patterns: ["DOLOR.*ENROJ", "ENROJ.*INDUR", "DOLOR.*INDUR"]}
   ev_pain:                   {kind: event, type: yes_no, required: false, aliases: ["DOLOR", "DOLOR LOCAL"],
-                              patterns: ["^DOLOR"]}
+                              patterns: ["^DOLOR(LOCAL)?$"]}
   ev_redness:                {kind: event, type: yes_no, required: false, aliases: ["ENROJECIMIENTO", "RUBOR"],
-                              patterns: ["ENROJEC", "ENROJES"]}
+                              patterns: ["^ENROJE[CS][A-Z]*$"]}
   ev_induration:             {kind: event, type: yes_no, required: false, aliases: ["INDURACION", "INDURACIÓN"],
-                              patterns: ["INDURAC", "INDURAS"]}
+                              patterns: ["^INDURA[CS][A-Z]*$"]}
   ev_abscess_unspecified:    {kind: event, type: yes_no, required: false, aliases: ["ABSCESO"]}
   ev_somnolence:             {kind: event, type: yes_no, required: false, aliases: ["SOMNOLENCIA"]}
   ev_high_blood_pressure:    {kind: event, type: yes_no, required: false,

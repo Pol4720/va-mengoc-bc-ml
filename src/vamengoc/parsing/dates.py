@@ -17,7 +17,7 @@ from typing import Any
 from vamengoc.parsing.text import MISSING_TOKENS, NOT_APPLICABLE_TOKENS, normalize_text
 from vamengoc.parsing.values import Parsed, Status
 
-__all__ = ["EXCEL_EPOCH", "excel_serial_to_date", "parse_date"]
+__all__ = ["EXCEL_EPOCH", "excel_serial_to_date", "parse_date", "repair_report_dates"]
 
 EXCEL_EPOCH = dt.date(1899, 12, 30)  # Excel's 1900 system incl. the Lotus leap-year bug
 _SERIAL_MIN, _SERIAL_MAX = 10_000, 80_000  # 1927-05-18 .. 2119-01-10
@@ -149,3 +149,82 @@ def parse_date(value: Any, *, two_digit_pivot: int = 30) -> Parsed[dt.date]:
         return Parsed(d, Status.RECOVERED) if d else Parsed(None, Status.INVALID)
 
     return Parsed(None, Status.INVALID)
+
+
+def _with_year(d: dt.date, year: int) -> dt.date | None:
+    return _safe_date(year, d.month, d.day)
+
+
+def repair_report_dates(
+    vaccination: dt.date | None,
+    notification: dt.date | None,
+    file_year: int,
+    *,
+    max_delay_days: int = 365,
+) -> tuple[dt.date | None, dt.date | None, str, str]:
+    """Correct mistyped years of the vaccination and notification dates of one report.
+
+    Each annual workbook holds the notifications of its year, which may concern vaccinations
+    of the previous year. A vaccination year outside ``[file_year - 1, file_year]`` or a
+    notification year outside ``[file_year - 1, file_year + 1]`` is a typing error (2029 or
+    2002 in the 2019 workbook). The year is replaced only when exactly the day and month are
+    kept and the corrected pair is coherent (0 <= notification - vaccination <= max delay);
+    among coherent corrections the shortest delay wins. Otherwise the impossible date is
+    dropped (set to None) and the analysis falls back to the other date or the file year.
+
+    Two dates that are both outside the workbook year but consistent with each other are kept
+    (an old vaccination reported late is not a typing error).
+
+    Returns ``(vaccination, notification, vaccination_rule, notification_rule)`` where a rule
+    is ``kept``, ``kept_consistent``, ``imputed_year`` or ``dropped_impossible``.
+    """
+    v_ok = vaccination is not None and file_year - 1 <= vaccination.year <= file_year
+    n_ok = notification is not None and file_year - 1 <= notification.year <= file_year + 1
+    v_rule = n_rule = "kept"
+
+    def coherent(v: dt.date | None, n: dt.date | None) -> bool:
+        if v is None or n is None:
+            return True
+        return 0 <= (n - v).days <= max_delay_days
+
+    if (
+        vaccination is not None
+        and notification is not None
+        and not v_ok
+        and not n_ok
+        and coherent(vaccination, notification)
+    ):
+        # Both dates outside the workbook year but consistent with each other: an old vaccination
+        # reported late (or a report filed in another year's workbook), not a typing error.
+        return vaccination, notification, "kept_consistent", "kept_consistent"
+    if vaccination is not None and not v_ok and n_ok and coherent(vaccination, notification):
+        # A vaccination just outside the window (e.g. early January of the next year) that agrees
+        # with a valid notification date is a real date, not a typing error.
+        v_ok, v_rule = True, "kept_consistent"
+    if vaccination is not None and not v_ok:
+        ref = notification if n_ok else None
+        cands = [c for y in (file_year, file_year - 1) if (c := _with_year(vaccination, y)) is not None]
+        cands = [c for c in cands if coherent(c, ref)]
+        if ref is not None:
+            ref_n = ref
+            cands.sort(key=lambda c: (ref_n - c).days)
+        elif cands:
+            cands = [cands[0]]  # no reference: the file year (the workbook's own year)
+        if cands:
+            vaccination, v_rule = cands[0], "imputed_year"
+        else:
+            vaccination, v_rule = None, "dropped_impossible"
+    if notification is not None and not n_ok:
+        ref = vaccination
+        cands = [c for y in (file_year, file_year + 1, file_year - 1) if (c := _with_year(notification, y)) is not None]
+        cands = [c for c in cands if coherent(ref, c)]
+        if ref is not None:
+            ref_v = ref
+            cands.sort(key=lambda c: (c - ref_v).days)
+        elif cands:
+            cands = [cands[0]]
+        if cands:
+            notification, n_rule = cands[0], "imputed_year"
+        else:
+            notification, n_rule = None, "dropped_impossible"
+    return vaccination, notification, v_rule, n_rule

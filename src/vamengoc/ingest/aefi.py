@@ -35,7 +35,7 @@ from vamengoc.parsing.ages import (
     parse_age,
     reconcile_age,
 )
-from vamengoc.parsing.dates import parse_date
+from vamengoc.parsing.dates import parse_date, repair_report_dates
 from vamengoc.parsing.doses import parse_dose
 from vamengoc.parsing.lots import parse_lots
 from vamengoc.parsing.text import cell_to_str, normalize_text, strip_accents
@@ -70,14 +70,34 @@ def discover_aefi_files(directory: Path, pattern: str) -> list[tuple[int, Path]]
     return sorted(found, key=lambda t: (t[0], t[1].name))
 
 
-def _choose_sheet(
+def _data_rows(grid: SheetGrid, header_idx: int) -> int:
+    return sum(
+        1
+        for r in range(header_idx + 1, grid.n_rows)
+        if any(v is not None and not (isinstance(v, str) and not v.strip()) for v in grid.rows[r])
+    )
+
+
+def _choose_sheets(
     path: Path, preferred: str, fields: list[FieldSpec], project: Project
-) -> tuple[SheetGrid, int, HeaderMatch]:
+) -> list[tuple[SheetGrid, int, HeaderMatch, str]]:
+    """Sheets of one workbook to ingest: the master sheet plus any configured extra sheets.
+
+    The master sheet is the schema-matching sheet whose name is the preferred one or matches
+    ``aefi_master_sheet_pattern``; among several candidates (or none so named) the one with the
+    most data rows wins. Product extracts (``aefi_excluded_sheet_patterns``) are never read:
+    the 2021-2024 workbooks copy the COVID-19 reports of the master sheet into such sheets.
+    Sheets matching ``aefi_extra_sheet_patterns`` (2018 late cases) are read in addition.
+    """
     inputs = project.config.inputs
-    names = list_sheets(path)
-    ordered = sorted(names, key=lambda n: (normalize_text(n) != normalize_text(preferred), n))
+    excluded = [re.compile(p) for p in inputs.aefi_excluded_sheet_patterns]
+    extra = [re.compile(p) for p in inputs.aefi_extra_sheet_patterns]
+    master_rx = re.compile(inputs.aefi_master_sheet_pattern)
+    candidates: list[tuple[SheetGrid, int, HeaderMatch, int]] = []
     last_error: Exception | None = None
-    for name in ordered:
+    for name in list_sheets(path):
+        if any(rx.search(name) for rx in excluded):
+            continue
         grid = read_sheet(path, name)
         try:
             idx, match = detect_header_row(
@@ -86,9 +106,26 @@ def _choose_sheet(
         except SchemaError as exc:
             last_error = exc
             continue
-        return grid, idx, match
-    msg = f"{path.name}: no sheet matches the AEFI schema ({last_error})"
-    raise SchemaError(msg)
+        candidates.append((grid, idx, match, _data_rows(grid, idx)))
+    if not candidates:
+        msg = f"{path.name}: no sheet matches the AEFI schema ({last_error})"
+        raise SchemaError(msg)
+    is_extra = [any(rx.search(c[0].sheet) for rx in extra) for c in candidates]
+    pool = [c for c, x in zip(candidates, is_extra, strict=True) if not x] or candidates
+
+    def rank(c: tuple[SheetGrid, int, HeaderMatch, int]) -> tuple[int, int, int]:
+        name = c[0].sheet
+        named = normalize_text(name) == normalize_text(preferred) or bool(master_rx.search(name))
+        return (0 if named else 1, -c[3], 0)
+
+    master = min(pool, key=rank)
+    chosen = [(master[0], master[1], master[2], "master")]
+    chosen += [
+        (c[0], c[1], c[2], "extra")
+        for c, x in zip(candidates, is_extra, strict=True)
+        if x and c[0].sheet != master[0].sheet
+    ]
+    return chosen
 
 
 def _row_digest(key: bytes, cells: list[Any]) -> str:
@@ -140,14 +177,21 @@ def ingest_aefi(
     unmapped_vaccines: Counter[str] = Counter()
     other_uncategorised: Counter[str] = Counter()
 
+    sheets_to_read: list[tuple[int, Path, str, SheetGrid, int, HeaderMatch, str]] = []
     for file_year, path in files:
         sha = ctx.register_input(path)
-        grid, header_idx, match = _choose_sheet(path, project.config.inputs.aefi_preferred_sheet, fields, project)
+        for grid, header_idx, match, role in _choose_sheets(
+            path, project.config.inputs.aefi_preferred_sheet, fields, project
+        ):
+            sheets_to_read.append((file_year, path, sha, grid, header_idx, match, role))
+
+    for file_year, path, sha, grid, header_idx, match, role in sheets_to_read:
+        source = path.name if role == "master" else f"{path.name}#{grid.sheet}"
         headers = grid.rows[header_idx]
         report = match.as_report(headers)
-        report.update({"sheet": grid.sheet, "header_row": header_idx + 1, "file_year": file_year})
+        report.update({"sheet": grid.sheet, "header_row": header_idx + 1, "file_year": file_year, "role": role})
         if match.missing_required:
-            msg = f"{path.name}: required AEFI fields missing: {match.missing_required}"
+            msg = f"{source}: required AEFI fields missing: {match.missing_required}"
             raise SchemaError(msg)
 
         col_of = match.field_to_column()
@@ -170,8 +214,9 @@ def ingest_aefi(
                 return _row[c] if c is not None and c < len(_row) else None
 
             rec: dict[str, Any] = {
-                "record_id": pseudo.record_id(sha, r + 1),
-                "source_file": path.name,
+                "record_id": pseudo.record_id(sha if role == "master" else f"{sha}#{grid.sheet}", r + 1),
+                "source_file": source,
+                "source_sheet_role": role,
                 "file_year": file_year,
                 "source_row": r + 1,
                 "row_digest": _row_digest(digest_key, [row[c] for c in sorted(match.columns)]),
@@ -187,10 +232,19 @@ def ingest_aefi(
             status["vaccination_date"][vdate.status] += 1
             ndate = parse_date(raw("notification_date"))
             status["notification_date"][ndate.status] += 1
-            rec["vaccination_date"] = vdate.value
-            rec["notification_date"] = ndate.value
+            # Mistyped years (2029, 2002 in the 2019 workbook) are corrected when the right year is
+            # logically determined by the other date and the workbook year; otherwise dropped.
+            v_fixed, n_fixed, v_rule, n_rule = repair_report_dates(
+                vdate.value, ndate.value, file_year, max_delay_days=plaus.max_notification_delay_days
+            )
+            rec["vaccination_date"] = v_fixed
+            rec["notification_date"] = n_fixed
             rec["vaccination_date_status"] = vdate.status
             rec["notification_date_status"] = ndate.status
+            rec["vaccination_date_rule"] = v_rule
+            rec["notification_date_rule"] = n_rule
+            status["vaccination_year_check"][v_rule] += 1
+            status["notification_year_check"][n_rule] += 1
 
             # Pseudonymous person key: name + birth date + sex, consumed here only.
             name_present = normalize_text(raw("full_name")) != ""
@@ -209,7 +263,7 @@ def ingest_aefi(
             rec_age = reconcile_age(
                 age.value,
                 bdate.value,
-                vdate.value,
+                v_fixed,
                 tolerance_months=plaus.age_tolerance_months,
                 max_age_years=plaus.max_age_years,
             )
@@ -220,7 +274,7 @@ def ingest_aefi(
             rec["age_group_reported"] = normalize_age_group(raw("age_group_raw"))
             rec["age_group"] = age_group_from_months(rec_age.months)
             rec["birth_year"] = bdate.value.year if bdate.value else None
-            rec["birth_after_vaccination"] = bool(bdate.value and vdate.value and bdate.value > vdate.value)
+            rec["birth_after_vaccination"] = bool(bdate.value and v_fixed and bdate.value > v_fixed)
 
             prov_raw = raw("province")
             prov = norm.province.map(prov_raw)
@@ -293,14 +347,15 @@ def ingest_aefi(
             }
             for c in junk_cols
         ]
-        schema_reports[path.name] = report
-        recorded_events[path.name] = sorted(f for f in match.field_to_column() if f.startswith("ev_"))
-        parse_status[path.name] = {k: dict(v) for k, v in status.items()}
+        schema_reports[source] = report
+        recorded_events[source] = sorted(f for f in match.field_to_column() if f.startswith("ev_"))
+        parse_status[source] = {k: dict(v) for k, v in status.items()}
         ctx.step(
             "ingest_aefi_file",
             rows_out=n_rows,
-            file=path.name,
+            file=source,
             sheet=grid.sheet,
+            role=role,
             header_row=header_idx + 1,
             n_matched=match.n_matched,
             fuzzy=len(match.fuzzy),
