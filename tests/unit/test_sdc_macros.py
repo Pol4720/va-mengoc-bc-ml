@@ -169,7 +169,7 @@ def test_builder_differencing_protections() -> None:
 
     dp = pd.DataFrame(
         {
-            "design": ["primary_all_other_vaccines", "infant_active_comparator", "infant_active_comparator"],
+            "design": ["primary_finlay_vaccines", "infant_finlay_comparator", "infant_finlay_comparator"],
             "event": ["e1", "e1", "e2"],
             "a": [20, 17, 9],
             "b": [100, 90, 50],

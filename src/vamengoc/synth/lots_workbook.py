@@ -119,23 +119,30 @@ class SyntheticLots:
     path: Path | None = None
 
 
-def _lot_ids(rng: np.random.Generator, years: list[int]) -> list[str]:
+def _lot_ids(rng: np.random.Generator, release_years: list[int]) -> list[str]:
+    """Lot codes whose first digit is the last digit of the release year.
+
+    Older lots use the A999 shape, later ones 999A (with occasional suffix variants), as in the
+    real workbook (999A 71 %, A999 23 %, A999A 3 %).
+    """
     ids = []
-    counter = 101
-    for y in years:
+    seq: dict[int, int] = {}
+    for y in release_years:
+        d = y % 10
+        seq[d] = seq.get(d, int(rng.integers(0, 20))) + 1
+        body = f"{d}{seq[d] % 100:02d}"
         if y <= 2014:
-            lid = f"M{counter}"
+            lid = f"M{body}"
+            if rng.random() < 0.1:
+                lid += "B"
         else:
-            lid = f"{counter}M"
+            lid = f"{body}M"
             r = rng.random()
             if r < 0.04:
                 lid += "X"
             elif r < 0.06:
                 lid += "x"
-            elif r < 0.08:
-                lid += str(rng.integers(1, 3))
         ids.append(lid)
-        counter += 1
     return ids
 
 
@@ -162,7 +169,10 @@ def _simulate_lots(cfg: LotsSynthConfig, rng: np.random.Generator) -> pd.DataFra
     probs = np.array([p for _, p in DESTINATIONS])
     dest_idx = rng.choice(len(DESTINATIONS), size=n, p=probs / probs.sum())
     dest = [DESTINATIONS[i][0] for i in dest_idx]
-    ids = _lot_ids(rng, years)
+    # The code carries the release year: the production year, or the next one for lots finished
+    # at the end of a year.
+    release = yr + (rng.random(n) < 0.1).astype(int)
+    ids = _lot_ids(rng, [int(r) for r in release])
     # Duplicated identifiers: re-use earlier IDs for export lots of later years.
     dup_targets = rng.choice(np.arange(n // 2, n), size=cfg.n_duplicate_ids, replace=False)
     dup_sources = rng.choice(np.arange(0, n // 2), size=cfg.n_duplicate_ids, replace=False)
@@ -174,6 +184,7 @@ def _simulate_lots(cfg: LotsSynthConfig, rng: np.random.Generator) -> pd.DataFra
         {
             "lot_id": ids,
             "production_year": yr,
+            "release_year": release,
             "destination": dest,
             "ph": ph,
             "protein_conc": prot,

@@ -271,6 +271,9 @@ _MANUF = {
     "IPV": ["Serum Institute of India"],
     "AA": ["Bio Farma"],
     "BCG": ["Serum Institute of India"],
+    "SOBERANA PLUS": ["Instituto Finlay", "Finlay"],
+    "SOBERANA 02": ["Instituto Finlay", "Finlay"],
+    "ABDALA": ["CIGB", "Heber Biotec"],
 }
 # latent reactogenicity phenotypes: event probabilities
 PHENOTYPES: dict[str, dict[str, float]] = {
@@ -335,7 +338,15 @@ _OTHER_TEXT = [
 
 @dataclass
 class AEFISynthConfig:
-    years: tuple[int, ...] = tuple(range(2017, 2026))
+    years: tuple[int, ...] = tuple(range(2017, 2027))
+    # Months delivered for incomplete years: the real 2023 workbook stops in July and the current
+    # year arrives month by month.
+    months_by_year: dict[int, int] = field(default_factory=lambda: {2023: 7, 2026: 3})
+    copy_paste_lot_rate: float = 0.05  # VA-MENGOC-BC reports whose LOTE was copied from an old row
+    schedule_error_rate: float = 0.03  # VA-MENGOC-BC rows with an impossible age or dose
+    date_typo_rate: float = 0.004  # mistyped year in the vaccination or notification date
+    late_sheet_year: int | None = 2018  # workbook with a "cases left out of the closing" sheet
+    covid_years: tuple[int, int] = (2021, 2024)  # COVID-19 vaccines in the master sheet
     reports_per_year: int = 7700
     scale: float = 1.0
     seed: int = 11
@@ -475,10 +486,19 @@ def _other_lot(rng: np.random.Generator) -> Any:
     return f"L{n}"
 
 
-def _choose_ambc_lot(rng: np.random.Generator, lots: pd.DataFrame | None, year: int) -> tuple[str | None, float]:
+def _choose_ambc_lot(
+    rng: np.random.Generator, lots: pd.DataFrame | None, year: int, copy_paste: bool = False
+) -> tuple[str | None, float]:
     if lots is None or lots.empty:
-        return f"{int(rng.integers(500, 900))}M", 0.0
-    pool = lots[(lots["production_year"] <= year) & (lots["production_year"] >= year - 3)]
+        return f"{year % 10}{int(rng.integers(10, 99))}M", 0.0
+    rel = lots["release_year"] if "release_year" in lots else lots["production_year"]
+    if copy_paste:
+        # LOTE copied from an old row: a lot released five or more years before the vaccination.
+        old = lots[rel <= year - 5]
+        if not old.empty:
+            row = old.iloc[int(rng.integers(0, len(old)))]
+            return str(row["lot_id"]), float(row["z_endotoxin"])
+    pool = lots[(rel <= year) & (rel >= year - 3)]
     if pool.empty:
         pool = lots
     w = np.exp(-(year - pool["production_year"].to_numpy()) / 1.5)
@@ -517,10 +537,20 @@ def _one_record(
     labels, probs = zip(*VACCINES, strict=True)
     p = np.array(probs) / np.sum(probs)
     label = str(rng.choice(labels, p=p))
+    if cfg.covid_years[0] <= year <= cfg.covid_years[1] and rng.random() < 0.06:
+        label = str(rng.choice(["SOBERANA PLUS", "SOBERANA 02", "ABDALA"]))
     group = _vaccine_group(label)
     age_days, dose = _age_days(rng, label)
+    schedule_error = label.startswith("AM-BC") and rng.random() < cfg.schedule_error_rate
+    if schedule_error:
+        # Impossible VA-MENGOC-BC administration: 2-month-old first dose, or a third dose.
+        if rng.random() < 0.6:
+            age_days, dose = int(rng.integers(45, 75)), "1"
+        else:
+            dose = "3"
     start = dt.date(year - 1 if allow_2016 and rng.random() < 0.03 else year, 1, 1)
-    end = dt.date(year, 8, 31) if year == max(cfg.years) else dt.date(year, 12, 31)
+    last_month = cfg.months_by_year.get(year, 12)
+    end = (dt.date(year, last_month + 1, 1) - dt.timedelta(days=1)) if last_month < 12 else dt.date(year, 12, 31)
     span = (end - start).days
     if start.year < year:
         span = 364
@@ -556,7 +586,9 @@ def _one_record(
     lot_val: Any
     z_endo = 0.0
     if comps[0].upper().replace(" ", "").replace("-", "") in {"AMBC"} or "AM-BC" in comps:
-        lot_id, z_endo = _choose_ambc_lot(rng, cfg.national_lots, vdate.year)
+        lot_id, z_endo = _choose_ambc_lot(
+            rng, cfg.national_lots, vdate.year, copy_paste=bool(rng.random() < cfg.copy_paste_lot_rate)
+        )
         lot_val = _lot_cell(rng, lot_id) if lot_id else None
         if len(comps) > 1:
             lot_val = f"{lot_val}, {_other_lot(rng)}"
@@ -619,7 +651,16 @@ def _one_record(
         )
     )
     other_text = str(rng.choice(_OTHER_TEXT)) if events["other"] else "N"
+    vdate_typo = ndate_typo = None
+    r_typo = rng.random()
+    if r_typo < cfg.date_typo_rate / 2 and not (vdate.month == 2 and vdate.day == 29):
+        vdate_typo = vdate.replace(year=vdate.year + 10)  # 2019 typed as 2029
+    elif r_typo < cfg.date_typo_rate and ndate is not None and not (ndate.month == 2 and ndate.day == 29):
+        ndate_typo = ndate.replace(year=ndate.year - 17)  # 2019 typed as 2002
     return {
+        "vdate_typo": vdate_typo,
+        "ndate_typo": ndate_typo,
+        "schedule_error": schedule_error,
         "name": name,
         "sex": sex,
         "bdate": bdate,
@@ -677,8 +718,8 @@ def _row(rng: np.random.Generator, rec: dict[str, Any], dates_as_text: bool) -> 
         rec["prov"] if rng.random() > 0.02 else rec["prov"].lower(),
         "S" if rec["pregnant"] else "N",
         rec["vdate"].month if rng.random() > 0.05 else rec["vdate"].month % 12 + 1,
-        _date_cell(rng, rec["vdate"], dates_as_text),
-        _date_cell(rng, rec["ndate"], dates_as_text),
+        _date_cell(rng, rec.get("vdate_typo") or rec["vdate"], dates_as_text),
+        _date_cell(rng, rec.get("ndate_typo") or rec["ndate"], dates_as_text),
         rec["label"],
         _dose_cell(rng, rec["doses"]),
         rec["site"],
@@ -743,7 +784,13 @@ def _layout(year: int, enabled: bool) -> tuple[list[Any], dict[str, Any]]:
     return header, opts
 
 
-def _write_year(path: Path, year: int, rows: list[list[Any]], cfg: AEFISynthConfig) -> None:
+def _write_year(
+    path: Path,
+    year: int,
+    rows: list[list[Any]],
+    cfg: AEFISynthConfig,
+    extra_sheets: dict[str, list[list[Any]]] | None = None,
+) -> None:
     header, opts = _layout(year, cfg.schema_variations)
     keep = [i for i, h in enumerate(BASE_HEADER) if h not in opts["drop"]]
     if opts["swap_lote_fab"]:
@@ -760,6 +807,12 @@ def _write_year(path: Path, year: int, rows: list[list[Any]], cfg: AEFISynthConf
         if junk_col in keep:
             out[keep.index(junk_col)] = "N" if (opts["junk_value"] and k == 3) else None
         ws.append(out + ([None] * len(opts["extra"])))
+    # Further sheets with the master layout: late cases (2018) and product extracts (COVID-19).
+    for name, extra_rows in (extra_sheets or {}).items():
+        ws2 = wb.create_sheet(name)
+        ws2.append([header[i] for i in keep] + opts["extra"])
+        for row in extra_rows:
+            ws2.append([row[i] for i in keep] + ([None] * len(opts["extra"])))
     wb.save(path)
 
 
@@ -770,7 +823,7 @@ def generate_aefi(cfg: AEFISynthConfig, out_dir: Path) -> pd.DataFrame:
     truth_rows: list[dict[str, Any]] = []
     persons: list[dict[str, Any]] = []
     for year in cfg.years:
-        factor = {2020: 0.72, 2021: 0.68}.get(year, 1.0) * (0.65 if year == max(cfg.years) else 1.0)
+        factor = {2020: 0.72, 2021: 0.68}.get(year, 1.0) * cfg.months_by_year.get(year, 12) / 12
         n = max(20, round(cfg.reports_per_year * cfg.scale * factor * rng.uniform(0.95, 1.05)))
         records = []
         for _ in range(n):
@@ -800,7 +853,24 @@ def generate_aefi(cfg: AEFISynthConfig, out_dir: Path) -> pd.DataFrame:
         rows = [rows[i] for i in order]
         records = [records[i] for i in order]
         kinds = [kinds[i] for i in order]
-        _write_year(out_dir / f"EA_{year}_TOTAL.xlsx", year, rows, cfg)
+        dates_as_text = _layout(year, cfg.schema_variations)[1]["dates_as_text"]
+        extra: dict[str, list[list[Any]]] = {}
+        if year == cfg.late_sheet_year:
+            # Cases left out of the closing of the year (same layout, last quarter).
+            late = []
+            for _ in range(max(5, round(len(rows) * 0.004))):
+                rec = _one_record(rng, year, cfg, None, allow_2016=False)
+                rec["vdate"] = dt.date(year, int(rng.integers(10, 13)), int(rng.integers(1, 29)))
+                rec["ndate"] = rec["vdate"] + dt.timedelta(days=int(rng.integers(1, 10)))
+                rec["vdate_typo"] = rec["ndate_typo"] = None
+                late.append(rec)
+            extra["Casos que no entraronen el cier"] = [_row(rng, r, dates_as_text) for r in late]
+            records += late
+            kinds += ["late_sheet"] * len(late)
+        product = [row for row, rec in zip(rows, records, strict=False) if str(rec["label"]).startswith("ABDALA")]
+        if product:
+            extra["ABDALA"] = product  # extract copied from the master sheet; never ingested
+        _write_year(out_dir / f"EA_{year}_TOTAL.xlsx", year, rows, cfg, extra)
         for rec, kind in zip(records, kinds, strict=True):
             truth_rows.append(
                 {
@@ -813,6 +883,9 @@ def generate_aefi(cfg: AEFISynthConfig, out_dir: Path) -> pd.DataFrame:
                     "pheno": rec["pheno"],
                     "hosp": rec["hosp"],
                     "z_endotoxin": rec["z_endotoxin"],
+                    "schedule_error": rec.get("schedule_error", False),
+                    "vdate_typo": rec.get("vdate_typo") is not None,
+                    "ndate_typo": rec.get("ndate_typo") is not None,
                     **{f"ev_{k}": v for k, v in rec["events"].items()},
                 }
             )

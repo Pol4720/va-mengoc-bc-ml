@@ -18,7 +18,11 @@ from vamengoc.synth import SyntheticDataset
 def test_ingestion_handles_schema_drift(pipeline_run: tuple[Project, PipelineOutputs]) -> None:
     _, out = pipeline_run
     reports = out.aefi.schema_reports
-    assert len(reports) == 9
+    # 2017-2026 workbooks plus the 2018 sheet of cases left out of the closing; the ABDALA
+    # product extracts (copies of master rows) are never read.
+    assert len(reports) == 11
+    assert "EA_2018_TOTAL.xlsx#Casos que no entraronen el cier" in reports
+    assert not any("ABDALA" in k for k in reports)
     assert reports["EA_2020_TOTAL.xlsx"]["header_row"] == 2  # title row above the header
     assert "ev_purpura" in reports["EA_2023_TOTAL.xlsx"]["missing_optional"]
     assert reports["EA_2021_TOTAL.xlsx"]["unmatched_columns"][0]["header"] == "OBSERVACIONES"
@@ -26,7 +30,9 @@ def test_ingestion_handles_schema_drift(pipeline_run: tuple[Project, PipelineOut
     st = out.aefi.staging
     assert {"full_name", "address", "birth_date", "other_text"}.isdisjoint(st.columns)
     assert st["person_id"].str.match(r"^[PW][0-9a-f]+$").all()
-    assert st["vaccination_date"].notna().all()
+    # Impossible vaccination dates that cannot be corrected are dropped (and flagged), never kept.
+    assert st["vaccination_date"].notna().mean() > 0.995
+    assert st.loc[st["vaccination_date"].isna(), "vaccination_date_rule"].eq("dropped_impossible").all()
 
 
 def test_dedup_matches_generated_truth(
@@ -41,14 +47,23 @@ def test_dedup_matches_generated_truth(
     # every planted exact duplicate is removed; a planted key duplicate can coincide with an exact one
     assert n_exact <= log["exact_duplicates_removed"] <= n_exact + n_key
     assert log["rows_out"] == log["rows_in"] - log["exact_duplicates_removed"] - log["key_duplicate_rows_merged"]
-    assert log["rows_out"] <= int((truth["kind"] == "original").sum()) + 2
+    assert log["rows_out"] <= int(truth["kind"].isin(["original", "late_sheet"]).sum()) + 2
 
 
 def test_curated_variables(pipeline_run: tuple[Project, PipelineOutputs]) -> None:
     project, out = pipeline_run
     rep = out.curated.reports
     assert rep["analytic_year"].notna().all()
-    assert rep.loc[rep["in_study_window"], "analytic_year"].between(2017, 2025).all()
+    # Open-ended window: the partial 2026 workbook enters without editing the configuration.
+    assert rep.loc[rep["in_study_window"], "analytic_year"].between(2017, 2026).all()
+    assert out.curated.study_years == (2017, 2026)
+    assert out.curated.partial_years() == [2023, 2026]
+    # Planted problems are detected: impossible VA-MENGOC-BC doses and mistyped years.
+    assert rep["schedule_invalid"].sum() > 0
+    assert not rep.loc[rep["schedule_invalid"], "p1_population"].any()
+    assert (rep["dq_vaccination_year_imputed"] | rep["dq_notification_year_imputed"]).any()
+    assert rep["finlay_comparator"].any()
+    assert not (rep["p1_population"] & ~rep["has_target"] & ~rep["finlay_comparator"]).any()
     assert (~rep["in_study_window"]).sum() > 0  # 2016 vaccinations in the 2017 file
     assert rep["has_target"].sum() > 50
     assert rep["coadministered"].any() and rep["target_only"].any()
@@ -72,11 +87,22 @@ def test_analyses_present(pipeline_run: tuple[Project, PipelineOutputs]) -> None
     _, out = pipeline_run
     p1, p2 = out.results["paper1"], out.results["paper2"]
     assert set(p1["disproportionality"]["design"]) == {
-        "primary_all_other_vaccines",
-        "infant_active_comparator",
+        "primary_finlay_vaccines",
+        "infant_finlay_comparator",
         "excluding_coadministration",
-        "excluding_pentavalent_masking",
+        "concomitant_influence",
+        "primary_including_schedule_errors",
     }
+    assert p1["partial_years"] == [2023, 2026]
+    rates = p1["rates_all_target"].set_index("year")
+    assert rates.loc[2023, "partial_year"] and pd.isna(rates.loc[2023, "rate_per_100k"])
+    assert 2023 not in range(p1["rates_trend"]["first_year"], p1["rates_trend"]["last_year"] + 1) or (
+        p1["rates_trend"]["n_years"] < p1["rates_trend"]["last_year"] - p1["rates_trend"]["first_year"] + 1
+    )
+    # Expired lots planted by copy-paste are found with the release-year code rule.
+    ls = p2["linkage_summary"]
+    assert ls["code_rule"] == "digits_first1" and ls["n_lot_expired"] > 0
+    assert p2["p2_feasibility"]["verdict"] in {"adequate", "limited"}
     assert p1["lca_best_k"] >= 2
     assert p1["rates_trend"]["estimable"]
     assert len(p2["capability"]) == 3 * 11
@@ -150,3 +176,34 @@ def test_snapshot_errors(tmp_path: Path) -> None:
     (run / "local_only" / SNAPSHOT_NAME).write_bytes(pickle.dumps({"format": 99}))
     with pytest.raises(ValueError, match="unsupported snapshot format"):
         load_results_snapshot(project, run.name)
+
+
+def test_every_manuscript_macro_is_defined(pipeline_run: tuple[Project, PipelineOutputs]) -> None:
+    """Each \\V, \\PO and \\PT macro used by a document is defined by the release or the preamble.
+
+    The release is rebuilt from data, so a macro that only some data produce would break the
+    LaTeX build on the real run; this guards every document against that.
+    """
+    import re
+
+    project, out = pipeline_run
+    assert out.release_dir is not None
+    name = re.compile(r"\\((?:V|PO|PT)[A-Z][A-Za-z]*)")
+    defined_rx = re.compile(r"\\(?:newcommand|providecommand|renewcommand|def)\*?\{?\\((?:V|PO|PT)[A-Za-z]+)")
+    defined: set[str] = set()
+    for f in (out.release_dir / "latex").glob("*.tex"):
+        defined |= set(defined_rx.findall(f.read_text(encoding="utf-8")))
+    docs = [*project.root.glob("papers/**/*.tex"), *project.root.glob("reports/*.tex")]
+    newif = re.compile(r"\\newif\\if((?:V|PO|PT)[A-Za-z]+)")
+    for f in docs:
+        text = f.read_text(encoding="utf-8")
+        defined |= set(defined_rx.findall(text))
+        for n in newif.findall(text):
+            defined |= {n + "true", n + "false"}
+    missing: dict[str, set[str]] = {}
+    for f in docs:
+        text = re.sub(r"(?<!\\)%.*", "", f.read_text(encoding="utf-8"))
+        used = set(name.findall(text)) - defined
+        if used:
+            missing[str(f.relative_to(project.root))] = used
+    assert not missing, missing

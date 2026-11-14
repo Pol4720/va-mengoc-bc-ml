@@ -44,7 +44,7 @@ def test_keygen(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
 def test_schema_check(synthetic_dir: SyntheticDataset, tmp_path: Path) -> None:
     r = runner.invoke(app, ["schema-check", "--input", str(synthetic_dir.directory)])
     assert r.exit_code == 0, r.stdout
-    assert "EA_2025_TOTAL.xlsx" in r.stdout and "9 AEFI files checked, 0 with problems." in r.stdout
+    assert "EA_2025_TOTAL.xlsx" in r.stdout and "10 AEFI files checked, 0 with problems." in r.stdout
     bad = tmp_path / "bad"
     bad.mkdir()
     from openpyxl import Workbook
