@@ -33,30 +33,30 @@ atribuibles a la vacunación o inmunización; diseño de solo casos; farmacovigi
 \linenumbers
 
 \section*{Resumen}
-\noindent\textbf{Antecedentes:} Se debate si la calidad medida de los lotes de vacuna influye en las
-reacciones notificadas, y no se ha estudiado en las vacunas de vesículas de membrana externa (VME),
-cuya reactogenicidad depende de la endotoxina y del adyuvante.\par
+\noindent\textbf{Antecedentes:} No se ha estudiado si la calidad de los lotes influye en las
+reacciones notificadas con las vacunas de vesículas de membrana externa (VME), cuya reactogenicidad
+depende de la endotoxina y del adyuvante.\par
 \noindent\textbf{Métodos:} Los datos de liberación de \PTNLots{} lotes de VA-MENGOC-BC
 (\PTLotFirstYear--\PTLotLastYear; \PTNAttributes{} atributos) se analizaron con control de procesos,
-capacidad ($P_{pk}$), monitorización multivariante robusta, detección de puntos de cambio y pruebas
-de equivalencia entre lotes nacionales y de exportación. Las notificaciones cubanas de eventos
+capacidad ($P_{pk}$), monitorización multivariante y pruebas de equivalencia entre lotes nacionales y
+de exportación. Las notificaciones cubanas de eventos
 supuestamente atribuibles a la vacunación o inmunización (\VStudyFirstYear--\VStudyLastYear) se
-vincularon con los lotes administrados. En un diseño de solo casos, ecuaciones de estimación
-generalizadas agrupadas por lote estimaron si las notificaciones de fiebre o de reacciones locales
-severas variaban con los atributos del lote, con control de la tasa de falsos descubrimientos, una
-exposición de control negativo y análisis de sensibilidad.\par
+vincularon con los lotes administrados, excluyendo las notificaciones cuyo lote estaba vencido o
+aún no liberado en la vacunación (el código del lote indica su año de liberación). En un diseño de
+solo casos, ecuaciones de estimación generalizadas agrupadas por lote relacionaron las
+notificaciones de fiebre o de reacciones locales severas con los atributos del lote, con control de
+la tasa de falsos descubrimientos y una exposición de control negativo.\par
 \noindent\textbf{Resultados:} \PTConformitySentence; el $P_{pk}$ fue menor que 1,0 en
 \PTNAttrPpkBelowOne{} atributos y los lotes nacionales y de exportación fueron equivalentes en
 \PTNEquivalent{} de \PTNAttributes. De \PTNTargetReports{} notificaciones, \PTNLinked{}
-(\PTLinkRate) se vincularon con \PTNLinkedLots{} lotes. \PTNSignificantFDR{} de \PTNPrimaryTests{}
-asociaciones preespecificadas superaron la corrección (\PTSignificantList); la razón de odds por
-desviación estándar de endotoxina para la fiebre de al menos 39\,\textdegree{}C fue
+(\PTLinkRate) se vincularon con \PTNLinkedLots{} lotes; el \PTLotInconsistentPct{} de las
+notificaciones datables registraba un lote imposible, por lo que el análisis por lote resultó
+\PTFeasibilityWord. \PTNSignificantFDR{} de \PTNPrimaryTests{}
+asociaciones preespecificadas superaron la corrección (\PTSignificantList); la razón de odds por DE
+de endotoxina para la fiebre ${}\geq39$\,\textdegree{}C fue
 \PTEvFeverThreeNineEndotoxinOR{} (\CI{} \PTEvFeverThreeNineEndotoxinCI). \PTNegControlSentence, y
 los atributos de los lotes \PTIncrementalWord{} la predicción fuera del lote.\par
-\noindent\textbf{Conclusiones:} Vincular los ensayos rutinarios de liberación con la
-farmacovigilancia es factible y permite contrastar hipótesis sobre la reactogenicidad relacionada con
-los lotes dentro de especificación, en apoyo de la gestión de riesgos para la calidad y de la
-vigilancia poscomercialización de las vacunas de VME.
+\noindent\textbf{Conclusiones:} \PTConclusionSentence.
 
 \clearpage
 \section{Introducción}\label{sec:intro}
@@ -104,7 +104,10 @@ exportación, con \PTNAttributes{} atributos de calidad y sus especificaciones. 
 ESAVI procedieron de la base nacional de vigilancia descrita en un análisis complementario:
 \VNFiles{} ficheros anuales de \VStudyFirstYear--\VStudyLastYear, armonizados, seudonimizados y
 depurados de duplicados con el mismo flujo de análisis de código abierto (versión \VCodeVersion)
-\cite{Kahn2016,ENISA2019}. \VFormSentence. Los datos de los lotes son información industrial confidencial; se
+\cite{Kahn2016,ENISA2019}. \VFormSentence. Como en el análisis complementario, se excluyeron como
+errores de registro \PTScheduleExcluded{} dosis de VA-MENGOC-BC registradas fuera del esquema de
+vacunación (por debajo de la edad mínima o con un número de dosis inexistente en el esquema). Los
+datos de los lotes son información industrial confidencial; se
 analizaron en una estación de trabajo institucional y solo se publican como posición dentro de la
 ventana de especificación (0 = límite inferior, 1 = límite superior), nunca como valores brutos.
 
@@ -139,12 +142,27 @@ Los números de lote registrados en las notificaciones se normalizaron y se empa
 registro de liberación en tres pasos: coincidencia exacta, coincidencia en el núcleo del código (sin
 separadores ni sufijos) y coincidencia aproximada (similitud de al menos \PTFuzzyThreshold{} entre
 lotes nacionales producidos antes de la vacunación). Las coincidencias ambiguas se resolvieron a
-favor de los lotes nacionales y del lote más reciente producido antes del año de vacunación. Los
-enlaces que implicaban una vacunación más de \PTMaxYearsAfterProduction{} años después de la
-producción se consideraron inverosímiles y se excluyeron del análisis principal
-(\figref{fig:flow}). Se compararon las características de las notificaciones vinculadas y no
-vinculadas para evaluar el sesgo de vinculación (\tabref{tab:S-linkbias} del material
-suplementario).
+favor de los lotes nacionales y del lote más reciente producido antes del año de vacunación. Se
+compararon las características de las notificaciones vinculadas y no vinculadas para evaluar el
+sesgo de vinculación (\tabref{tab:S-linkbias} del material suplementario).
+
+Los formularios nacionales se cumplimentan a mano y las filas se copian a menudo de la anterior;
+cuando no se actualiza la celda LOTE, la notificación arrastra el lote de otra vacunación. El primer
+dígito del código de un lote de VA-MENGOC-BC es la última cifra de su año de liberación, y un lote
+tiene una vigencia de \PTShelfLife{} años. Dada la fecha de vacunación, el año de liberación es el
+último año cuya cifra final coincide con el código (un lote con código 1 se liberó en 2011 si se usó
+en 2012 y en 2021 si se usó en 2022), y un lote usado más de \PTShelfLife{} años después de ese año
+estaba vencido. La regla reprodujo el año de producción registrado en el libro de liberación, o el
+siguiente, en el \PTCodeRuleAgreement{} de los lotes. Una notificación cuyo lote estaba vencido, o
+aún no liberado, en la fecha de vacunación no puede llevar el lote administrado; estas notificaciones
+se excluyeron de los análisis de asociación y se conservaron en un análisis de sensibilidad
+(\figref{fig:flow}). Como las entradas copiadas que siguen dentro del período de vigencia no pueden
+detectarse, su proporción es una cota inferior del error del campo de lote. La regla de decisión se
+fijó antes del análisis: el análisis por lote se consideró respaldado si esa proporción no superaba
+el \PTFeasCautionPct, respaldado con una limitación declarada hasta el \PTFeasMaxPct, y no
+respaldado por encima de ese valor o con menos de \PTFeasMinReports{} notificaciones vinculadas
+válidas o \PTFeasMinLots{} lotes, porque una clasificación errónea de la exposición de esa magnitud
+sesga las asociaciones por lote hacia el nulo y hace poco informativa su ausencia.
 
 \begin{figure}[tbp]
 \centering
@@ -176,7 +194,7 @@ familia principal \cite{Benjamini1995}; el control negativo no formó parte de l
 atributos, la atipicidad multivariante ($T^2$) y los desenlaces secundarios fueron exploratorios.
 
 Los análisis de sensibilidad restringieron los datos a los enlaces exactos, excluyeron las vacunas
-coadministradas y conservaron los enlaces temporalmente inverosímiles; reajustaron las exposiciones en
+coadministradas y conservaron las notificaciones con un lote vencido o aún no liberado en la vacunación; reajustaron las exposiciones en
 un modelo logístico bayesiano con intercepto aleatorio, y modelaron a nivel de lote la proporción de
 notificaciones con cada reacción con un modelo cuasibinomial ponderado por el número de
 notificaciones por lote. Para interpretar los resultados nulos, se calculó la razón de odds mínima
@@ -255,8 +273,11 @@ control.}
 De \PTNTargetReports{} notificaciones con VA-MENGOC-BC, \PTNLinked{} (\PTLinkRate) se vincularon con
 \PTNLinkedLots{} lotes: \PTLinkExact{} por coincidencia exacta, \PTLinkCore{} por el núcleo del
 código y \PTLinkFuzzy{} por coincidencia aproximada (\figref{fig:flow}; \tabref{tab:S-linkage} del
-material suplementario). El análisis principal incluyó \PTNAnalysed{} notificaciones en
-\PTNAnalysedLots{} lotes (mediana de \PTReportsPerLot{} notificaciones por lote).
+material suplementario). De \PTLotAssessable{} notificaciones cuyo lote podía datarse,
+\PTLotInconsistent{} (\PTLotInconsistentPct) registraban un lote vencido (\PTLotExpired) o aún no
+liberado (\PTLotBeforeRelease) en la fecha de vacunación. \PTFeasibilitySentence. El análisis
+principal incluyó \PTNAnalysed{} notificaciones en \PTNAnalysedLots{} lotes (mediana de
+\PTReportsPerLot{} notificaciones por lote).
 
 \subsection{Atributos de los lotes y reacciones notificadas}\label{sec:r-assoc}
 \PTNSignificantFDR{} de las \PTNPrimaryTests{} asociaciones preespecificadas siguieron siendo
@@ -325,7 +346,9 @@ lotes (puntos), frente a su distribución de permutación (se marca el percentil
 \subsection{Hallazgos principales}\label{sec:d-principal}
 El registro de liberación de \PTNLots{} lotes de VA-MENGOC-BC mostró un proceso
 \PTWithinSpecPhrase, con \PTNChangepoints{} desplazamientos sostenidos y una capacidad menor que 1,0
-en \PTNAttrPpkBelowOne{} atributos. Al vincular el \PTLinkRate{} de las notificaciones de ESAVI con
+en \PTNAttrPpkBelowOne{} atributos. El \PTLotInconsistentPct{} de las notificaciones con un lote
+datable registraba un lote imposible, y el análisis por lote resultó \PTFeasibilityWord. Al
+vincular el \PTLinkRate{} de las notificaciones de ESAVI con
 sus lotes, \PTNSignificantFDR{} de \PTNPrimaryTests{} asociaciones preespecificadas entre los
 atributos de los lotes y el perfil de reacciones notificadas superaron la corrección por
 multiplicidad (\PTSignificantList), mientras que la exposición de control negativo
@@ -366,7 +389,9 @@ aumentara por igual la frecuencia de todas las reacciones no se detectaría. En 
 exhaustividad de la notificación podría diferir entre lotes de formas relacionadas con sus
 atributos, por ejemplo a través del tiempo calendario; el ajuste por año y el control negativo
 atenúan, pero no excluyen, este sesgo. En tercer lugar, en algunas notificaciones el número de lote
-faltaba o no se encontró, y las notificaciones vinculadas y no vinculadas pueden diferir
+faltaba, no se encontró o se copió de otras filas: se excluyeron las notificaciones con un lote
+vencido o aún no liberado, pero los lotes copiados que seguían vigentes no pueden detectarse y
+diluyen cualquier asociación, y las notificaciones vinculadas y no vinculadas pueden diferir
 (\tabref{tab:S-linkbias} del material suplementario). En cuarto lugar, los lotes estuvieron
 \PTWithinSpecPhrase, por lo que los resultados no se extrapolan fuera del intervalo especificado. En
 quinto lugar, los ensayos de liberación miden una muestra de cada lote en el momento de la
@@ -377,13 +402,13 @@ reacciones se registraron como indicadores del formulario nacional, sin validaci
 Los fabricantes ya custodian los registros de liberación y los sistemas nacionales ya registran el
 lote administrado; el flujo de análisis utilizado aquí muestra que ambos pueden vincularse de forma
 rutinaria, preservando la confidencialidad de los datos industriales mediante el control de
-divulgación. Registrar las dosis distribuidas por lote permitiría estimar la incidencia por lote, y
+divulgación. Comprobar al introducir el dato que el lote registrado estaba vigente en la fecha de
+vacunación, algo que el propio código permite, eliminaría la principal fuente de error de la
+exposición. Registrar las dosis distribuidas por lote permitiría estimar la incidencia por lote, y
 el mismo marco puede aplicarse a otras vacunas con datos de calidad por lote.
 
 \section{Conclusiones}\label{sec:conclusions}
-Los lotes de VA-MENGOC-BC se produjeron \PTWithinSpecPhrase. Vincular los atributos de liberación de
-los lotes con las notificaciones nacionales de ESAVI es factible y ofrece un modo reproducible de
-contrastar si la variación dentro de especificación se asocia con la reactogenicidad; las
+Los lotes de VA-MENGOC-BC se produjeron \PTWithinSpecPhrase. \PTConclusionSentence; las
 asociaciones identificadas aquí (\PTSignificantList) definen hipótesis para su confirmación y para la
 gestión de riesgos para la calidad.
 

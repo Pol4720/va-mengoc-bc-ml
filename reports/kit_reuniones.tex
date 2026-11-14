@@ -103,8 +103,8 @@ provisional que aplica el código mientras no se resuelvan.
 \# & Pregunta & Decisión provisional en el código & Dónde se configura & Responsable &
   Estado\\
 \midrule
-1 & Significado de las siglas de las vacunas y códigos de provincia & Mapeos marcados como
-  inferidos & \nolinkurl{vaccines.yaml}, \nolinkurl{geography.yaml} & & P\\
+1 & Siglas de las vacunas y códigos de provincia & Investigado; falta confirmar AA &
+  \nolinkurl{vaccines.yaml} & & C\\
 2 & Fecha que define el año de un registro; esquema de los ficheros 2018--2025 & Año analítico = año
   de vacunación; esquema validado fichero a fichero & \nolinkurl{analysis.analytic_year_from} & & P\\
 3 & Significado de la columna MES y de la columna final sin cabecera & MES solo como control de
@@ -117,8 +117,8 @@ provisional que aplica el código mientras no se resuelvan.
   lote nacional más reciente & \nolinkurl{linkage.py} & & P\\
 7 & Base legal, aprobación ética y retención; evaluación de impacto & Tratamiento local seudonimizado;
   release agregado con control de divulgación & \nolinkurl{DATA_GOVERNANCE.md} & & P\\
-8 & Dosis aplicadas en \VStudyLastYear{} (denominador) & Tasas de \VStudyLastYear{} no calculadas &
-  Hoja de cobertura & & P\\
+8 & Dosis aplicadas en los años recientes (denominador) & Años sin dosis o incompletos sin tasa &
+  Hoja de cobertura & & C\\
 9 & Atributos de calidad publicables en unidades absolutas & Solo posición normalizada e índices
   adimensionales & \nolinkurl{sdc.release_lot_values} & & P\\
 10 & Tasa de referencia del programa (\POExpectedRate{} por \num{100000} dosis) & Tomada de la
@@ -130,8 +130,13 @@ provisional que aplica el código mientras no se resuelvan.
   registran & \nolinkurl{aefi.yaml}, \nolinkurl{events.yaml} & & P\\
 13 & Nombre de la columna de IgG (ELISA) en el libro de lotes & Atributo opcional; si no se reconoce,
   se analiza sin él & \nolinkurl{lots.yaml} & & P\\
-\Linea & & & & & \\
-\Linea & & & & & \\
+14 & Comparador del artículo 1 & Solo vacunas Finlay; las demás, concomitantes &
+  \nolinkurl{comparator} & Jefa de proyecto & R\\
+15 & Lotes vencidos (filas copiadas) & Excluidos; regla de factibilidad del artículo 2 &
+  \nolinkurl{p2_feasibility} & & R\\
+16 & Edades fuera del esquema & Se excluyen solo las dosis imposibles & \nolinkurl{schedule} & & R\\
+17 & Entregas mensuales y 2026 & Ventana abierta; años incompletos sin tasa &
+  \nolinkurl{study_years} & & R\\
 \bottomrule
 \end{tabularx}
 \end{table}

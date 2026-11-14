@@ -46,12 +46,33 @@ clasificación (1 = perfecta).}
 \begin{table}[htbp]
 \centering\small
 \caption{Razones de odds ajustadas de hospitalización del modelo de regresión logística de Firth
-multivariable ajustado a todas las notificaciones (intervalos de confianza de Wald del 95\,\%). Los
+multivariable ajustado a la población de análisis (intervalos de confianza de Wald del 95\,\%). Los
 contrastes por región se refieren a la región occidental; los términos de eventos y vacunas son
 indicadores de presencia frente a ausencia. Se suprimen los términos registrados en menos de
 \VMinCell{} notificaciones.}
 \label{tab:S-logistic}
 \POTableLogistic
+\end{table}
+
+\section{Esquema de vacunación de VA-MENGOC-BC}\label{sec:S-schedule}
+\begin{table}[htbp]
+\centering\small
+\caption{Notificaciones con VA-MENGOC-BC por categoría del esquema (dosis~1 a los 3 y dosis~2 a
+los 5 meses; edades mínimas de 3 meses y de 3 meses más 6 semanas, con un período de gracia de 4
+días). Se suprimen los recuentos menores que \VMinCell.}
+\label{tab:S-schedule}
+\begin{tabular}{@{}lrl@{}}
+\toprule
+Categoría & Notificaciones & Decisión \\
+\midrule
+En el esquema & \PONScheduleOnTime & se conserva \\
+Adelantada, por encima de la edad mínima & \PONScheduleEarly & se conserva \\
+Tardía (recuperación) & \PONScheduleLate & se conserva \\
+Refuerzo (campañas) & \PONScheduleBooster & se conserva \\
+Por debajo de la edad mínima & \PONScheduleTooYoung & se excluye \\
+Número de dosis inexistente en el esquema & \PONScheduleDoseNotInSchedule & se excluye \\
+\bottomrule
+\end{tabular}
 \end{table}
 
 \section{Desproporcionalidad en cada diseño de comparación}\label{sec:S-designs}
@@ -66,23 +87,23 @@ estadísticos derivados de ellos.
 
 \begin{table}[htbp]
 \centering\small
-\caption{Diseño principal: notificaciones con VA-MENGOC-BC frente al resto (todos los tipos de
-evento).}
+\caption{Diseño principal: notificaciones con VA-MENGOC-BC frente a las de las demás vacunas
+Finlay (todos los tipos de evento).}
 \label{tab:S-disp-primary}
-\POTableDispPrimaryAllOtherVaccines
+\POTableDispPrimaryFinlayVaccines
 \end{table}
 
 \begin{table}[htbp]
 \centering\small
-\caption{Diseño de comparador activo en lactantes: notificaciones en menores de \POInfantMonths{}
-meses.}
+\caption{Diseño en lactantes: notificaciones en menores de \POInfantMonths{} meses, VA-MENGOC-BC
+frente a las demás vacunas Finlay.}
 \label{tab:S-disp-infant}
-\POTableDispInfantActiveComparator
+\POTableDispInfantFinlayComparator
 \end{table}
 
 \begin{table}[htbp]
 \centering\small
-\caption{Diseño de una sola vacuna: VA-MENGOC-BC administrada sola frente a otras vacunas
+\caption{Diseño de una sola vacuna: VA-MENGOC-BC administrada sola frente a otras vacunas Finlay
 administradas solas.}
 \label{tab:S-disp-single}
 \POTableDispExcludingCoadministration
@@ -90,10 +111,18 @@ administradas solas.}
 
 \begin{table}[htbp]
 \centering\small
-\caption{Diseño de enmascaramiento: grupo de comparación sin las notificaciones que mencionan la
-vacuna pentavalente (PENTA-L).}
-\label{tab:S-disp-masking}
-\POTableDispExcludingPentavalentMasking
+\caption{Diseño principal conservando las \PONScheduleInvalid{} dosis de VA-MENGOC-BC registradas
+fuera del esquema de vacunación.}
+\label{tab:S-disp-schedule}
+\POTableDispPrimaryIncludingScheduleErrors
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Vacunas concomitantes: notificaciones con VA-MENGOC-BC y vacunas coadministradas frente a
+VA-MENGOC-BC administrada sola.}
+\label{tab:S-disp-concomitant}
+\POTableDispConcomitantInfluence
 \end{table}
 
 \section{Estabilidad temporal del componente de información}\label{sec:S-cumic}

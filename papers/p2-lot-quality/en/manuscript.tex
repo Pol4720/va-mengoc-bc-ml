@@ -34,26 +34,25 @@ pharmacovigilance\par
 \linenumbers
 
 \section*{Abstract}
-\noindent\textbf{Background:} Whether the measured quality of vaccine lots influences reported
-reactions is debated and unstudied for outer membrane vesicle (OMV) vaccines, whose reactogenicity
-depends on endotoxin and adjuvant.\par
+\noindent\textbf{Background:} Whether lot quality influences reported reactions is unstudied for
+outer membrane vesicle (OMV) vaccines, whose reactogenicity depends on endotoxin and adjuvant.\par
 \noindent\textbf{Methods:} Release data of \PTNLots{} VA-MENGOC-BC lots (\PTLotFirstYear--\PTLotLastYear;
-\PTNAttributes{} attributes) were analysed with process control, capability ($P_{pk}$), robust
-multivariate monitoring, change-point detection and national-versus-export equivalence tests.
+\PTNAttributes{} attributes) were analysed with process control, capability ($P_{pk}$),
+multivariate monitoring and national-versus-export equivalence tests.
 Cuban reports of adverse events following immunization (\VStudyFirstYear--\VStudyLastYear) were
-linked to the administered lots. In a case-only design, generalised estimating equations clustered
-by lot estimated whether reports of fever or severe local reactions varied with lot attributes, with
-false-discovery-rate control, a negative-control exposure and sensitivity analyses.\par
+linked to the administered lots, excluding reports whose lot had expired or was not yet released at
+vaccination (the lot code gives the release year). In a case-only design, lot-clustered generalised
+estimating equations related reports of fever or severe local reactions to lot attributes, with
+false-discovery-rate control and a negative-control exposure.\par
 \noindent\textbf{Results:} \PTConformitySentence; $P_{pk}$ was below 1.0 for \PTNAttrPpkBelowOne{}
 attributes and national and export lots were equivalent for \PTNEquivalent{} of \PTNAttributes.
-Of \PTNTargetReports{} reports, \PTNLinked{} (\PTLinkRate) were linked to \PTNLinkedLots{} lots.
+Of \PTNTargetReports{} reports, \PTNLinked{} (\PTLinkRate) were linked to \PTNLinkedLots{} lots;
+\PTLotInconsistentPct{} of datable reports recorded an impossible lot, so the lot-level analysis was
+\PTFeasibilityWord.
 \PTNSignificantFDR{} of \PTNPrimaryTests{} prespecified associations survived correction
-(\PTSignificantList); the odds ratio per standard deviation of endotoxin for fever of at least
-39\,\textdegree{}C was \PTEvFeverThreeNineEndotoxinOR{} (\CI{} \PTEvFeverThreeNineEndotoxinCI).
+(\PTSignificantList); the odds ratio per SD of endotoxin for fever ${}\geq39$\,\textdegree{}C was \PTEvFeverThreeNineEndotoxinOR{} (\CI{} \PTEvFeverThreeNineEndotoxinCI).
 \PTNegControlSentence, and lot attributes \PTIncrementalWord{} out-of-lot prediction.\par
-\noindent\textbf{Conclusions:} Linking routine release testing with pharmacovigilance is feasible
-and tests lot-related hypotheses about reactogenicity within specification, supporting quality risk
-management and post-marketing surveillance of OMV vaccines.
+\noindent\textbf{Conclusions:} \PTConclusionSentence.
 
 \clearpage
 \section{Introduction}\label{sec:intro}
@@ -99,7 +98,10 @@ national programme and \PTNExportLots{} for export, with \PTNAttributes{} qualit
 their specifications. The AEFI reports came from the national surveillance database described in a
 companion analysis: \VNFiles{} annual files of \VStudyFirstYear--\VStudyLastYear, harmonised,
 pseudonymised and deduplicated with the same open-source pipeline (version \VCodeVersion)
-\cite{Kahn2016,ENISA2019}. \VFormSentence. Lot data are confidential industrial information; they were analysed
+\cite{Kahn2016,ENISA2019}. \VFormSentence. As in the companion analysis, \PTScheduleExcluded{}
+VA-MENGOC-BC doses recorded outside the vaccination schedule (below the minimum age or with a dose
+number absent from the schedule) were excluded as recording errors. Lot data are confidential
+industrial information; they were analysed
 on an institutional workstation and are released only as positions within the specification
 window (0 = lower limit, 1 = upper limit), never as raw values.
 
@@ -133,10 +135,25 @@ Lot numbers recorded in the reports were normalised and matched to the release r
 steps: exact match, match on the core of the lot code (ignoring separators and suffixes), and
 fuzzy match (similarity of at least \PTFuzzyThreshold{} among national lots produced before
 vaccination). Ambiguous matches were resolved in favour of national lots and of the most recent
-lot produced before the year of vaccination. Links implying vaccination more than
-\PTMaxYearsAfterProduction{} years after production were considered implausible and excluded from
-the primary analysis (\figref{fig:flow}). Characteristics of linked and unlinked reports were
+lot produced before the year of vaccination. Characteristics of linked and unlinked reports were
 compared to assess linkage bias (Supplementary \tabref{tab:S-linkbias}).
+
+The national forms are filled in by hand, and rows are often copied from the previous one; when the
+LOTE cell is not updated, the report carries the lot of another vaccination. The first digit of a
+VA-MENGOC-BC lot code is the last digit of its release year, and a lot is valid for
+\PTShelfLife{} years. Given the vaccination date, the release year is the latest year whose last
+digit matches the code (a lot coded 1 was released in 2011 when used in 2012 and in 2021 when used in
+2022), and a lot used more than \PTShelfLife{} years after that year had expired. The rule reproduced
+the production year recorded in the release record, or the following year, for \PTCodeRuleAgreement{}
+of the lots. A report whose lot was expired, or not yet released, at vaccination cannot carry the lot
+administered; these reports were excluded from the association analyses and kept in a sensitivity
+analysis (\figref{fig:flow}). Because copied entries that remain within the validity window cannot
+be detected, their share is a lower bound of the error rate of the lot field. The decision rule
+was set before the analysis: the lot-level analysis was considered supported if that share did not
+exceed \PTFeasCautionPct, supported with a stated limitation up to \PTFeasMaxPct, and not supported
+above it or with fewer than \PTFeasMinReports{} valid linked reports or \PTFeasMinLots{} lots, because
+exposure misclassification of that size biases lot-level associations towards the null and makes
+their absence uninformative.
 
 \begin{figure}[tbp]
 \centering
@@ -167,7 +184,7 @@ was not part of the family. The other attributes, the multivariate atypicality (
 secondary outcomes were exploratory.
 
 Sensitivity analyses restricted the data to exact links, excluded co-administered vaccines and
-retained temporally implausible links; refitted the exposures in a Bayesian random-intercept
+retained the reports whose lot was expired or not yet released at vaccination; refitted the exposures in a Bayesian random-intercept
 logistic model; and modelled the proportion of reports with each reaction at lot level with a
 quasi-binomial model weighted by the number of reports per lot. To interpret null findings, the
 minimum detectable odds ratio per SD with 80\% power was computed from the number of reports, the
@@ -240,9 +257,11 @@ interquartile range; red lines mark specification limits.}
 \subsection{Linkage}\label{sec:r-link}
 Of \PTNTargetReports{} reports involving VA-MENGOC-BC, \PTNLinked{} (\PTLinkRate) were linked to
 \PTNLinkedLots{} lots: \PTLinkExact{} by exact match, \PTLinkCore{} by the core of the code and
-\PTLinkFuzzy{} by fuzzy match (\figref{fig:flow}; Supplementary \tabref{tab:S-linkage}). The primary
-analysis included \PTNAnalysed{} reports in \PTNAnalysedLots{} lots (median \PTReportsPerLot{}
-reports per lot).
+\PTLinkFuzzy{} by fuzzy match (\figref{fig:flow}; Supplementary \tabref{tab:S-linkage}). Of
+\PTLotAssessable{} reports whose lot could be dated, \PTLotInconsistent{} (\PTLotInconsistentPct)
+recorded a lot that was expired (\PTLotExpired) or not yet released (\PTLotBeforeRelease) at
+vaccination. \PTFeasibilitySentence. The primary analysis included \PTNAnalysed{} reports in
+\PTNAnalysedLots{} lots (median \PTReportsPerLot{} reports per lot).
 
 \subsection{Lot attributes and reported reactions}\label{sec:r-assoc}
 \PTNSignificantFDR{} of the \PTNPrimaryTests{} prespecified associations remained significant after
@@ -311,7 +330,9 @@ permutations of attribute profiles between lots).}
 \subsection{Principal findings}\label{sec:d-principal}
 The release record of \PTNLots{} lots of VA-MENGOC-BC showed a process
 \PTWithinSpecPhrase, with \PTNChangepoints{} sustained shifts and capability below 1.0 for
-\PTNAttrPpkBelowOne{} attributes. Linking \PTLinkRate{} of the AEFI reports to their lots, we found
+\PTNAttrPpkBelowOne{} attributes. \PTLotInconsistentPct{} of the reports with a datable lot recorded
+an impossible lot, and the lot-level analysis was \PTFeasibilityWord. Linking \PTLinkRate{} of the
+AEFI reports to their lots, we found
 that \PTNSignificantFDR{} of \PTNPrimaryTests{} prespecified associations between lot attributes
 and the profile of reported reactions survived correction for multiplicity (\PTSignificantList),
 while the negative-control exposure \PTNegControlWord{} with the reactions.
@@ -347,8 +368,9 @@ estimates the relative profile of reactions, not their incidence; an attribute t
 frequency of all reactions equally would not be detected. Second, reporting completeness could
 differ between lots in ways related to their attributes, for example through calendar time;
 adjustment for year and the negative control mitigate but do not exclude this bias. Third, lot
-numbers were missing or unmatched in some reports, and linked and unlinked reports may differ
-(Supplementary \tabref{tab:S-linkbias}). Fourth, the lots were \PTWithinSpecPhrase, so the
+numbers were missing, unmatched or copied from other rows: reports with an expired or not-yet-released
+lot were excluded, but copied lots that were still valid remain undetectable and dilute any
+association, and linked and unlinked reports may differ (Supplementary \tabref{tab:S-linkbias}). Fourth, the lots were \PTWithinSpecPhrase, so the
 results do not extrapolate beyond the specified range. Fifth, release tests
 measure a sample of each lot at release and do not capture changes during storage and distribution.
 Finally, reactions were recorded as indicators of the national form without clinical validation.
@@ -356,15 +378,16 @@ Finally, reactions were recorded as indicators of the national form without clin
 \subsection{Implications}\label{sec:d-implications}
 Manufacturers already hold the release records and national systems already record the lot
 administered; the pipeline used here shows that both can be linked routinely, with confidentiality
-of industrial data preserved through disclosure control. Recording the doses distributed per lot
+of industrial data preserved through disclosure control. Checking at entry that the lot recorded was
+valid on the vaccination date, which the code itself makes possible, would remove the main source
+of exposure error. Recording the doses distributed per lot
 would allow incidence per lot to be estimated, and the same framework can be applied to other
 vaccines with lot-level quality data.
 
 \section{Conclusions}\label{sec:conclusions}
-VA-MENGOC-BC lots were produced \PTWithinSpecPhrase. Linking lot release attributes
-with national AEFI reports is feasible and provides a reproducible way to test whether variation
-within specification is associated with reactogenicity; the associations identified here
-(\PTSignificantList) define hypotheses for confirmation and for quality risk management.
+VA-MENGOC-BC lots were produced \PTWithinSpecPhrase. \PTConclusionSentence; the
+associations identified here (\PTSignificantList) define hypotheses for confirmation and for
+quality risk management.
 
 \section*{Declarations}
 \input{papers/p2-lot-quality/shared/declarations_en.tex}

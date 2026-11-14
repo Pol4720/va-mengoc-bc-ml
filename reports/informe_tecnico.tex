@@ -52,18 +52,23 @@ Fecha de compilación & \today\\
 \section*{Mensajes principales}
 \addcontentsline{toc}{section}{Mensajes principales}
 \begin{itemize}[leftmargin=*,itemsep=3pt]
-\Mensaje{Se analizaron \PONReports{} notificaciones de eventos supuestamente atribuibles a la
-  vacunación o inmunización (ESAVI) sin duplicados; \PONTarget{} (\POPctTarget) incluyeron
-  VA-MENGOC-BC.}
+\Mensaje{De \VReportsInWindow{} notificaciones de eventos supuestamente atribuibles a la
+  vacunación o inmunización (ESAVI) sin duplicados, \PONTargetAll{} (\POPctTargetAll) incluyeron
+  VA-MENGOC-BC; se excluyeron \PONScheduleInvalid{} dosis registradas fuera del esquema y la
+  comparación se hizo solo con las \PONFinlayComparator{} notificaciones de otras vacunas Finlay.
+  \VPartialYearsSentence.}
 \Mensaje{La tasa global de notificación fue de \POPooledRate{} por \num{100000} dosis (\CI{}
   \POPooledRateCI), \PORateVsExpected{} la tasa de referencia del programa, y \POTrendWord{} entre
   \PORateFirstYear{} y \PORateLastYear{} (razón de tasas anual \POTrendRR, \CI{} \POTrendRRCI).}
-\Mensaje{Con el criterio preespecificado, \POSignalsPrimaryAllOtherVaccines{} tipos de evento se
+\Mensaje{Frente a las demás vacunas Finlay y con el criterio preespecificado,
+  \POSignalsPrimaryFinlayVaccines{} tipos de evento se
   notificaron de forma desproporcionada (\POSignalList); \PONSignalsRobustPhrase{} se mantuvo en los
   \PONDesigns{} diseños de comparación. Las señales no descritas como esperadas
   (\POSignalEmergingList) requieren revisión clínica caso a caso.}
 \Mensaje{Se enlazaron \PTNLinked{} de \PTNTargetReports{} notificaciones (\PTLinkRate) con un lote
-  liberado. \PTConformitySentence.}
+  liberado. \PTLotInconsistent{} de \PTLotAssessable{} notificaciones con un lote datable
+  (\PTLotInconsistentPct) registraban un lote vencido o aún no liberado: el análisis por lote
+  resultó \PTFeasibilityWord. \PTConformitySentence.}
 \Mensaje{De \PTNPrimaryTests{} asociaciones preespecificadas entre atributos de los lotes y
   reacciones, \PTNSignificantFDR{} superaron la corrección por comparaciones múltiples
   (\PTSignificantList). \PTNegControlSentence.}
@@ -197,7 +202,7 @@ diseño de comparación y la \figref{fig:forest}, las razones de odds de notific
 \centering
 \includegraphics{p1_forest}
 \caption{Razones de odds de notificación (IC 95\,\%, escala logarítmica) de los eventos con
-VA-MENGOC-BC frente al resto de las vacunas y en el diseño de comparador activo en lactantes.}
+VA-MENGOC-BC frente a las demás vacunas Finlay y en lactantes.}
 \label{fig:forest}
 \end{figure}
 

@@ -33,14 +33,14 @@ vesículas de membrana externa; análisis de clases latentes; aprendizaje autom�
 \noindent\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{%
 \textbf{Puntos clave}
 \begin{itemize}[leftmargin=*,itemsep=2pt,topsep=2pt]
-\item De \PONReports{} notificaciones sin duplicados de eventos supuestamente atribuibles a la
-  vacunación o inmunización recibidas por el sistema nacional de vigilancia de Cuba en
-  \VStudyFirstYear--\VStudyLastYear, \PONTarget{} (\POPctTarget) incluyeron VA-MENGOC-BC, con una
+\item De \VReportsInWindow{} notificaciones sin duplicados de eventos supuestamente atribuibles a
+  la vacunación o inmunización recibidas por el sistema nacional de vigilancia de Cuba en
+  \VStudyFirstYear--\VStudyLastYear, \PONTargetAll{} (\POPctTargetAll) incluyeron VA-MENGOC-BC, con una
   tasa global de notificación de \POPooledRate{} por \num{100000} dosis, \PORateVsExpected{} la
   tasa de referencia del programa para todas las vacunas infantiles.
-\item Con un criterio bayesiano preespecificado, \POSignalsPrimaryAllOtherVaccines{} de
-  \PONEventsScreened{} tipos de evento evaluados se notificaron de forma desproporcionada con
-  VA-MENGOC-BC (\POSignalList); \PONSignalsRobustPhrase{} se mantuvo en los \PONDesigns{} diseños
+\item Frente a las demás vacunas del mismo fabricante y con un criterio bayesiano
+  preespecificado, \POSignalsPrimaryFinlayVaccines{} de \PONEventsScreened{} tipos de evento
+  evaluados se notificaron de forma desproporcionada con VA-MENGOC-BC (\POSignalList); \PONSignalsRobustPhrase{} se mantuvo en los \PONDesigns{} diseños
   de comparación.
 \item Los eventos notificados conjuntamente formaron \POLCABestK{} fenotipos latentes; la
   hospitalización se predijo con una discriminación \PODiscriminationWord{} en los años
@@ -63,19 +63,25 @@ a la hospitalización.\par
 \noindent\textbf{Métodos:} Análisis de desproporcionalidad de notificaciones individuales de casos
 en la base de datos nacional de vigilancia de ESAVI de Cuba (acceso institucional), que abarca
 \VStudyFirstYear--\VStudyLastYear{} y todas las provincias. Las notificaciones de \VNFiles{}
-ficheros anuales se armonizaron, seudonimizaron y depuraron de duplicados. Las tasas de
-notificación usaron como denominador las dosis administradas. VA-MENGOC-BC se comparó con el resto
-de las vacunas mediante la razón de odds de notificación, la razón de notificación proporcional, el
+ficheros anuales se armonizaron, seudonimizaron y depuraron de duplicados; las fechas mal tecleadas
+se corrigieron solo cuando las demás fechas determinaban el valor correcto, y se excluyeron como
+errores de registro \PONScheduleInvalid{} dosis de VA-MENGOC-BC registradas fuera del esquema de
+vacunación. Las tasas de notificación usaron como denominador las dosis administradas. VA-MENGOC-BC
+se comparó con las demás vacunas de su fabricante, el Instituto Finlay de Vacunas, mediante la
+razón de odds de notificación, la razón de notificación proporcional, el
 componente de información bayesiano (IC) y la media geométrica bayesiana empírica, con un criterio
 de señal preespecificado (límite inferior de credibilidad del 95\,\% IC\textsubscript{025}${}>0$
-con al menos \PODispMinReports{} notificaciones) y tres comparadores de sensibilidad; no se realizó
-un análisis caso a caso. El análisis de clases latentes resumió los eventos notificados
+con al menos \PODispMinReports{} notificaciones) y diseños de sensibilidad; la influencia de las
+vacunas concomitantes se evaluó dentro de las notificaciones con VA-MENGOC-BC. No se realizó un
+análisis caso a caso. El análisis de clases latentes resumió los eventos notificados
 conjuntamente; la regresión logística de Firth y la potenciación del gradiente con validación
 temporal describieron la hospitalización. El informe sigue READUS-PV.\par
-\noindent\textbf{Resultados:} De \PONReports{} notificaciones, \PONTarget{} (\POPctTarget)
-incluyeron VA-MENGOC-BC. La tasa global de notificación fue de \POPooledRate{} por \num{100000}
+\noindent\textbf{Resultados:} De \VReportsInWindow{} notificaciones, \PONTargetAll{}
+(\POPctTargetAll) incluyeron VA-MENGOC-BC, de las cuales \PONTargetAnalysed{} tenían una
+administración válida; \PONFinlayComparator{} notificaciones correspondieron a otras vacunas
+Finlay. La tasa global de notificación fue de \POPooledRate{} por \num{100000}
 dosis (\CI{} \POPooledRateCI) y \POTrendWord{} en el tiempo (razón de tasas anual \POTrendRR;
-\CI{} \POTrendRRCI). \POSignalsPrimaryAllOtherVaccines{} de \PONEventsScreened{} tipos de evento
+\CI{} \POTrendRRCI). \POSignalsPrimaryFinlayVaccines{} de \PONEventsScreened{} tipos de evento
 cumplieron el criterio de señal (\POSignalList), \PONSignalsRobust{} de ellos con todos los
 comparadores. Un modelo de \POLCABestK{} clases describió la notificación conjunta (índice de Rand
 ajustado por remuestreo \POLCAAri). El mejor modelo de hospitalización (\POBestModel) alcanzó un
@@ -127,8 +133,9 @@ calibración, no de la exactitud aparente \cite{Salas2022,Collins2024,VanCalster
 
 Por ello analizamos las notificaciones espontáneas nacionales de \VStudyFirstYear--\VStudyLastYear{}
 con cuatro objetivos: (i) estimar las tasas de notificación de ESAVI con VA-MENGOC-BC y su tendencia;
-(ii) buscar notificación desproporcionada de eventos concretos frente al resto de las vacunas,
-comprobando la robustez de cada señal ante la elección del comparador; (iii) describir la estructura
+(ii) buscar notificación desproporcionada de eventos concretos frente a las demás vacunas del
+mismo fabricante, comprobando la robustez de cada señal ante la elección del comparador y la
+influencia de las vacunas concomitantes; (iii) describir la estructura
 latente de los eventos notificados conjuntamente, y (iv) describir los factores asociados a la
 hospitalización entre las notificaciones.
 
@@ -168,24 +175,52 @@ según el marco armonizado de Kahn et al.\ \cite{Kahn2016}. \VFormSentence. Los 
 sustituyeron en la ingesta por resúmenes con clave (HMAC-SHA-256) cuya clave secreta se guarda fuera
 del repositorio \cite{ENISA2019}; las fechas de nacimiento se convirtieron en edad, y los campos de
 texto libre se procesaron localmente y nunca se publicaron, conforme a la ley cubana de protección
-de datos personales \cite{Ley149}. Se eliminaron los registros duplicados exactos
+de datos personales \cite{Ley149}. Cada libro se leyó desde su hoja maestra; los libros de
+2021--2024 contienen además copias de las notificaciones de vacunas contra la COVID-19 en hojas por
+producto, que no se leyeron, y se añadió una hoja de casos que no entraron en el cierre de 2018
+(\VNExtraSheets{} hoja adicional). Un año mal tecleado en la fecha de vacunación o de notificación
+(por ejemplo, 2029 o 2002 en el fichero de 2019) se corrigió solo cuando el día y el mes, la otra
+fecha y el año del fichero lo determinaban, con una demora de 0 a 365 días (\VVaccYearImputed{}
+fechas de vacunación y \VNotifYearImputed{} de notificación); las fechas imposibles que no podían
+corregirse no se usaron (\VVaccYearDropped{} y \VNotifYearDropped), y la edad se recalculó con las
+fechas corregidas. \VPartialYearsSentence. Se eliminaron los registros duplicados exactos
 (\VExactDuplicates) y se fusionaron los registros con la misma persona seudonimizada, fecha de
 vacunación, vacunas y lotes (\VKeyDuplicatesMerged{} filas), con lo que quedaron \VReportsDedup{}
 notificaciones. El año de análisis fue el de vacunación; la ventana de estudio conservó
 \VReportsInWindow{} notificaciones (se excluyeron \VReportsOutsideWindow{} fuera de la ventana;
 \figref{fig:flow}).
 
+Cada administración de VA-MENGOC-BC se contrastó con el esquema nacional: dosis~1 a los 3 y
+dosis~2 a los 5 meses de edad \cite{SierraGonzalez2019}; la vacuna es válida desde los 3 meses, con
+dos dosis separadas por 6--8 semanas y sin refuerzo sistemático. Las edades mínimas (3 meses para la
+dosis~1 y 3 meses más 6 semanas para la dosis~2) se aplicaron con el período de gracia habitual de 4
+días \cite{Kroger2023}; una edad registrada solo en meses completos recibió el beneficio de la duda
+(un niño registrado con 2 meses puede tener casi 3). Una dosis por debajo de su edad mínima o un
+número de dosis inexistente en el esquema no puede ser una administración válida e indica un error
+de registro de la vacuna, la dosis o la edad; estas \PONScheduleInvalid{} notificaciones
+(\POPctScheduleInvalid{} de las notificaciones con VA-MENGOC-BC) se excluyeron de los análisis y se
+conservaron en un diseño de sensibilidad. Las dosis adelantadas (\PONScheduleEarly), tardías de
+recuperación (\PONScheduleLate) y de refuerzo en campañas (\PONScheduleBooster) son válidas y se
+conservaron.
+
 \begin{figure}[tbp]
 \centering
 \ReportFlow
 \caption{Flujo de notificaciones de ESAVI desde los ficheros anuales hasta la población de
-análisis. Las cifras proceden de la publicación con control de divulgación.}
+análisis: notificaciones con VA-MENGOC-BC con una administración válida y notificaciones de las
+demás vacunas Finlay. Las cifras proceden de la publicación con control de divulgación.}
 \label{fig:flow}
 \end{figure}
 
-\subsection{Definición de la exposición y de los eventos}\label{sec:events}
+\subsection{Definición de la exposición, del comparador y de los eventos}\label{sec:events}
 Una notificación se atribuyó a VA-MENGOC-BC cuando la vacuna figuraba entre las administradas,
-incluida la coadministración con otras vacunas. Los eventos fueron los \PONEventsScreened{}
+incluida la coadministración con otras vacunas. De acuerdo con la dirección del proyecto del
+producto, las demás vacunas se compararon solo cuando eran productos del mismo fabricante, el
+Instituto Finlay de Vacunas (\POComparatorList); las vacunas de otros fabricantes entraron en el
+análisis solo como vacunas concomitantes administradas con VA-MENGOC-BC. La población de análisis
+comprendió, por tanto, \PONTargetAnalysed{} notificaciones con VA-MENGOC-BC con una administración
+válida y \PONFinlayComparator{} notificaciones de otras vacunas Finlay; no se compararon
+\PONNonFinlayOnly{} notificaciones solo de vacunas de otros fabricantes. Los eventos fueron los \PONEventsScreened{}
 indicadores del formulario nacional, que siguen la clasificación de la OMS en eventos comunes, raros
 y graves \cite{WHO2016AEFI,CIOMS2012}; cuando existen, se citan como referencia las definiciones
 correspondientes de la Brighton Collaboration
@@ -224,12 +259,15 @@ ${}\geq2$) se presenta como medida de concordancia.
 
 Todos los comparadores fueron vacunas, por lo que las medidas expresan la notificación relativa a
 otras vacunas del mismo sistema y no el riesgo frente a la no vacunación. Se preespecificaron cuatro
-diseños de comparación: el diseño principal (notificaciones con VA-MENGOC-BC frente al resto); un
-diseño de comparador activo en lactantes, restringido a notificaciones en menores de
-\POInfantMonths{} meses; un diseño restringido a notificaciones de una sola vacuna (VA-MENGOC-BC
-administrada sola frente a otras vacunas administradas solas), y un diseño que elimina del grupo de
-comparación las notificaciones que mencionan la vacuna pentavalente, el producto reactogénico
-dominante, para evaluar el enmascaramiento \cite{Maignen2014}. El IC acumulado se recalculó año a
+diseños de comparación: el diseño principal (notificaciones con VA-MENGOC-BC frente a las de las
+demás vacunas Finlay); un diseño restringido a notificaciones en menores de \POInfantMonths{}
+meses; un diseño restringido a notificaciones de una sola vacuna (VA-MENGOC-BC administrada sola
+frente a otras vacunas Finlay administradas solas), y el diseño principal conservando las dosis
+registradas fuera del esquema. La influencia de las vacunas concomitantes se evaluó por separado
+dentro de las notificaciones con VA-MENGOC-BC, comparando aquellas en que se coadministraron otras
+vacunas (\PONTargetCoadmin) con las de VA-MENGOC-BC administrada sola; el enmascaramiento por
+productos reactogénicos coadministrados es una fuente conocida de señales espurias u ocultas
+\cite{Maignen2014}. El IC acumulado se recalculó año a
 año para mostrar la estabilidad temporal de las estimaciones. Dado el carácter exploratorio de la
 detección de señales, no se ajustó por comparaciones múltiples \cite{Rothman1990}; las señales son
 hipótesis para la revisión clínica y no riesgos confirmados
@@ -245,11 +283,11 @@ probabilidades de los ítems y \POLCAStarts{} inicios aleatorios por modelo. Los
 y la entropía \cite{Nylund2007}. La estabilidad se midió con la mediana del índice de Rand ajustado
 \cite{Hubert1985} entre la clasificación original y \POLCABootstrap{} reajustes por remuestreo, tras
 el emparejamiento óptimo de etiquetas \cite{Kuhn1955}. La pertenencia a las clases se comparó entre
-las notificaciones con VA-MENGOC-BC y el resto mediante una prueba de $\chi^2$.
+las notificaciones con VA-MENGOC-BC y las de otras vacunas Finlay mediante una prueba de $\chi^2$.
 
 \subsection{Factores asociados a la hospitalización}\label{sec:m-hosp}
-La hospitalización se modeló a partir de la edad, el sexo, la coadministración, la región, las
-vacunas y los indicadores de eventos. Como los eventos raros y graves separan el desenlace, el modelo
+La hospitalización se modeló en la población de análisis a partir de la edad, el sexo, la
+coadministración, la región, las vacunas y los indicadores de eventos. Como los eventos raros y graves separan el desenlace, el modelo
 logístico multivariable se ajustó por la verosimilitud penalizada de Firth \cite{Firth1993,Heinze2002},
 tras eliminar los términos exactamente colineales, y sus razones de odds ajustadas se presentan con
 intervalos de Wald. Un modelo de árboles con potenciación del gradiente (LightGBM) \cite{Ke2017}
@@ -261,9 +299,11 @@ FLIC \cite{Puhr2017}. Las contribuciones exactas TreeSHAP describieron el modelo
 \cite{Lundberg2020}. Los modelos son explicativos y no se diseñaron para el triaje clínico.
 
 \subsection{Patrones temporales y contexto epidemiológico}\label{sec:m-time}
-Los recuentos mensuales de notificaciones se estabilizaron en varianza con la transformación de
+Los recuentos mensuales de todas las notificaciones (una descripción del sistema de vigilancia,
+no una comparación) y de las notificaciones con VA-MENGOC-BC se estabilizaron en varianza con la transformación de
 Anscombe \cite{Anscombe1948} y se segmentaron con un algoritmo PELT exacto
-\cite{Killick2012,Truong2020} (segmento mínimo de seis meses, penalización de tipo BIC). Para situar
+\cite{Killick2012,Truong2020} (segmento mínimo de seis meses, penalización de tipo BIC); los meses que ningún fichero cubría se
+trataron como ausentes y no como ceros. Para situar
 la vacuna en su contexto, los casos nacionales anuales de enfermedad meningocócica
 (\POITSFirstYear--\POITSLastYear) se analizaron como serie temporal interrumpida con un modelo
 binomial negativo segmentado, tratando \POITSTransition{} (vacunación masiva e incorporación al
@@ -283,14 +323,15 @@ Declaraciones.
 \section{Resultados}\label{sec:results}
 
 \subsection{Notificaciones y características}\label{sec:r-reports}
-El análisis incluyó \PONReports{} notificaciones, de las cuales \PONTarget{} (\POPctTarget)
-incluyeron VA-MENGOC-BC y \PONTargetOnly{} de ellas no tuvieron vacunas coadministradas
+La población de análisis incluyó \PONReports{} notificaciones, de las cuales \PONTarget{}
+(\POPctTarget) incluyeron VA-MENGOC-BC y \PONTargetOnly{} de ellas no tuvieron vacunas
+coadministradas; las otras \PONOther{} notificaciones correspondieron a otras vacunas Finlay
 (\tabref{tab:characteristics}). La mediana del tiempo entre la vacunación y la notificación fue de
 \PODelayMedian{} días.
 
 \begin{table}[tbp]
 \centering\small
-\caption{Características de las notificaciones de ESAVI con VA-MENGOC-BC y con otras vacunas. Los
+\caption{Características de las notificaciones de ESAVI con VA-MENGOC-BC y con otras vacunas Finlay. Los
 valores son $n$ (\%) salvo indicación en contrario; se suprimen los recuentos menores que
 \VMinCell, y [c] marca la supresión complementaria que impide recuperarlos por diferencia.}
 \label{tab:characteristics}
@@ -309,7 +350,8 @@ $p$\POTrendP; dispersión de cuasi-Poisson \PODispersion).
 \centering
 \includegraphics[width=\textwidth]{p1_rates}
 \caption{Notificación en el tiempo. (a) Número mensual de notificaciones de ESAVI para todas las
-vacunas y para VA-MENGOC-BC; las líneas verticales marcan los puntos de cambio detectados por PELT en
+vacunas y para VA-MENGOC-BC (los meses sin fichero quedan en blanco); las líneas verticales marcan
+los puntos de cambio detectados por PELT en
 la serie de todas las vacunas. (b) Tasa anual de notificación de VA-MENGOC-BC por \num{100000} dosis
 con intervalo de confianza exacto del 95\,\% (banda); la línea horizontal es la tasa esperada del
 programa para todas las vacunas infantiles.}
@@ -317,16 +359,18 @@ programa para todas las vacunas infantiles.}
 \end{figure}
 
 \subsection{Desproporcionalidad}\label{sec:r-disp}
-Con el comparador principal, \POSignalsPrimaryAllOtherVaccines{} de los \PONEventsScreened{} tipos
-de evento evaluados cumplieron el criterio de señal preespecificado (\POSignalList;
+Frente a las demás vacunas Finlay (diseño principal), \POSignalsPrimaryFinlayVaccines{} de los
+\PONEventsScreened{} tipos de evento evaluados cumplieron el criterio de señal preespecificado (\POSignalList;
 \tabref{tab:disproportionality}, \figref{fig:forest}): \PONSignalsExpectedPhrase{} de reacciones
 esperadas (\POSignalExpectedList) y \PONSignalsEmergingPhrase{} de eventos no clasificados como
-esperados (\POSignalEmergingList). El número de señales fue \POSignalsInfantActiveComparator{} en el
-diseño de comparador activo en lactantes, \POSignalsExcludingCoadministration{} en las
-notificaciones de una sola vacuna y \POSignalsExcludingPentavalentMasking{} al eliminar del
-comparador las notificaciones con vacuna pentavalente (\tabref{tab:designs};
-Tablas~\ref{tab:S-disp-primary}--\ref{tab:S-disp-masking} del material suplementario);
-\PONSignalsRobustPhrase{} se mantuvo en los \PONDesigns{} diseños (\POSignalRobustList). El IC
+esperados (\POSignalEmergingList). El número de señales fue \POSignalsInfantFinlayComparator{} en
+lactantes, \POSignalsExcludingCoadministration{} en las notificaciones de una sola vacuna y
+\POSignalsPrimaryIncludingScheduleErrors{} al conservar las dosis fuera del esquema
+(\tabref{tab:designs}; Tablas~\ref{tab:S-disp-primary}--\ref{tab:S-disp-concomitant} del material
+suplementario); \PONSignalsRobustPhrase{} se mantuvo en los \PONDesigns{} diseños
+(\POSignalRobustList). Dentro de las notificaciones con VA-MENGOC-BC, \PONConcomitantSignals{} tipos
+de evento se notificaron de forma desproporcionada cuando se coadministraron otras vacunas
+(\POConcomitantSignalList). El IC
 acumulado de cada evento se muestra año a año en la \tabref{tab:S-cumic} del material
 suplementario. Para la fiebre de al menos 39\,\textdegree{}C, la ROR fue \POEvFeverThreeNineROR{}
 (\CI{} \POEvFeverThreeNineRORCI) y el IC\textsubscript{025}, \POEvFeverThreeNineICLow; para las
@@ -335,8 +379,8 @@ reacciones locales severas fueron \POEvSevereLocalReactionROR{} (\CI{}
 
 \begin{table}[tbp]
 \centering\small
-\caption{Desproporcionalidad de los eventos notificados con VA-MENGOC-BC frente al resto de las
-vacunas (diseño principal), para los eventos con al menos \VMinCell{} notificaciones. $a$,
+\caption{Desproporcionalidad de los eventos notificados con VA-MENGOC-BC frente a las demás
+vacunas Finlay (diseño principal), para los eventos con al menos \VMinCell{} notificaciones. $a$,
 notificaciones con VA-MENGOC-BC y el evento; $E$, valor esperado de $a$; IC\textsubscript{025},
 límite inferior de credibilidad del 95\,\% del componente de información; EB\textsubscript{05},
 percentil 5 inferior de la media geométrica bayesiana empírica; Métodos, número de los cuatro métodos
@@ -349,7 +393,7 @@ $a\geq\PODispMinReports$).}
 \begin{table}[tbp]
 \centering\small
 \caption{Número de señales de desproporcionalidad en los cuatro diseños de comparación
-preespecificados.}
+preespecificados y en el análisis de las vacunas concomitantes.}
 \label{tab:designs}
 \POTableDesigns
 \end{table}
@@ -358,10 +402,10 @@ preespecificados.}
 \centering
 \includegraphics{p1_forest}
 \caption{Razones de odds de notificación (IC 95\,\%, escala logarítmica) de los eventos notificados
-con VA-MENGOC-BC frente al resto de las vacunas (diseño principal) y en el diseño de comparador
-activo en lactantes. No se muestran los eventos con menos de \VMinCell{} notificaciones en el diseño
-principal; los cuatro diseños se presentan en las
-Tablas~\ref{tab:S-disp-primary}--\ref{tab:S-disp-masking} del material suplementario.}
+con VA-MENGOC-BC frente a las demás vacunas Finlay (diseño principal) y en lactantes. No se
+muestran los eventos con menos de \VMinCell{} notificaciones en el diseño principal; todos los
+diseños se presentan en las Tablas~\ref{tab:S-disp-primary}--\ref{tab:S-disp-concomitant} del
+material suplementario.}
 \label{fig:forest}
 \end{figure}
 
@@ -369,7 +413,8 @@ Tablas~\ref{tab:S-disp-primary}--\ref{tab:S-disp-masking} del material suplement
 El criterio de información bayesiano seleccionó un modelo de \POLCABestK{} clases
 (\tabref{tab:S-lca} del material suplementario), cuya clasificación fue estable entre muestras de
 remuestreo (mediana del índice de Rand ajustado \POLCAAri). La pertenencia a las clases
-\POLCAGroupWord{} entre las notificaciones con VA-MENGOC-BC y el resto ($\chi^2=\POLCAChi$,
+\POLCAGroupWord{} entre las notificaciones con VA-MENGOC-BC y las de otras vacunas Finlay
+($\chi^2=\POLCAChi$,
 \POLCADf{} grados de libertad; $p$\POLCAP; \figref{fig:lca}).
 
 \begin{figure}[tbp]
@@ -378,7 +423,7 @@ remuestreo (mediana del índice de Rand ajustado \POLCAAri). La pertenencia a la
 \caption{Clases latentes de los eventos notificados conjuntamente. (a) Probabilidad de cada evento
 dentro de cada clase latente (se imprimen los valores de al menos 0,2). (b) Proporción de
 notificaciones asignadas a cada clase entre las notificaciones con VA-MENGOC-BC y con otras
-vacunas.}
+vacunas Finlay.}
 \label{fig:lca}
 \end{figure}
 
@@ -421,7 +466,7 @@ suplementario).
 \section{Discusión}\label{sec:discussion}
 
 \subsection{Hallazgos principales}\label{sec:d-principal}
-En \VStudyFirstYear--\VStudyLastYear, VA-MENGOC-BC representó el \POPctTarget{} de las
+En \VStudyFirstYear--\VStudyLastYear, VA-MENGOC-BC representó el \POPctTargetAll{} de las
 notificaciones de ESAVI, con una tasa global de notificación de \POPooledRate{} por \num{100000}
 dosis que \POTrendWord{} durante el período. El análisis de desproporcionalidad señaló
 \POSignalList{} con el comparador principal, y \POSignalRobustList{} con todos los comparadores. Los
@@ -433,16 +478,18 @@ Los eventos notificados con más frecuencia con VA-MENGOC-BC fueron \POTopEvents
 reacciones locales son las reacciones esperadas de las vacunas de VME adsorbidas en aluminio
 \cite{Nokleby2007,Holst2009}, cuya endotoxina determina la pirogenicidad
 \cite{Sheerin2019,Rosenqvist1998}. En una base que solo contiene vacunas, la desproporcionalidad
-mide cuánto difiere el perfil de las notificaciones de VA-MENGOC-BC del de otras vacunas. Como la
-mayoría de los comparadores son también reactogénicos y la vacuna pentavalente de células enteras se
-coadministra con VA-MENGOC-BC, una señal que desaparece al eliminar la coadministración o la vacuna
-pentavalente se explica mejor por la atribución y el enmascaramiento que por el producto
+mide cuánto difiere el perfil de las notificaciones de VA-MENGOC-BC del de otras vacunas; restringir
+la comparación a productos del mismo fabricante mantiene el comparador dentro de un mismo sistema
+de producción y de calidad, a costa de comparadores que se administran sobre todo a edades mayores
+(vacunas contra difteria, tétanos y tos ferina, antitetánica y antitifoídica). Una señal que
+desaparece en las notificaciones de una sola vacuna, o que aparece solo cuando se coadministran
+otras vacunas, se explica mejor por la atribución y el enmascaramiento que por el producto
 \cite{Maignen2014,Salvo2013}; por el contrario, las señales que persisten con todos los comparadores
 son las que más merecen revisión clínica. El diseño estructurado con varios comparadores es, por
 tanto, la principal salvaguarda de este análisis, junto con el criterio preespecificado y el informe
 transparente de todos los eventos evaluados \cite{Fusaroli2024Elaboration,Fusaroli2026Pitfalls}.
 Las señales de reacciones esperadas (\POSignalExpectedList) cuantifican cuánto más aparece en las
-notificaciones la reactogenicidad conocida de una vacuna de VME que en las de otras vacunas; las
+notificaciones la reactogenicidad conocida de una vacuna de VME que en las de otras vacunas Finlay; las
 señales de eventos emergentes (\POSignalEmergingList) son las que requieren revisión caso a caso
 antes de cualquier interpretación.
 
@@ -472,8 +519,8 @@ calidad de los lotes administrados, que aborda la variabilidad de la fabricació
 
 \subsection{Fortalezas y limitaciones}\label{sec:d-limitations}
 El estudio abarca todas las notificaciones recibidas a escala nacional en
-\VStudyFirstYear--\VStudyLastYear, armoniza ficheros cuya estructura cambió con el tiempo,
-preespecifica su criterio de señal y sus diseños de comparación, y genera cada número a partir de
+\VStudyFirstYear--\VStudyLastYear, armoniza ficheros cuya estructura cambió con el tiempo, corrige
+o excluye los registros imposibles con reglas explícitas, preespecifica su criterio de señal y sus diseños de comparación, y genera cada número a partir de
 una publicación verificada y con control de divulgación, de modo que el análisis puede reproducirse
 y ampliarse cada año.
 
@@ -484,17 +531,22 @@ desagregadas por edad, dosis ni provincia. En segundo lugar, los indicadores de 
 validaron frente a las definiciones de Brighton \cite{Kohl2008}, y las descripciones en texto libre
 se excluyeron del análisis para proteger la confidencialidad. En tercer lugar, las notificaciones
 atribuidas a VA-MENGOC-BC incluyen vacunas coadministradas, y la desproporcionalidad no puede separar
-sus contribuciones; los diseños de sensibilidad abordan esta limitación pero no la eliminan. En
-cuarto lugar, todos los comparadores son vacunas, por lo que la desproporcionalidad no mide el riesgo
+sus contribuciones; los diseños de una sola vacuna y de vacunas concomitantes abordan esta limitación
+pero no la eliminan. En cuarto lugar, los registros se introdujeron a mano y se copiaron entre filas:
+se excluyeron las dosis imposibles y se corrigieron las fechas mal tecleadas, pero los errores que
+siguen siendo verosímiles no pueden detectarse, y el comparador Finlay difiere de VA-MENGOC-BC en
+las edades de administración, lo que el diseño en lactantes aborda solo en parte. En quinto lugar,
+todos los comparadores son vacunas, por lo que la desproporcionalidad no mide el riesgo
 frente a la no vacunación, y una señal es una hipótesis para la evaluación de causalidad
-\cite{WHO2018Causality,Fusaroli2026Causal}. En quinto lugar, la serie temporal interrumpida de la
+\cite{WHO2018Causality,Fusaroli2026Causal}. En sexto lugar, la serie temporal interrumpida de la
 incidencia nacional es ecológica y sirve solo de contexto. Por último, los recuentos pequeños se
 suprimieron en la publicación, por lo que los eventos graves raros solo pueden describirse de forma
 cualitativa.
 
 \subsection{Implicaciones}\label{sec:d-implications}
-El flujo de análisis desarrollado para este estudio puede ejecutarse cada año con los nuevos
-ficheros y convertir un análisis retrospectivo en una vigilancia continua y auditable. Las señales
+El flujo de análisis desarrollado para este estudio se ejecuta con cada entrega mensual de nuevos
+ficheros y convierte un análisis retrospectivo en una vigilancia continua y auditable; los años
+incompletos se señalan automáticamente y quedan fuera de las tasas anuales. Las señales
 que persisten con todos los comparadores deben ser revisadas con las historias clínicas por el
 comité nacional de causalidad, y la vinculación de las notificaciones con los atributos de calidad
 de los lotes administrados permite estudiar si la variabilidad de la fabricación contribuye a la

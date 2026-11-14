@@ -46,11 +46,32 @@ poorly separated classes and the entropy $R^2$ measures classification certainty
 \begin{table}[htbp]
 \centering\small
 \caption{Adjusted odds ratios of hospitalisation from the multivariable Firth logistic regression
-fitted to all reports (Wald 95\% confidence intervals). Region contrasts are relative to the
+fitted to the analysis population (Wald 95\% confidence intervals). Region contrasts are relative to the
 western region; event and vaccine terms are present-versus-absent indicators. Terms recorded in
 fewer than \VMinCell{} reports are suppressed.}
 \label{tab:S-logistic}
 \POTableLogistic
+\end{table}
+
+\section{Vaccination schedule of VA-MENGOC-BC}\label{sec:S-schedule}
+\begin{table}[htbp]
+\centering\small
+\caption{VA-MENGOC-BC reports by schedule category (dose~1 at 3 and dose~2 at 5 months; minimum
+ages 3 months and 3 months plus 6 weeks, with a 4-day grace period). Counts below \VMinCell{} are
+suppressed.}
+\label{tab:S-schedule}
+\begin{tabular}{@{}lrl@{}}
+\toprule
+Category & Reports & Decision \\
+\midrule
+On schedule & \PONScheduleOnTime & kept \\
+Early, above the minimum age & \PONScheduleEarly & kept \\
+Late (catch-up) & \PONScheduleLate & kept \\
+Booster (campaigns) & \PONScheduleBooster & kept \\
+Below the minimum age & \PONScheduleTooYoung & excluded \\
+Dose number not in the schedule & \PONScheduleDoseNotInSchedule & excluded \\
+\bottomrule
+\end{tabular}
 \end{table}
 
 \section{Disproportionality under each comparator design}\label{sec:S-designs}
@@ -64,32 +85,42 @@ together with the statistics derived from them.
 
 \begin{table}[htbp]
 \centering\small
-\caption{Primary design: VA-MENGOC-BC reports against all other reports (all event types).}
+\caption{Primary design: VA-MENGOC-BC reports against reports of the other Finlay vaccines (all
+event types).}
 \label{tab:S-disp-primary}
-\POTableDispPrimaryAllOtherVaccines
+\POTableDispPrimaryFinlayVaccines
 \end{table}
 
 \begin{table}[htbp]
 \centering\small
-\caption{Infant active-comparator design: reports in children younger than \POInfantMonths{}
-months.}
+\caption{Infant design: reports in children younger than \POInfantMonths{} months, VA-MENGOC-BC
+against other Finlay vaccines.}
 \label{tab:S-disp-infant}
-\POTableDispInfantActiveComparator
+\POTableDispInfantFinlayComparator
 \end{table}
 
 \begin{table}[htbp]
 \centering\small
-\caption{Single-vaccine design: VA-MENGOC-BC given alone against other vaccines given alone.}
+\caption{Single-vaccine design: VA-MENGOC-BC given alone against other Finlay vaccines given
+alone.}
 \label{tab:S-disp-single}
 \POTableDispExcludingCoadministration
 \end{table}
 
 \begin{table}[htbp]
 \centering\small
-\caption{Masking design: comparator group without the reports that mention the pentavalent
-vaccine (PENTA-L).}
-\label{tab:S-disp-masking}
-\POTableDispExcludingPentavalentMasking
+\caption{Primary design keeping the \PONScheduleInvalid{} VA-MENGOC-BC doses recorded outside the
+vaccination schedule.}
+\label{tab:S-disp-schedule}
+\POTableDispPrimaryIncludingScheduleErrors
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Concomitant vaccines: VA-MENGOC-BC reports with co-administered vaccines against
+VA-MENGOC-BC given alone.}
+\label{tab:S-disp-concomitant}
+\POTableDispConcomitantInfluence
 \end{table}
 
 \section{Temporal stability of the information component}\label{sec:S-cumic}

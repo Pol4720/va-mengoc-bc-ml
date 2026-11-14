@@ -12,11 +12,18 @@
     \VLang{records}{registros}: \VReportsRaw};
   \node[box, below=16mm of files] (dedup) {\VLang{Deduplicated reports}{Notificaciones sin duplicados}\\
     \VReportsDedup};
-  \node[box, below=12mm of dedup] (win) {\VLang{Analysis population}{Población de análisis}
+  \node[box, below=12mm of dedup] (win) {\VLang{Reports in the study window}{Notificaciones en la ventana de estudio}
     \VStudyFirstYear--\VStudyLastYear\\ \VReportsInWindow};
-  \node[box, below=10mm of win, xshift=-29mm, text width=40mm] (t) {VA-MENGOC-BC\\ \PONTarget};
+  \node[box, below=10mm of win, xshift=-29mm, text width=40mm] (t) {VA-MENGOC-BC\\ \PONTargetAll};
   \node[box, below=10mm of win, xshift=29mm, text width=40mm] (o)
-    {\VLang{Other vaccines only}{Solo otras vacunas}\\ \PONOther};
+    {\VLang{Other Finlay vaccines}{Otras vacunas Finlay}\\ \PONFinlayComparator};
+  \node[box, below=10mm of t, text width=40mm] (ta) {\VLang{Valid administration}{Administración
+    válida}\\ \PONTargetAnalysed\\[2pt]
+    {\footnotesize \VLang{excluded, outside the schedule}{excluidas, fuera del esquema}:
+    \PONScheduleInvalid}};
+  \node[side, text width=40mm, anchor=north] (nf) at ($(o.south)+(0,-6mm)$) {\VLang{Vaccines of other
+    manufacturers only (not compared)}{Solo vacunas de otros fabricantes (no comparadas)}:
+    \PONNonFinlayOnly};
   \coordinate (m1) at ($(files.south)!0.5!(dedup.north)$);
   \coordinate (m2) at ($(dedup.south)!0.5!(win.north)$);
   \node[side] (dup) at ($(m1)+(33mm,0)$) {\VLang{Exact duplicates removed}{Duplicados exactos
@@ -28,6 +35,7 @@
   \draw[arr] (dedup) -- (win);
   \draw[arr] (win.south) -- ++(0,-5mm) -| (t.north);
   \draw[arr] (win.south) -- ++(0,-5mm) -| (o.north);
+  \draw[arr] (t) -- (ta);
   \draw[arr, vgrey!70] (m1) -- (dup.west);
   \draw[arr, vgrey!70] (m2) -- (out.west);
 \end{tikzpicture}}

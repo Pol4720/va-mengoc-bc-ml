@@ -22,10 +22,10 @@
   \coordinate (m2) at ($(lnk.south)!0.5!(ana.north)$);
   \node[side] (nl) at ($(m1)+(31mm,0)$) {\VLang{No lot recorded}{Sin lote registrado}: \PTLinkNoLotRecorded\\
     \VLang{No matching lot}{Sin lote coincidente}: \PTLinkNoMatch};
-  \node[side] (ti) at ($(m2)+(31mm,0)$) {\VLang{Vaccinated more than \PTMaxYearsAfterProduction{} years after
-    production (implausible link)}{Vacunación más de \PTMaxYearsAfterProduction{} años después de la
-    producción (enlace inverosímil)}: \PTTemporalImplausible\\
-    \VLang{Missing covariates}{Covariables ausentes}: \PTExcludedOther};
+  \node[side] (ti) at ($(m2)+(31mm,0)$) {\VLang{Lot expired or not yet released at
+    vaccination}{Lote vencido o aún no liberado en la vacunación}: \PTTemporalImplausible\\
+    \VLang{Dose outside the schedule or missing covariates}{Dosis fuera del esquema o covariables
+    ausentes}: \PTExcludedOther};
   \draw[arr] (rep) -- (lnk);
   \draw[arr] (lnk) -- (ana);
   \draw[arr, vgrey!70] (m1) -- (nl.west);
