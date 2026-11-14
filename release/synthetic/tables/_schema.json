@@ -5,7 +5,7 @@
       "n_flagged"
     ],
     "description": "Plausibility checks by source-file year",
-    "rows": 162
+    "rows": 230
   },
   "dq_conformance": {
     "person_count_columns": [
@@ -13,11 +13,14 @@
       "n_ok",
       "n_recovered",
       "n_missing",
+      "n_kept",
+      "n_kept_consistent",
+      "n_imputed_year",
       "n_not_applicable",
       "n_absent_column"
     ],
     "description": "Parse outcomes by file and field",
-    "rows": 432
+    "rows": 550
   },
   "dq_completeness": {
     "person_count_columns": [
@@ -25,7 +28,7 @@
       "n_present"
     ],
     "description": "Completeness by file year",
-    "rows": 81
+    "rows": 90
   },
   "p1_characteristics": {
     "person_count_columns": [
@@ -33,7 +36,7 @@
       "denominator"
     ],
     "description": "Characteristics of AEFI reports, target vs other vaccines",
-    "rows": 60
+    "rows": 58
   },
   "p1_characteristics_continuous": {
     "person_count_columns": [
@@ -59,28 +62,28 @@
       "n_target_hospitalized"
     ],
     "description": "Annual report counts (analytic year)",
-    "rows": 9
+    "rows": 10
   },
   "p1_rates_target": {
     "person_count_columns": [
       "count"
     ],
     "description": "VA-MENGOC-BC reporting rate per 100 000 doses",
-    "rows": 9
+    "rows": 10
   },
   "p1_rates_by_event": {
     "person_count_columns": [
       "count"
     ],
     "description": "Event-specific reporting rates per 100 000 doses",
-    "rows": 63
+    "rows": 70
   },
   "p1_rates_hospitalized": {
     "person_count_columns": [
       "count"
     ],
     "description": "Reporting rate of hospitalised AEFI per 100 000 doses",
-    "rows": 9
+    "rows": 10
   },
   "p1_design_sizes": {
     "person_count_columns": [
@@ -88,21 +91,21 @@
       "n_comparator"
     ],
     "description": "Reports in the target and comparator groups of each disproportionality design",
-    "rows": 4
+    "rows": 5
   },
   "p1_disproportionality": {
     "person_count_columns": [
       "a"
     ],
     "description": "Disproportionality by design (READUS-PV); b, c, d withheld (see p1_design_sizes)",
-    "rows": 104
+    "rows": 130
   },
   "p1_cumulative_ic": {
     "person_count_columns": [
       "a"
     ],
     "description": "Cumulative IC by year",
-    "rows": 45
+    "rows": 40
   },
   "p1_lca_selection": {
     "person_count_columns": [],
@@ -114,12 +117,12 @@
       "n"
     ],
     "description": "Latent class membership by vaccine group (secondary SDC)",
-    "rows": 12
+    "rows": 10
   },
   "p1_lca_profiles": {
     "person_count_columns": [],
     "description": "Item-response probabilities of the selected LCA model",
-    "rows": 72
+    "rows": 60
   },
   "p1_cooccurrence_target": {
     "person_count_columns": [
@@ -133,12 +136,12 @@
       "n_with_term"
     ],
     "description": "Adjusted odds ratios of hospitalisation (Firth logistic regression)",
-    "rows": 30
+    "rows": 24
   },
   "p1_shap_importance": {
     "person_count_columns": [],
     "description": "Mean |SHAP| (temporal test set)",
-    "rows": 31
+    "rows": 26
   },
   "p1_shap_dependence": {
     "person_count_columns": [
@@ -159,21 +162,21 @@
       "count"
     ],
     "description": "Notification delay (days) by year",
-    "rows": 9
+    "rows": 10
   },
   "p1_monthly_all": {
     "person_count_columns": [
       "count"
     ],
     "description": "Monthly reports, all",
-    "rows": 104
+    "rows": 111
   },
   "p1_monthly_target": {
     "person_count_columns": [
       "count"
     ],
     "description": "Monthly reports, VA-MENGOC-BC",
-    "rows": 104
+    "rows": 111
   },
   "context_incidence_fitted": {
     "person_count_columns": [],
@@ -189,6 +192,18 @@
     "person_count_columns": [],
     "description": "VA-MENGOC-BC doses and coverage (public)",
     "rows": 40
+  },
+  "p1_comparator_products": {
+    "person_count_columns": [
+      "n"
+    ],
+    "description": "Reports of each Finlay comparator product (a report may hold two)",
+    "rows": 6
+  },
+  "p1_observed_months": {
+    "person_count_columns": [],
+    "description": "Months covered by each annual workbook",
+    "rows": 10
   },
   "p2_capability": {
     "person_count_columns": [],
@@ -235,13 +250,21 @@
     "description": "National vs export lots: TOST and HL shift",
     "rows": 11
   },
+  "p2_lot_validity_by_year": {
+    "person_count_columns": [
+      "n_assessable",
+      "n_inconsistent"
+    ],
+    "description": "Reports whose recorded lot was expired or not yet released, by analytic year",
+    "rows": 10
+  },
   "p2_linkage_by_year": {
     "person_count_columns": [
       "n_reports",
       "n_linked"
     ],
     "description": "Linkage by analytic year",
-    "rows": 9
+    "rows": 10
   },
   "p2_linkage_bias": {
     "person_count_columns": [

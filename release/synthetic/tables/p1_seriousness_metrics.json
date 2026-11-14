@@ -1,25 +1,27 @@
 {
-  "events_test": 57,
-  "events_train": 119,
+  "events_test": 14,
+  "events_train": 33,
   "metrics": {
     "gbm_test": {
-      "auprc": 0.07896324199523373,
-      "auroc": 0.6813556431719487,
-      "brier": 0.009155082521988295,
-      "cal_intercept": 0.0646624010068306,
-      "cal_slope": 0.5970762401230938,
-      "prevalence": 0.009462151394422311
+      "auprc": 0.014577779651375262,
+      "auroc": 0.6397347740667976,
+      "brier": 0.007133821682902713,
+      "cal_intercept": 0.04066395400575818,
+      "cal_slope": 0.2913099928429108,
+      "prevalence": 0.006829268292682927
     },
     "logistic_test": {
-      "auprc": 0.1189695519358512,
-      "auroc": 0.6868404881820774,
-      "brier": 0.008947802609269513,
-      "cal_intercept": 0.021542681264908763,
-      "cal_slope": 0.9704836127833942,
-      "prevalence": 0.009462151394422311
+      "auprc": 0.03980798235935008,
+      "auroc": 0.6299291327532978,
+      "brier": 0.006804814295255751,
+      "cal_intercept": -0.18634483300684476,
+      "cal_slope": 0.6453506744153304,
+      "prevalence": 0.006829268292682927
     }
   },
-  "n_test": 6024,
-  "n_train": 12672,
-  "notes": []
+  "n_test": 2050,
+  "n_train": 3699,
+  "notes": [
+    "term vac_HIB dropped from the logistic model (exact collinearity)"
+  ]
 }

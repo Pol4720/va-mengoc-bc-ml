@@ -1,4 +1,9 @@
 file_year,check,category,n_records,n_flagged,pct_flagged,label_en,label_es
+2017,dq_vaccination_year_imputed,plausibility/temporal,2417,<5,,"Vaccination year mistyped, corrected from the notification date and workbook year","Año de vacunación mal tecleado, corregido con la fecha de notificación y el año del libro"
+2017,dq_vaccination_year_dropped,plausibility/temporal,2417,0,0.0,Impossible vaccination date that could not be corrected (not used),Fecha de vacunación imposible y no corregible (no utilizada)
+2017,dq_notification_year_imputed,plausibility/temporal,2417,5,0.2068680182043856,"Notification year mistyped, corrected from the vaccination date and workbook year","Año de notificación mal tecleado, corregido con la fecha de vacunación y el año del libro"
+2017,dq_notification_year_dropped,plausibility/temporal,2417,0,0.0,Impossible notification date that could not be corrected (not used),Fecha de notificación imposible y no corregible (no utilizada)
+2017,dq_schedule_invalid,plausibility/schedule,2417,51,2.110053785684733,VA-MENGOC-BC dose outside the schedule (below minimum age or non-existent dose),Dosis de VA-MENGOC-BC fuera del esquema (por debajo de la edad mínima o dosis inexistente)
 2017,dq_notification_before_vaccination,plausibility/temporal,2417,11,0.4551096400496483,Notification date before vaccination date,Fecha de notificación anterior a la vacunación
 2017,dq_notification_delay_implausible,plausibility/temporal,2417,0,0.0,Notification delay above plausible maximum,Demora de notificación mayor que el máximo plausible
 2017,dq_birth_after_vaccination,plausibility/temporal,2417,0,0.0,Birth date after vaccination date,Fecha de nacimiento posterior a la vacunación
@@ -11,153 +16,216 @@ file_year,check,category,n_records,n_flagged,pct_flagged,label_en,label_es
 2017,dq_hospitalized_without_date,plausibility/atemporal,2417,0,0.0,Hospitalised without admission date,Ingresado sin fecha de ingreso
 2017,dq_admission_date_not_hospitalized,plausibility/atemporal,2417,0,0.0,Admission date recorded but not hospitalised,Fecha de ingreso registrada sin ingreso
 2017,dq_pregnant_male,plausibility/atemporal,2417,0,0.0,Pregnancy recorded for a male,Embarazo registrado en varón
-2017,dq_pregnant_age_implausible,plausibility/atemporal,2417,6,0.24824162184526272,Pregnancy at implausible age,Embarazo a edad no plausible
+2017,dq_pregnant_age_implausible,plausibility/atemporal,2417,<5,,Pregnancy at implausible age,Embarazo a edad no plausible
 2017,dq_recovered_and_died,plausibility/atemporal,2417,0,0.0,Both recovered and died,Curado y fallecido a la vez
-2017,dq_no_event_marked,completeness,2417,<5,,No event indicator marked,Ningún evento marcado
+2017,dq_no_event_marked,completeness,2417,7,0.2896152254861398,No event indicator marked,Ningún evento marcado
 2017,dq_unmapped_vaccine,conformance,2417,0,0.0,Vaccine code not in dictionary,Código de vacuna fuera del diccionario
 2017,dq_target_lot_missing,completeness,2417,<5,,VA-MENGOC-BC report without lot,Notificación de VA-MENGOC-BC sin lote
-2017,dq_month_mismatch,plausibility/atemporal,2417,108,4.468349193214729,MONTH column matches neither vaccination nor notification month,Columna MES no coincide con el mes de vacunación ni de notificación
-2018,dq_notification_before_vaccination,plausibility/temporal,2374,12,0.5054759898904801,Notification date before vaccination date,Fecha de notificación anterior a la vacunación
-2018,dq_notification_delay_implausible,plausibility/temporal,2374,0,0.0,Notification delay above plausible maximum,Demora de notificación mayor que el máximo plausible
-2018,dq_birth_after_vaccination,plausibility/temporal,2374,0,0.0,Birth date after vaccination date,Fecha de nacimiento posterior a la vacunación
-2018,dq_discharge_before_admission,plausibility/temporal,2374,0,0.0,Discharge before admission,Egreso anterior al ingreso
-2018,dq_stay_implausible,plausibility/temporal,2374,0,0.0,Hospital stay above plausible maximum,Estadía hospitalaria mayor que el máximo plausible
-2018,dq_admission_before_vaccination,plausibility/temporal,2374,0,0.0,Admission before vaccination,Ingreso anterior a la vacunación
-2018,dq_age_conflict,plausibility/atemporal,2374,0,0.0,Reported age disagrees with date-derived age,Edad informada discrepante con la edad calculada
-2018,dq_age_missing,completeness,2374,0,0.0,Age not determinable,Edad no determinable
-2018,dq_age_group_mismatch,plausibility/atemporal,2374,0,0.0,Age group inconsistent with age,Grupo de edad inconsistente con la edad
-2018,dq_hospitalized_without_date,plausibility/atemporal,2374,0,0.0,Hospitalised without admission date,Ingresado sin fecha de ingreso
-2018,dq_admission_date_not_hospitalized,plausibility/atemporal,2374,0,0.0,Admission date recorded but not hospitalised,Fecha de ingreso registrada sin ingreso
-2018,dq_pregnant_male,plausibility/atemporal,2374,0,0.0,Pregnancy recorded for a male,Embarazo registrado en varón
-2018,dq_pregnant_age_implausible,plausibility/atemporal,2374,5,0.21061499578770007,Pregnancy at implausible age,Embarazo a edad no plausible
-2018,dq_recovered_and_died,plausibility/atemporal,2374,0,0.0,Both recovered and died,Curado y fallecido a la vez
-2018,dq_no_event_marked,completeness,2374,<5,,No event indicator marked,Ningún evento marcado
-2018,dq_unmapped_vaccine,conformance,2374,0,0.0,Vaccine code not in dictionary,Código de vacuna fuera del diccionario
-2018,dq_target_lot_missing,completeness,2374,<5,,VA-MENGOC-BC report without lot,Notificación de VA-MENGOC-BC sin lote
-2018,dq_month_mismatch,plausibility/atemporal,2374,95,4.001684919966301,MONTH column matches neither vaccination nor notification month,Columna MES no coincide con el mes de vacunación ni de notificación
-2019,dq_notification_before_vaccination,plausibility/temporal,2210,10,0.45248868778280543,Notification date before vaccination date,Fecha de notificación anterior a la vacunación
-2019,dq_notification_delay_implausible,plausibility/temporal,2210,0,0.0,Notification delay above plausible maximum,Demora de notificación mayor que el máximo plausible
-2019,dq_birth_after_vaccination,plausibility/temporal,2210,0,0.0,Birth date after vaccination date,Fecha de nacimiento posterior a la vacunación
-2019,dq_discharge_before_admission,plausibility/temporal,2210,0,0.0,Discharge before admission,Egreso anterior al ingreso
-2019,dq_stay_implausible,plausibility/temporal,2210,0,0.0,Hospital stay above plausible maximum,Estadía hospitalaria mayor que el máximo plausible
-2019,dq_admission_before_vaccination,plausibility/temporal,2210,0,0.0,Admission before vaccination,Ingreso anterior a la vacunación
-2019,dq_age_conflict,plausibility/atemporal,2210,0,0.0,Reported age disagrees with date-derived age,Edad informada discrepante con la edad calculada
-2019,dq_age_missing,completeness,2210,0,0.0,Age not determinable,Edad no determinable
-2019,dq_age_group_mismatch,plausibility/atemporal,2210,0,0.0,Age group inconsistent with age,Grupo de edad inconsistente con la edad
-2019,dq_hospitalized_without_date,plausibility/atemporal,2210,0,0.0,Hospitalised without admission date,Ingresado sin fecha de ingreso
-2019,dq_admission_date_not_hospitalized,plausibility/atemporal,2210,0,0.0,Admission date recorded but not hospitalised,Fecha de ingreso registrada sin ingreso
-2019,dq_pregnant_male,plausibility/atemporal,2210,0,0.0,Pregnancy recorded for a male,Embarazo registrado en varón
-2019,dq_pregnant_age_implausible,plausibility/atemporal,2210,<5,,Pregnancy at implausible age,Embarazo a edad no plausible
-2019,dq_recovered_and_died,plausibility/atemporal,2210,0,0.0,Both recovered and died,Curado y fallecido a la vez
-2019,dq_no_event_marked,completeness,2210,<5,,No event indicator marked,Ningún evento marcado
-2019,dq_unmapped_vaccine,conformance,2210,0,0.0,Vaccine code not in dictionary,Código de vacuna fuera del diccionario
-2019,dq_target_lot_missing,completeness,2210,0,0.0,VA-MENGOC-BC report without lot,Notificación de VA-MENGOC-BC sin lote
-2019,dq_month_mismatch,plausibility/atemporal,2210,102,4.615384615384615,MONTH column matches neither vaccination nor notification month,Columna MES no coincide con el mes de vacunación ni de notificación
-2020,dq_notification_before_vaccination,plausibility/temporal,1726,9,0.5214368482039398,Notification date before vaccination date,Fecha de notificación anterior a la vacunación
-2020,dq_notification_delay_implausible,plausibility/temporal,1726,0,0.0,Notification delay above plausible maximum,Demora de notificación mayor que el máximo plausible
-2020,dq_birth_after_vaccination,plausibility/temporal,1726,0,0.0,Birth date after vaccination date,Fecha de nacimiento posterior a la vacunación
-2020,dq_discharge_before_admission,plausibility/temporal,1726,0,0.0,Discharge before admission,Egreso anterior al ingreso
-2020,dq_stay_implausible,plausibility/temporal,1726,0,0.0,Hospital stay above plausible maximum,Estadía hospitalaria mayor que el máximo plausible
-2020,dq_admission_before_vaccination,plausibility/temporal,1726,0,0.0,Admission before vaccination,Ingreso anterior a la vacunación
-2020,dq_age_conflict,plausibility/atemporal,1726,0,0.0,Reported age disagrees with date-derived age,Edad informada discrepante con la edad calculada
-2020,dq_age_missing,completeness,1726,0,0.0,Age not determinable,Edad no determinable
-2020,dq_age_group_mismatch,plausibility/atemporal,1726,0,0.0,Age group inconsistent with age,Grupo de edad inconsistente con la edad
-2020,dq_hospitalized_without_date,plausibility/atemporal,1726,0,0.0,Hospitalised without admission date,Ingresado sin fecha de ingreso
-2020,dq_admission_date_not_hospitalized,plausibility/atemporal,1726,0,0.0,Admission date recorded but not hospitalised,Fecha de ingreso registrada sin ingreso
-2020,dq_pregnant_male,plausibility/atemporal,1726,0,0.0,Pregnancy recorded for a male,Embarazo registrado en varón
-2020,dq_pregnant_age_implausible,plausibility/atemporal,1726,5,0.28968713789107764,Pregnancy at implausible age,Embarazo a edad no plausible
-2020,dq_recovered_and_died,plausibility/atemporal,1726,0,0.0,Both recovered and died,Curado y fallecido a la vez
-2020,dq_no_event_marked,completeness,1726,5,0.28968713789107764,No event indicator marked,Ningún evento marcado
-2020,dq_unmapped_vaccine,conformance,1726,0,0.0,Vaccine code not in dictionary,Código de vacuna fuera del diccionario
-2020,dq_target_lot_missing,completeness,1726,0,0.0,VA-MENGOC-BC report without lot,Notificación de VA-MENGOC-BC sin lote
-2020,dq_month_mismatch,plausibility/atemporal,1726,67,3.88180764774044,MONTH column matches neither vaccination nor notification month,Columna MES no coincide con el mes de vacunación ni de notificación
-2021,dq_notification_before_vaccination,plausibility/temporal,1620,<5,,Notification date before vaccination date,Fecha de notificación anterior a la vacunación
-2021,dq_notification_delay_implausible,plausibility/temporal,1620,0,0.0,Notification delay above plausible maximum,Demora de notificación mayor que el máximo plausible
-2021,dq_birth_after_vaccination,plausibility/temporal,1620,0,0.0,Birth date after vaccination date,Fecha de nacimiento posterior a la vacunación
-2021,dq_discharge_before_admission,plausibility/temporal,1620,0,0.0,Discharge before admission,Egreso anterior al ingreso
-2021,dq_stay_implausible,plausibility/temporal,1620,0,0.0,Hospital stay above plausible maximum,Estadía hospitalaria mayor que el máximo plausible
-2021,dq_admission_before_vaccination,plausibility/temporal,1620,0,0.0,Admission before vaccination,Ingreso anterior a la vacunación
-2021,dq_age_conflict,plausibility/atemporal,1620,0,0.0,Reported age disagrees with date-derived age,Edad informada discrepante con la edad calculada
-2021,dq_age_missing,completeness,1620,0,0.0,Age not determinable,Edad no determinable
-2021,dq_age_group_mismatch,plausibility/atemporal,1620,0,0.0,Age group inconsistent with age,Grupo de edad inconsistente con la edad
-2021,dq_hospitalized_without_date,plausibility/atemporal,1620,0,0.0,Hospitalised without admission date,Ingresado sin fecha de ingreso
-2021,dq_admission_date_not_hospitalized,plausibility/atemporal,1620,0,0.0,Admission date recorded but not hospitalised,Fecha de ingreso registrada sin ingreso
-2021,dq_pregnant_male,plausibility/atemporal,1620,0,0.0,Pregnancy recorded for a male,Embarazo registrado en varón
-2021,dq_pregnant_age_implausible,plausibility/atemporal,1620,<5,,Pregnancy at implausible age,Embarazo a edad no plausible
-2021,dq_recovered_and_died,plausibility/atemporal,1620,0,0.0,Both recovered and died,Curado y fallecido a la vez
-2021,dq_no_event_marked,completeness,1620,<5,,No event indicator marked,Ningún evento marcado
-2021,dq_unmapped_vaccine,conformance,1620,0,0.0,Vaccine code not in dictionary,Código de vacuna fuera del diccionario
-2021,dq_target_lot_missing,completeness,1620,0,0.0,VA-MENGOC-BC report without lot,Notificación de VA-MENGOC-BC sin lote
-2021,dq_month_mismatch,plausibility/atemporal,1620,57,3.5185185185185186,MONTH column matches neither vaccination nor notification month,Columna MES no coincide con el mes de vacunación ni de notificación
-2022,dq_notification_before_vaccination,plausibility/temporal,2413,19,0.7874015748031497,Notification date before vaccination date,Fecha de notificación anterior a la vacunación
-2022,dq_notification_delay_implausible,plausibility/temporal,2413,0,0.0,Notification delay above plausible maximum,Demora de notificación mayor que el máximo plausible
-2022,dq_birth_after_vaccination,plausibility/temporal,2413,0,0.0,Birth date after vaccination date,Fecha de nacimiento posterior a la vacunación
-2022,dq_discharge_before_admission,plausibility/temporal,2413,0,0.0,Discharge before admission,Egreso anterior al ingreso
-2022,dq_stay_implausible,plausibility/temporal,2413,0,0.0,Hospital stay above plausible maximum,Estadía hospitalaria mayor que el máximo plausible
-2022,dq_admission_before_vaccination,plausibility/temporal,2413,0,0.0,Admission before vaccination,Ingreso anterior a la vacunación
-2022,dq_age_conflict,plausibility/atemporal,2413,0,0.0,Reported age disagrees with date-derived age,Edad informada discrepante con la edad calculada
-2022,dq_age_missing,completeness,2413,0,0.0,Age not determinable,Edad no determinable
-2022,dq_age_group_mismatch,plausibility/atemporal,2413,0,0.0,Age group inconsistent with age,Grupo de edad inconsistente con la edad
-2022,dq_hospitalized_without_date,plausibility/atemporal,2413,0,0.0,Hospitalised without admission date,Ingresado sin fecha de ingreso
-2022,dq_admission_date_not_hospitalized,plausibility/atemporal,2413,0,0.0,Admission date recorded but not hospitalised,Fecha de ingreso registrada sin ingreso
-2022,dq_pregnant_male,plausibility/atemporal,2413,0,0.0,Pregnancy recorded for a male,Embarazo registrado en varón
-2022,dq_pregnant_age_implausible,plausibility/atemporal,2413,<5,,Pregnancy at implausible age,Embarazo a edad no plausible
-2022,dq_recovered_and_died,plausibility/atemporal,2413,0,0.0,Both recovered and died,Curado y fallecido a la vez
-2022,dq_no_event_marked,completeness,2413,7,0.29009531703273933,No event indicator marked,Ningún evento marcado
-2022,dq_unmapped_vaccine,conformance,2413,0,0.0,Vaccine code not in dictionary,Código de vacuna fuera del diccionario
-2022,dq_target_lot_missing,completeness,2413,<5,,VA-MENGOC-BC report without lot,Notificación de VA-MENGOC-BC sin lote
-2022,dq_month_mismatch,plausibility/atemporal,2413,101,4.185661002900953,MONTH column matches neither vaccination nor notification month,Columna MES no coincide con el mes de vacunación ni de notificación
-2023,dq_notification_before_vaccination,plausibility/temporal,2239,10,0.4466279589102278,Notification date before vaccination date,Fecha de notificación anterior a la vacunación
-2023,dq_notification_delay_implausible,plausibility/temporal,2239,0,0.0,Notification delay above plausible maximum,Demora de notificación mayor que el máximo plausible
-2023,dq_birth_after_vaccination,plausibility/temporal,2239,0,0.0,Birth date after vaccination date,Fecha de nacimiento posterior a la vacunación
-2023,dq_discharge_before_admission,plausibility/temporal,2239,0,0.0,Discharge before admission,Egreso anterior al ingreso
-2023,dq_stay_implausible,plausibility/temporal,2239,0,0.0,Hospital stay above plausible maximum,Estadía hospitalaria mayor que el máximo plausible
-2023,dq_admission_before_vaccination,plausibility/temporal,2239,0,0.0,Admission before vaccination,Ingreso anterior a la vacunación
-2023,dq_age_conflict,plausibility/atemporal,2239,0,0.0,Reported age disagrees with date-derived age,Edad informada discrepante con la edad calculada
-2023,dq_age_missing,completeness,2239,0,0.0,Age not determinable,Edad no determinable
-2023,dq_age_group_mismatch,plausibility/atemporal,2239,0,0.0,Age group inconsistent with age,Grupo de edad inconsistente con la edad
-2023,dq_hospitalized_without_date,plausibility/atemporal,2239,0,0.0,Hospitalised without admission date,Ingresado sin fecha de ingreso
-2023,dq_admission_date_not_hospitalized,plausibility/atemporal,2239,0,0.0,Admission date recorded but not hospitalised,Fecha de ingreso registrada sin ingreso
-2023,dq_pregnant_male,plausibility/atemporal,2239,0,0.0,Pregnancy recorded for a male,Embarazo registrado en varón
-2023,dq_pregnant_age_implausible,plausibility/atemporal,2239,<5,,Pregnancy at implausible age,Embarazo a edad no plausible
-2023,dq_recovered_and_died,plausibility/atemporal,2239,0,0.0,Both recovered and died,Curado y fallecido a la vez
-2023,dq_no_event_marked,completeness,2239,<5,,No event indicator marked,Ningún evento marcado
-2023,dq_unmapped_vaccine,conformance,2239,0,0.0,Vaccine code not in dictionary,Código de vacuna fuera del diccionario
-2023,dq_target_lot_missing,completeness,2239,<5,,VA-MENGOC-BC report without lot,Notificación de VA-MENGOC-BC sin lote
-2023,dq_month_mismatch,plausibility/atemporal,2239,110,4.912907548012505,MONTH column matches neither vaccination nor notification month,Columna MES no coincide con el mes de vacunación ni de notificación
-2024,dq_notification_before_vaccination,plausibility/temporal,2260,10,0.4424778761061947,Notification date before vaccination date,Fecha de notificación anterior a la vacunación
-2024,dq_notification_delay_implausible,plausibility/temporal,2260,0,0.0,Notification delay above plausible maximum,Demora de notificación mayor que el máximo plausible
-2024,dq_birth_after_vaccination,plausibility/temporal,2260,0,0.0,Birth date after vaccination date,Fecha de nacimiento posterior a la vacunación
-2024,dq_discharge_before_admission,plausibility/temporal,2260,0,0.0,Discharge before admission,Egreso anterior al ingreso
-2024,dq_stay_implausible,plausibility/temporal,2260,0,0.0,Hospital stay above plausible maximum,Estadía hospitalaria mayor que el máximo plausible
-2024,dq_admission_before_vaccination,plausibility/temporal,2260,0,0.0,Admission before vaccination,Ingreso anterior a la vacunación
-2024,dq_age_conflict,plausibility/atemporal,2260,0,0.0,Reported age disagrees with date-derived age,Edad informada discrepante con la edad calculada
-2024,dq_age_missing,completeness,2260,0,0.0,Age not determinable,Edad no determinable
-2024,dq_age_group_mismatch,plausibility/atemporal,2260,0,0.0,Age group inconsistent with age,Grupo de edad inconsistente con la edad
-2024,dq_hospitalized_without_date,plausibility/atemporal,2260,0,0.0,Hospitalised without admission date,Ingresado sin fecha de ingreso
-2024,dq_admission_date_not_hospitalized,plausibility/atemporal,2260,0,0.0,Admission date recorded but not hospitalised,Fecha de ingreso registrada sin ingreso
-2024,dq_pregnant_male,plausibility/atemporal,2260,0,0.0,Pregnancy recorded for a male,Embarazo registrado en varón
-2024,dq_pregnant_age_implausible,plausibility/atemporal,2260,<5,,Pregnancy at implausible age,Embarazo a edad no plausible
-2024,dq_recovered_and_died,plausibility/atemporal,2260,0,0.0,Both recovered and died,Curado y fallecido a la vez
-2024,dq_no_event_marked,completeness,2260,<5,,No event indicator marked,Ningún evento marcado
-2024,dq_unmapped_vaccine,conformance,2260,0,0.0,Vaccine code not in dictionary,Código de vacuna fuera del diccionario
-2024,dq_target_lot_missing,completeness,2260,<5,,VA-MENGOC-BC report without lot,Notificación de VA-MENGOC-BC sin lote
-2024,dq_month_mismatch,plausibility/atemporal,2260,92,4.070796460176991,MONTH column matches neither vaccination nor notification month,Columna MES no coincide con el mes de vacunación ni de notificación
-2025,dq_notification_before_vaccination,plausibility/temporal,1523,9,0.5909389363099147,Notification date before vaccination date,Fecha de notificación anterior a la vacunación
-2025,dq_notification_delay_implausible,plausibility/temporal,1523,0,0.0,Notification delay above plausible maximum,Demora de notificación mayor que el máximo plausible
-2025,dq_birth_after_vaccination,plausibility/temporal,1523,0,0.0,Birth date after vaccination date,Fecha de nacimiento posterior a la vacunación
-2025,dq_discharge_before_admission,plausibility/temporal,1523,0,0.0,Discharge before admission,Egreso anterior al ingreso
-2025,dq_stay_implausible,plausibility/temporal,1523,0,0.0,Hospital stay above plausible maximum,Estadía hospitalaria mayor que el máximo plausible
-2025,dq_admission_before_vaccination,plausibility/temporal,1523,0,0.0,Admission before vaccination,Ingreso anterior a la vacunación
-2025,dq_age_conflict,plausibility/atemporal,1523,0,0.0,Reported age disagrees with date-derived age,Edad informada discrepante con la edad calculada
-2025,dq_age_missing,completeness,1523,0,0.0,Age not determinable,Edad no determinable
-2025,dq_age_group_mismatch,plausibility/atemporal,1523,0,0.0,Age group inconsistent with age,Grupo de edad inconsistente con la edad
-2025,dq_hospitalized_without_date,plausibility/atemporal,1523,0,0.0,Hospitalised without admission date,Ingresado sin fecha de ingreso
-2025,dq_admission_date_not_hospitalized,plausibility/atemporal,1523,0,0.0,Admission date recorded but not hospitalised,Fecha de ingreso registrada sin ingreso
-2025,dq_pregnant_male,plausibility/atemporal,1523,0,0.0,Pregnancy recorded for a male,Embarazo registrado en varón
-2025,dq_pregnant_age_implausible,plausibility/atemporal,1523,5,0.3282994090610637,Pregnancy at implausible age,Embarazo a edad no plausible
-2025,dq_recovered_and_died,plausibility/atemporal,1523,0,0.0,Both recovered and died,Curado y fallecido a la vez
-2025,dq_no_event_marked,completeness,1523,<5,,No event indicator marked,Ningún evento marcado
-2025,dq_unmapped_vaccine,conformance,1523,0,0.0,Vaccine code not in dictionary,Código de vacuna fuera del diccionario
-2025,dq_target_lot_missing,completeness,1523,<5,,VA-MENGOC-BC report without lot,Notificación de VA-MENGOC-BC sin lote
-2025,dq_month_mismatch,plausibility/atemporal,1523,55,3.6112934996717008,MONTH column matches neither vaccination nor notification month,Columna MES no coincide con el mes de vacunación ni de notificación
+2017,dq_month_mismatch,plausibility/atemporal,2417,107,4.426975589573852,MONTH column matches neither vaccination nor notification month,Columna MES no coincide con el mes de vacunación ni de notificación
+2018,dq_vaccination_year_imputed,plausibility/temporal,2275,<5,,"Vaccination year mistyped, corrected from the notification date and workbook year","Año de vacunación mal tecleado, corregido con la fecha de notificación y el año del libro"
+2018,dq_vaccination_year_dropped,plausibility/temporal,2275,0,0.0,Impossible vaccination date that could not be corrected (not used),Fecha de vacunación imposible y no corregible (no utilizada)
+2018,dq_notification_year_imputed,plausibility/temporal,2275,5,0.21978021978021978,"Notification year mistyped, corrected from the vaccination date and workbook year","Año de notificación mal tecleado, corregido con la fecha de vacunación y el año del libro"
+2018,dq_notification_year_dropped,plausibility/temporal,2275,0,0.0,Impossible notification date that could not be corrected (not used),Fecha de notificación imposible y no corregible (no utilizada)
+2018,dq_schedule_invalid,plausibility/schedule,2275,57,2.5054945054945055,VA-MENGOC-BC dose outside the schedule (below minimum age or non-existent dose),Dosis de VA-MENGOC-BC fuera del esquema (por debajo de la edad mínima o dosis inexistente)
+2018,dq_notification_before_vaccination,plausibility/temporal,2275,7,0.3076923076923077,Notification date before vaccination date,Fecha de notificación anterior a la vacunación
+2018,dq_notification_delay_implausible,plausibility/temporal,2275,0,0.0,Notification delay above plausible maximum,Demora de notificación mayor que el máximo plausible
+2018,dq_birth_after_vaccination,plausibility/temporal,2275,0,0.0,Birth date after vaccination date,Fecha de nacimiento posterior a la vacunación
+2018,dq_discharge_before_admission,plausibility/temporal,2275,0,0.0,Discharge before admission,Egreso anterior al ingreso
+2018,dq_stay_implausible,plausibility/temporal,2275,0,0.0,Hospital stay above plausible maximum,Estadía hospitalaria mayor que el máximo plausible
+2018,dq_admission_before_vaccination,plausibility/temporal,2275,0,0.0,Admission before vaccination,Ingreso anterior a la vacunación
+2018,dq_age_conflict,plausibility/atemporal,2275,<5,,Reported age disagrees with date-derived age,Edad informada discrepante con la edad calculada
+2018,dq_age_missing,completeness,2275,0,0.0,Age not determinable,Edad no determinable
+2018,dq_age_group_mismatch,plausibility/atemporal,2275,0,0.0,Age group inconsistent with age,Grupo de edad inconsistente con la edad
+2018,dq_hospitalized_without_date,plausibility/atemporal,2275,0,0.0,Hospitalised without admission date,Ingresado sin fecha de ingreso
+2018,dq_admission_date_not_hospitalized,plausibility/atemporal,2275,0,0.0,Admission date recorded but not hospitalised,Fecha de ingreso registrada sin ingreso
+2018,dq_pregnant_male,plausibility/atemporal,2275,0,0.0,Pregnancy recorded for a male,Embarazo registrado en varón
+2018,dq_pregnant_age_implausible,plausibility/atemporal,2275,<5,,Pregnancy at implausible age,Embarazo a edad no plausible
+2018,dq_recovered_and_died,plausibility/atemporal,2275,0,0.0,Both recovered and died,Curado y fallecido a la vez
+2018,dq_no_event_marked,completeness,2275,<5,,No event indicator marked,Ningún evento marcado
+2018,dq_unmapped_vaccine,conformance,2275,0,0.0,Vaccine code not in dictionary,Código de vacuna fuera del diccionario
+2018,dq_target_lot_missing,completeness,2275,<5,,VA-MENGOC-BC report without lot,Notificación de VA-MENGOC-BC sin lote
+2018,dq_month_mismatch,plausibility/atemporal,2275,97,4.263736263736264,MONTH column matches neither vaccination nor notification month,Columna MES no coincide con el mes de vacunación ni de notificación
+2019,dq_vaccination_year_imputed,plausibility/temporal,2324,5,0.21514629948364888,"Vaccination year mistyped, corrected from the notification date and workbook year","Año de vacunación mal tecleado, corregido con la fecha de notificación y el año del libro"
+2019,dq_vaccination_year_dropped,plausibility/temporal,2324,0,0.0,Impossible vaccination date that could not be corrected (not used),Fecha de vacunación imposible y no corregible (no utilizada)
+2019,dq_notification_year_imputed,plausibility/temporal,2324,11,0.47332185886402756,"Notification year mistyped, corrected from the vaccination date and workbook year","Año de notificación mal tecleado, corregido con la fecha de vacunación y el año del libro"
+2019,dq_notification_year_dropped,plausibility/temporal,2324,0,0.0,Impossible notification date that could not be corrected (not used),Fecha de notificación imposible y no corregible (no utilizada)
+2019,dq_schedule_invalid,plausibility/schedule,2324,41,1.7641996557659207,VA-MENGOC-BC dose outside the schedule (below minimum age or non-existent dose),Dosis de VA-MENGOC-BC fuera del esquema (por debajo de la edad mínima o dosis inexistente)
+2019,dq_notification_before_vaccination,plausibility/temporal,2324,13,0.5593803786574871,Notification date before vaccination date,Fecha de notificación anterior a la vacunación
+2019,dq_notification_delay_implausible,plausibility/temporal,2324,0,0.0,Notification delay above plausible maximum,Demora de notificación mayor que el máximo plausible
+2019,dq_birth_after_vaccination,plausibility/temporal,2324,0,0.0,Birth date after vaccination date,Fecha de nacimiento posterior a la vacunación
+2019,dq_discharge_before_admission,plausibility/temporal,2324,0,0.0,Discharge before admission,Egreso anterior al ingreso
+2019,dq_stay_implausible,plausibility/temporal,2324,0,0.0,Hospital stay above plausible maximum,Estadía hospitalaria mayor que el máximo plausible
+2019,dq_admission_before_vaccination,plausibility/temporal,2324,0,0.0,Admission before vaccination,Ingreso anterior a la vacunación
+2019,dq_age_conflict,plausibility/atemporal,2324,0,0.0,Reported age disagrees with date-derived age,Edad informada discrepante con la edad calculada
+2019,dq_age_missing,completeness,2324,0,0.0,Age not determinable,Edad no determinable
+2019,dq_age_group_mismatch,plausibility/atemporal,2324,0,0.0,Age group inconsistent with age,Grupo de edad inconsistente con la edad
+2019,dq_hospitalized_without_date,plausibility/atemporal,2324,0,0.0,Hospitalised without admission date,Ingresado sin fecha de ingreso
+2019,dq_admission_date_not_hospitalized,plausibility/atemporal,2324,0,0.0,Admission date recorded but not hospitalised,Fecha de ingreso registrada sin ingreso
+2019,dq_pregnant_male,plausibility/atemporal,2324,0,0.0,Pregnancy recorded for a male,Embarazo registrado en varón
+2019,dq_pregnant_age_implausible,plausibility/atemporal,2324,6,0.25817555938037867,Pregnancy at implausible age,Embarazo a edad no plausible
+2019,dq_recovered_and_died,plausibility/atemporal,2324,0,0.0,Both recovered and died,Curado y fallecido a la vez
+2019,dq_no_event_marked,completeness,2324,5,0.21514629948364888,No event indicator marked,Ningún evento marcado
+2019,dq_unmapped_vaccine,conformance,2324,0,0.0,Vaccine code not in dictionary,Código de vacuna fuera del diccionario
+2019,dq_target_lot_missing,completeness,2324,<5,,VA-MENGOC-BC report without lot,Notificación de VA-MENGOC-BC sin lote
+2019,dq_month_mismatch,plausibility/atemporal,2324,98,4.216867469879518,MONTH column matches neither vaccination nor notification month,Columna MES no coincide con el mes de vacunación ni de notificación
+2020,dq_vaccination_year_imputed,plausibility/temporal,1581,<5,,"Vaccination year mistyped, corrected from the notification date and workbook year","Año de vacunación mal tecleado, corregido con la fecha de notificación y el año del libro"
+2020,dq_vaccination_year_dropped,plausibility/temporal,1581,0,0.0,Impossible vaccination date that could not be corrected (not used),Fecha de vacunación imposible y no corregible (no utilizada)
+2020,dq_notification_year_imputed,plausibility/temporal,1581,<5,,"Notification year mistyped, corrected from the vaccination date and workbook year","Año de notificación mal tecleado, corregido con la fecha de vacunación y el año del libro"
+2020,dq_notification_year_dropped,plausibility/temporal,1581,0,0.0,Impossible notification date that could not be corrected (not used),Fecha de notificación imposible y no corregible (no utilizada)
+2020,dq_schedule_invalid,plausibility/schedule,1581,26,1.644528779253637,VA-MENGOC-BC dose outside the schedule (below minimum age or non-existent dose),Dosis de VA-MENGOC-BC fuera del esquema (por debajo de la edad mínima o dosis inexistente)
+2020,dq_notification_before_vaccination,plausibility/temporal,1581,8,0.5060088551549652,Notification date before vaccination date,Fecha de notificación anterior a la vacunación
+2020,dq_notification_delay_implausible,plausibility/temporal,1581,0,0.0,Notification delay above plausible maximum,Demora de notificación mayor que el máximo plausible
+2020,dq_birth_after_vaccination,plausibility/temporal,1581,0,0.0,Birth date after vaccination date,Fecha de nacimiento posterior a la vacunación
+2020,dq_discharge_before_admission,plausibility/temporal,1581,0,0.0,Discharge before admission,Egreso anterior al ingreso
+2020,dq_stay_implausible,plausibility/temporal,1581,0,0.0,Hospital stay above plausible maximum,Estadía hospitalaria mayor que el máximo plausible
+2020,dq_admission_before_vaccination,plausibility/temporal,1581,0,0.0,Admission before vaccination,Ingreso anterior a la vacunación
+2020,dq_age_conflict,plausibility/atemporal,1581,0,0.0,Reported age disagrees with date-derived age,Edad informada discrepante con la edad calculada
+2020,dq_age_missing,completeness,1581,0,0.0,Age not determinable,Edad no determinable
+2020,dq_age_group_mismatch,plausibility/atemporal,1581,0,0.0,Age group inconsistent with age,Grupo de edad inconsistente con la edad
+2020,dq_hospitalized_without_date,plausibility/atemporal,1581,0,0.0,Hospitalised without admission date,Ingresado sin fecha de ingreso
+2020,dq_admission_date_not_hospitalized,plausibility/atemporal,1581,0,0.0,Admission date recorded but not hospitalised,Fecha de ingreso registrada sin ingreso
+2020,dq_pregnant_male,plausibility/atemporal,1581,0,0.0,Pregnancy recorded for a male,Embarazo registrado en varón
+2020,dq_pregnant_age_implausible,plausibility/atemporal,1581,0,0.0,Pregnancy at implausible age,Embarazo a edad no plausible
+2020,dq_recovered_and_died,plausibility/atemporal,1581,0,0.0,Both recovered and died,Curado y fallecido a la vez
+2020,dq_no_event_marked,completeness,1581,<5,,No event indicator marked,Ningún evento marcado
+2020,dq_unmapped_vaccine,conformance,1581,0,0.0,Vaccine code not in dictionary,Código de vacuna fuera del diccionario
+2020,dq_target_lot_missing,completeness,1581,0,0.0,VA-MENGOC-BC report without lot,Notificación de VA-MENGOC-BC sin lote
+2020,dq_month_mismatch,plausibility/atemporal,1581,69,4.364326375711575,MONTH column matches neither vaccination nor notification month,Columna MES no coincide con el mes de vacunación ni de notificación
+2021,dq_vaccination_year_imputed,plausibility/temporal,1501,5,0.3331112591605596,"Vaccination year mistyped, corrected from the notification date and workbook year","Año de vacunación mal tecleado, corregido con la fecha de notificación y el año del libro"
+2021,dq_vaccination_year_dropped,plausibility/temporal,1501,0,0.0,Impossible vaccination date that could not be corrected (not used),Fecha de vacunación imposible y no corregible (no utilizada)
+2021,dq_notification_year_imputed,plausibility/temporal,1501,<5,,"Notification year mistyped, corrected from the vaccination date and workbook year","Año de notificación mal tecleado, corregido con la fecha de vacunación y el año del libro"
+2021,dq_notification_year_dropped,plausibility/temporal,1501,0,0.0,Impossible notification date that could not be corrected (not used),Fecha de notificación imposible y no corregible (no utilizada)
+2021,dq_schedule_invalid,plausibility/schedule,1501,26,1.73217854763491,VA-MENGOC-BC dose outside the schedule (below minimum age or non-existent dose),Dosis de VA-MENGOC-BC fuera del esquema (por debajo de la edad mínima o dosis inexistente)
+2021,dq_notification_before_vaccination,plausibility/temporal,1501,7,0.46635576282478347,Notification date before vaccination date,Fecha de notificación anterior a la vacunación
+2021,dq_notification_delay_implausible,plausibility/temporal,1501,0,0.0,Notification delay above plausible maximum,Demora de notificación mayor que el máximo plausible
+2021,dq_birth_after_vaccination,plausibility/temporal,1501,0,0.0,Birth date after vaccination date,Fecha de nacimiento posterior a la vacunación
+2021,dq_discharge_before_admission,plausibility/temporal,1501,0,0.0,Discharge before admission,Egreso anterior al ingreso
+2021,dq_stay_implausible,plausibility/temporal,1501,0,0.0,Hospital stay above plausible maximum,Estadía hospitalaria mayor que el máximo plausible
+2021,dq_admission_before_vaccination,plausibility/temporal,1501,0,0.0,Admission before vaccination,Ingreso anterior a la vacunación
+2021,dq_age_conflict,plausibility/atemporal,1501,0,0.0,Reported age disagrees with date-derived age,Edad informada discrepante con la edad calculada
+2021,dq_age_missing,completeness,1501,0,0.0,Age not determinable,Edad no determinable
+2021,dq_age_group_mismatch,plausibility/atemporal,1501,0,0.0,Age group inconsistent with age,Grupo de edad inconsistente con la edad
+2021,dq_hospitalized_without_date,plausibility/atemporal,1501,0,0.0,Hospitalised without admission date,Ingresado sin fecha de ingreso
+2021,dq_admission_date_not_hospitalized,plausibility/atemporal,1501,0,0.0,Admission date recorded but not hospitalised,Fecha de ingreso registrada sin ingreso
+2021,dq_pregnant_male,plausibility/atemporal,1501,0,0.0,Pregnancy recorded for a male,Embarazo registrado en varón
+2021,dq_pregnant_age_implausible,plausibility/atemporal,1501,<5,,Pregnancy at implausible age,Embarazo a edad no plausible
+2021,dq_recovered_and_died,plausibility/atemporal,1501,0,0.0,Both recovered and died,Curado y fallecido a la vez
+2021,dq_no_event_marked,completeness,1501,<5,,No event indicator marked,Ningún evento marcado
+2021,dq_unmapped_vaccine,conformance,1501,0,0.0,Vaccine code not in dictionary,Código de vacuna fuera del diccionario
+2021,dq_target_lot_missing,completeness,1501,0,0.0,VA-MENGOC-BC report without lot,Notificación de VA-MENGOC-BC sin lote
+2021,dq_month_mismatch,plausibility/atemporal,1501,83,5.52964690206529,MONTH column matches neither vaccination nor notification month,Columna MES no coincide con el mes de vacunación ni de notificación
+2022,dq_vaccination_year_imputed,plausibility/temporal,2332,<5,,"Vaccination year mistyped, corrected from the notification date and workbook year","Año de vacunación mal tecleado, corregido con la fecha de notificación y el año del libro"
+2022,dq_vaccination_year_dropped,plausibility/temporal,2332,0,0.0,Impossible vaccination date that could not be corrected (not used),Fecha de vacunación imposible y no corregible (no utilizada)
+2022,dq_notification_year_imputed,plausibility/temporal,2332,5,0.2144082332761578,"Notification year mistyped, corrected from the vaccination date and workbook year","Año de notificación mal tecleado, corregido con la fecha de vacunación y el año del libro"
+2022,dq_notification_year_dropped,plausibility/temporal,2332,0,0.0,Impossible notification date that could not be corrected (not used),Fecha de notificación imposible y no corregible (no utilizada)
+2022,dq_schedule_invalid,plausibility/schedule,2332,31,1.3293310463121784,VA-MENGOC-BC dose outside the schedule (below minimum age or non-existent dose),Dosis de VA-MENGOC-BC fuera del esquema (por debajo de la edad mínima o dosis inexistente)
+2022,dq_notification_before_vaccination,plausibility/temporal,2332,13,0.5574614065180102,Notification date before vaccination date,Fecha de notificación anterior a la vacunación
+2022,dq_notification_delay_implausible,plausibility/temporal,2332,0,0.0,Notification delay above plausible maximum,Demora de notificación mayor que el máximo plausible
+2022,dq_birth_after_vaccination,plausibility/temporal,2332,0,0.0,Birth date after vaccination date,Fecha de nacimiento posterior a la vacunación
+2022,dq_discharge_before_admission,plausibility/temporal,2332,0,0.0,Discharge before admission,Egreso anterior al ingreso
+2022,dq_stay_implausible,plausibility/temporal,2332,0,0.0,Hospital stay above plausible maximum,Estadía hospitalaria mayor que el máximo plausible
+2022,dq_admission_before_vaccination,plausibility/temporal,2332,0,0.0,Admission before vaccination,Ingreso anterior a la vacunación
+2022,dq_age_conflict,plausibility/atemporal,2332,0,0.0,Reported age disagrees with date-derived age,Edad informada discrepante con la edad calculada
+2022,dq_age_missing,completeness,2332,0,0.0,Age not determinable,Edad no determinable
+2022,dq_age_group_mismatch,plausibility/atemporal,2332,0,0.0,Age group inconsistent with age,Grupo de edad inconsistente con la edad
+2022,dq_hospitalized_without_date,plausibility/atemporal,2332,0,0.0,Hospitalised without admission date,Ingresado sin fecha de ingreso
+2022,dq_admission_date_not_hospitalized,plausibility/atemporal,2332,0,0.0,Admission date recorded but not hospitalised,Fecha de ingreso registrada sin ingreso
+2022,dq_pregnant_male,plausibility/atemporal,2332,0,0.0,Pregnancy recorded for a male,Embarazo registrado en varón
+2022,dq_pregnant_age_implausible,plausibility/atemporal,2332,5,0.2144082332761578,Pregnancy at implausible age,Embarazo a edad no plausible
+2022,dq_recovered_and_died,plausibility/atemporal,2332,0,0.0,Both recovered and died,Curado y fallecido a la vez
+2022,dq_no_event_marked,completeness,2332,6,0.25728987993138935,No event indicator marked,Ningún evento marcado
+2022,dq_unmapped_vaccine,conformance,2332,0,0.0,Vaccine code not in dictionary,Código de vacuna fuera del diccionario
+2022,dq_target_lot_missing,completeness,2332,0,0.0,VA-MENGOC-BC report without lot,Notificación de VA-MENGOC-BC sin lote
+2022,dq_month_mismatch,plausibility/atemporal,2332,90,3.8593481989708405,MONTH column matches neither vaccination nor notification month,Columna MES no coincide con el mes de vacunación ni de notificación
+2023,dq_vaccination_year_imputed,plausibility/temporal,1353,<5,,"Vaccination year mistyped, corrected from the notification date and workbook year","Año de vacunación mal tecleado, corregido con la fecha de notificación y el año del libro"
+2023,dq_vaccination_year_dropped,plausibility/temporal,1353,0,0.0,Impossible vaccination date that could not be corrected (not used),Fecha de vacunación imposible y no corregible (no utilizada)
+2023,dq_notification_year_imputed,plausibility/temporal,1353,<5,,"Notification year mistyped, corrected from the vaccination date and workbook year","Año de notificación mal tecleado, corregido con la fecha de vacunación y el año del libro"
+2023,dq_notification_year_dropped,plausibility/temporal,1353,0,0.0,Impossible notification date that could not be corrected (not used),Fecha de notificación imposible y no corregible (no utilizada)
+2023,dq_schedule_invalid,plausibility/schedule,1353,25,1.8477457501847745,VA-MENGOC-BC dose outside the schedule (below minimum age or non-existent dose),Dosis de VA-MENGOC-BC fuera del esquema (por debajo de la edad mínima o dosis inexistente)
+2023,dq_notification_before_vaccination,plausibility/temporal,1353,8,0.5912786400591279,Notification date before vaccination date,Fecha de notificación anterior a la vacunación
+2023,dq_notification_delay_implausible,plausibility/temporal,1353,0,0.0,Notification delay above plausible maximum,Demora de notificación mayor que el máximo plausible
+2023,dq_birth_after_vaccination,plausibility/temporal,1353,0,0.0,Birth date after vaccination date,Fecha de nacimiento posterior a la vacunación
+2023,dq_discharge_before_admission,plausibility/temporal,1353,0,0.0,Discharge before admission,Egreso anterior al ingreso
+2023,dq_stay_implausible,plausibility/temporal,1353,0,0.0,Hospital stay above plausible maximum,Estadía hospitalaria mayor que el máximo plausible
+2023,dq_admission_before_vaccination,plausibility/temporal,1353,0,0.0,Admission before vaccination,Ingreso anterior a la vacunación
+2023,dq_age_conflict,plausibility/atemporal,1353,0,0.0,Reported age disagrees with date-derived age,Edad informada discrepante con la edad calculada
+2023,dq_age_missing,completeness,1353,0,0.0,Age not determinable,Edad no determinable
+2023,dq_age_group_mismatch,plausibility/atemporal,1353,0,0.0,Age group inconsistent with age,Grupo de edad inconsistente con la edad
+2023,dq_hospitalized_without_date,plausibility/atemporal,1353,0,0.0,Hospitalised without admission date,Ingresado sin fecha de ingreso
+2023,dq_admission_date_not_hospitalized,plausibility/atemporal,1353,0,0.0,Admission date recorded but not hospitalised,Fecha de ingreso registrada sin ingreso
+2023,dq_pregnant_male,plausibility/atemporal,1353,0,0.0,Pregnancy recorded for a male,Embarazo registrado en varón
+2023,dq_pregnant_age_implausible,plausibility/atemporal,1353,5,0.36954915003695493,Pregnancy at implausible age,Embarazo a edad no plausible
+2023,dq_recovered_and_died,plausibility/atemporal,1353,0,0.0,Both recovered and died,Curado y fallecido a la vez
+2023,dq_no_event_marked,completeness,1353,<5,,No event indicator marked,Ningún evento marcado
+2023,dq_unmapped_vaccine,conformance,1353,0,0.0,Vaccine code not in dictionary,Código de vacuna fuera del diccionario
+2023,dq_target_lot_missing,completeness,1353,0,0.0,VA-MENGOC-BC report without lot,Notificación de VA-MENGOC-BC sin lote
+2023,dq_month_mismatch,plausibility/atemporal,1353,52,3.843311160384331,MONTH column matches neither vaccination nor notification month,Columna MES no coincide con el mes de vacunación ni de notificación
+2024,dq_vaccination_year_imputed,plausibility/temporal,2329,<5,,"Vaccination year mistyped, corrected from the notification date and workbook year","Año de vacunación mal tecleado, corregido con la fecha de notificación y el año del libro"
+2024,dq_vaccination_year_dropped,plausibility/temporal,2329,0,0.0,Impossible vaccination date that could not be corrected (not used),Fecha de vacunación imposible y no corregible (no utilizada)
+2024,dq_notification_year_imputed,plausibility/temporal,2329,<5,,"Notification year mistyped, corrected from the vaccination date and workbook year","Año de notificación mal tecleado, corregido con la fecha de vacunación y el año del libro"
+2024,dq_notification_year_dropped,plausibility/temporal,2329,0,0.0,Impossible notification date that could not be corrected (not used),Fecha de notificación imposible y no corregible (no utilizada)
+2024,dq_schedule_invalid,plausibility/schedule,2329,40,1.7174753112924002,VA-MENGOC-BC dose outside the schedule (below minimum age or non-existent dose),Dosis de VA-MENGOC-BC fuera del esquema (por debajo de la edad mínima o dosis inexistente)
+2024,dq_notification_before_vaccination,plausibility/temporal,2329,14,0.6011163589523401,Notification date before vaccination date,Fecha de notificación anterior a la vacunación
+2024,dq_notification_delay_implausible,plausibility/temporal,2329,0,0.0,Notification delay above plausible maximum,Demora de notificación mayor que el máximo plausible
+2024,dq_birth_after_vaccination,plausibility/temporal,2329,0,0.0,Birth date after vaccination date,Fecha de nacimiento posterior a la vacunación
+2024,dq_discharge_before_admission,plausibility/temporal,2329,0,0.0,Discharge before admission,Egreso anterior al ingreso
+2024,dq_stay_implausible,plausibility/temporal,2329,0,0.0,Hospital stay above plausible maximum,Estadía hospitalaria mayor que el máximo plausible
+2024,dq_admission_before_vaccination,plausibility/temporal,2329,0,0.0,Admission before vaccination,Ingreso anterior a la vacunación
+2024,dq_age_conflict,plausibility/atemporal,2329,0,0.0,Reported age disagrees with date-derived age,Edad informada discrepante con la edad calculada
+2024,dq_age_missing,completeness,2329,0,0.0,Age not determinable,Edad no determinable
+2024,dq_age_group_mismatch,plausibility/atemporal,2329,0,0.0,Age group inconsistent with age,Grupo de edad inconsistente con la edad
+2024,dq_hospitalized_without_date,plausibility/atemporal,2329,0,0.0,Hospitalised without admission date,Ingresado sin fecha de ingreso
+2024,dq_admission_date_not_hospitalized,plausibility/atemporal,2329,0,0.0,Admission date recorded but not hospitalised,Fecha de ingreso registrada sin ingreso
+2024,dq_pregnant_male,plausibility/atemporal,2329,0,0.0,Pregnancy recorded for a male,Embarazo registrado en varón
+2024,dq_pregnant_age_implausible,plausibility/atemporal,2329,6,0.25762129669386,Pregnancy at implausible age,Embarazo a edad no plausible
+2024,dq_recovered_and_died,plausibility/atemporal,2329,0,0.0,Both recovered and died,Curado y fallecido a la vez
+2024,dq_no_event_marked,completeness,2329,<5,,No event indicator marked,Ningún evento marcado
+2024,dq_unmapped_vaccine,conformance,2329,0,0.0,Vaccine code not in dictionary,Código de vacuna fuera del diccionario
+2024,dq_target_lot_missing,completeness,2329,<5,,VA-MENGOC-BC report without lot,Notificación de VA-MENGOC-BC sin lote
+2024,dq_month_mismatch,plausibility/atemporal,2329,89,3.8213825676255904,MONTH column matches neither vaccination nor notification month,Columna MES no coincide con el mes de vacunación ni de notificación
+2025,dq_vaccination_year_imputed,plausibility/temporal,2380,<5,,"Vaccination year mistyped, corrected from the notification date and workbook year","Año de vacunación mal tecleado, corregido con la fecha de notificación y el año del libro"
+2025,dq_vaccination_year_dropped,plausibility/temporal,2380,0,0.0,Impossible vaccination date that could not be corrected (not used),Fecha de vacunación imposible y no corregible (no utilizada)
+2025,dq_notification_year_imputed,plausibility/temporal,2380,<5,,"Notification year mistyped, corrected from the vaccination date and workbook year","Año de notificación mal tecleado, corregido con la fecha de vacunación y el año del libro"
+2025,dq_notification_year_dropped,plausibility/temporal,2380,0,0.0,Impossible notification date that could not be corrected (not used),Fecha de notificación imposible y no corregible (no utilizada)
+2025,dq_schedule_invalid,plausibility/schedule,2380,48,2.0168067226890756,VA-MENGOC-BC dose outside the schedule (below minimum age or non-existent dose),Dosis de VA-MENGOC-BC fuera del esquema (por debajo de la edad mínima o dosis inexistente)
+2025,dq_notification_before_vaccination,plausibility/temporal,2380,17,0.7142857142857143,Notification date before vaccination date,Fecha de notificación anterior a la vacunación
+2025,dq_notification_delay_implausible,plausibility/temporal,2380,0,0.0,Notification delay above plausible maximum,Demora de notificación mayor que el máximo plausible
+2025,dq_birth_after_vaccination,plausibility/temporal,2380,0,0.0,Birth date after vaccination date,Fecha de nacimiento posterior a la vacunación
+2025,dq_discharge_before_admission,plausibility/temporal,2380,0,0.0,Discharge before admission,Egreso anterior al ingreso
+2025,dq_stay_implausible,plausibility/temporal,2380,0,0.0,Hospital stay above plausible maximum,Estadía hospitalaria mayor que el máximo plausible
+2025,dq_admission_before_vaccination,plausibility/temporal,2380,0,0.0,Admission before vaccination,Ingreso anterior a la vacunación
+2025,dq_age_conflict,plausibility/atemporal,2380,0,0.0,Reported age disagrees with date-derived age,Edad informada discrepante con la edad calculada
+2025,dq_age_missing,completeness,2380,0,0.0,Age not determinable,Edad no determinable
+2025,dq_age_group_mismatch,plausibility/atemporal,2380,0,0.0,Age group inconsistent with age,Grupo de edad inconsistente con la edad
+2025,dq_hospitalized_without_date,plausibility/atemporal,2380,0,0.0,Hospitalised without admission date,Ingresado sin fecha de ingreso
+2025,dq_admission_date_not_hospitalized,plausibility/atemporal,2380,0,0.0,Admission date recorded but not hospitalised,Fecha de ingreso registrada sin ingreso
+2025,dq_pregnant_male,plausibility/atemporal,2380,0,0.0,Pregnancy recorded for a male,Embarazo registrado en varón
+2025,dq_pregnant_age_implausible,plausibility/atemporal,2380,6,0.25210084033613445,Pregnancy at implausible age,Embarazo a edad no plausible
+2025,dq_recovered_and_died,plausibility/atemporal,2380,0,0.0,Both recovered and died,Curado y fallecido a la vez
+2025,dq_no_event_marked,completeness,2380,7,0.29411764705882354,No event indicator marked,Ningún evento marcado
+2025,dq_unmapped_vaccine,conformance,2380,0,0.0,Vaccine code not in dictionary,Código de vacuna fuera del diccionario
+2025,dq_target_lot_missing,completeness,2380,<5,,VA-MENGOC-BC report without lot,Notificación de VA-MENGOC-BC sin lote
+2025,dq_month_mismatch,plausibility/atemporal,2380,111,4.663865546218488,MONTH column matches neither vaccination nor notification month,Columna MES no coincide con el mes de vacunación ni de notificación
+2026,dq_vaccination_year_imputed,plausibility/temporal,588,0,0.0,"Vaccination year mistyped, corrected from the notification date and workbook year","Año de vacunación mal tecleado, corregido con la fecha de notificación y el año del libro"
+2026,dq_vaccination_year_dropped,plausibility/temporal,588,0,0.0,Impossible vaccination date that could not be corrected (not used),Fecha de vacunación imposible y no corregible (no utilizada)
+2026,dq_notification_year_imputed,plausibility/temporal,588,<5,,"Notification year mistyped, corrected from the vaccination date and workbook year","Año de notificación mal tecleado, corregido con la fecha de vacunación y el año del libro"
+2026,dq_notification_year_dropped,plausibility/temporal,588,0,0.0,Impossible notification date that could not be corrected (not used),Fecha de notificación imposible y no corregible (no utilizada)
+2026,dq_schedule_invalid,plausibility/schedule,588,17,2.891156462585034,VA-MENGOC-BC dose outside the schedule (below minimum age or non-existent dose),Dosis de VA-MENGOC-BC fuera del esquema (por debajo de la edad mínima o dosis inexistente)
+2026,dq_notification_before_vaccination,plausibility/temporal,588,<5,,Notification date before vaccination date,Fecha de notificación anterior a la vacunación
+2026,dq_notification_delay_implausible,plausibility/temporal,588,0,0.0,Notification delay above plausible maximum,Demora de notificación mayor que el máximo plausible
+2026,dq_birth_after_vaccination,plausibility/temporal,588,0,0.0,Birth date after vaccination date,Fecha de nacimiento posterior a la vacunación
+2026,dq_discharge_before_admission,plausibility/temporal,588,0,0.0,Discharge before admission,Egreso anterior al ingreso
+2026,dq_stay_implausible,plausibility/temporal,588,0,0.0,Hospital stay above plausible maximum,Estadía hospitalaria mayor que el máximo plausible
+2026,dq_admission_before_vaccination,plausibility/temporal,588,0,0.0,Admission before vaccination,Ingreso anterior a la vacunación
+2026,dq_age_conflict,plausibility/atemporal,588,0,0.0,Reported age disagrees with date-derived age,Edad informada discrepante con la edad calculada
+2026,dq_age_missing,completeness,588,0,0.0,Age not determinable,Edad no determinable
+2026,dq_age_group_mismatch,plausibility/atemporal,588,0,0.0,Age group inconsistent with age,Grupo de edad inconsistente con la edad
+2026,dq_hospitalized_without_date,plausibility/atemporal,588,0,0.0,Hospitalised without admission date,Ingresado sin fecha de ingreso
+2026,dq_admission_date_not_hospitalized,plausibility/atemporal,588,0,0.0,Admission date recorded but not hospitalised,Fecha de ingreso registrada sin ingreso
+2026,dq_pregnant_male,plausibility/atemporal,588,0,0.0,Pregnancy recorded for a male,Embarazo registrado en varón
+2026,dq_pregnant_age_implausible,plausibility/atemporal,588,<5,,Pregnancy at implausible age,Embarazo a edad no plausible
+2026,dq_recovered_and_died,plausibility/atemporal,588,0,0.0,Both recovered and died,Curado y fallecido a la vez
+2026,dq_no_event_marked,completeness,588,<5,,No event indicator marked,Ningún evento marcado
+2026,dq_unmapped_vaccine,conformance,588,0,0.0,Vaccine code not in dictionary,Código de vacuna fuera del diccionario
+2026,dq_target_lot_missing,completeness,588,0,0.0,VA-MENGOC-BC report without lot,Notificación de VA-MENGOC-BC sin lote
+2026,dq_month_mismatch,plausibility/atemporal,588,25,4.2517006802721085,MONTH column matches neither vaccination nor notification month,Columna MES no coincide con el mes de vacunación ni de notificación

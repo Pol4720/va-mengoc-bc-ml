@@ -1,0 +1,21 @@
+{
+  "comparator_products": [
+    "AL",
+    "AT",
+    "DPT",
+    "DT",
+    "PCV7-TT",
+    "SOBERANA",
+    "TT",
+    "TYPHOID"
+  ],
+  "n_finlay_comparator": 2927,
+  "n_non_finlay_only": 12902,
+  "n_population": 5749,
+  "n_target": 3183,
+  "n_target_analysed": 2822,
+  "n_target_coadministered": 68,
+  "n_target_schedule_invalid": 361,
+  "n_window": 19012,
+  "target": "AM-BC"
+}

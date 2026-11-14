@@ -1,0 +1,13 @@
+{
+  "caution_share": 0.1,
+  "inconsistent_share": 0.050032916392363395,
+  "max_inconsistent_share": 0.2,
+  "min_linked_lots": 30,
+  "min_linked_reports": 200,
+  "n_assessable": 3038,
+  "n_inconsistent": 152,
+  "n_valid_linked_lots": 180,
+  "n_valid_linked_reports": 2535,
+  "reasons": [],
+  "verdict": "adequate"
+}

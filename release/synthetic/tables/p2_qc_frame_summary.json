@@ -7,17 +7,17 @@
     "coadm"
   ],
   "exposure_sd_window": {
-    "aloh3_conc": 0.14622678709474848,
-    "bactericidal_titer": 0.13779895645691043,
-    "endotoxin": 0.05239074145147434,
-    "fill_volume": 0.29017692060657757,
-    "igg_elisa": 0.20256717238474825,
-    "ph": 0.11259716495392104,
-    "protein_adsorption": 0.18482332075817534,
-    "protein_conc": 0.16784999538898127,
-    "ps_adsorption": 0.17350243226233092,
-    "ps_conc": 0.13522245590395093,
-    "thiomersal_conc": 0.15562178992681663
+    "aloh3_conc": 0.13880900247541042,
+    "bactericidal_titer": 0.14561774450700563,
+    "endotoxin": 0.05388623571898052,
+    "fill_volume": 0.286797748385871,
+    "igg_elisa": 0.1986216218664972,
+    "ph": 0.10912545243872544,
+    "protein_adsorption": 0.1778300474059355,
+    "protein_conc": 0.1704212920598968,
+    "ps_adsorption": 0.1712940034853627,
+    "ps_conc": 0.13598957063542919,
+    "thiomersal_conc": 0.1566456660119353
   },
   "exposures": [
     "z_endotoxin",
@@ -33,13 +33,13 @@
     "z_fill_volume",
     "z_atypicality_t2"
   ],
-  "n_lots": 146,
-  "n_reports": 3042,
+  "n_lots": 180,
+  "n_reports": 2535,
   "notes": [],
   "reports_per_lot": {
-    "25%": 2.0,
-    "50%": 18.0,
-    "75%": 37.0,
-    "mean": 20.835616438356166
+    "25%": 1.0,
+    "50%": 8.0,
+    "75%": 26.25,
+    "mean": 14.083333333333334
   }
 }

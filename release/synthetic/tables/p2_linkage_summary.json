@@ -1,13 +1,13 @@
 {
   "by_level": {
-    "core": 168,
-    "exact": 2896,
-    "no_lot_recorded": 12,
-    "no_match": 155
+    "core": 184,
+    "exact": 2814,
+    "no_lot_recorded": 8,
+    "no_match": 177
   },
-  "link_rate": 0.9483132157226865,
-  "n_distinct_lots_linked": 158,
-  "n_linked": 3064,
-  "n_target_reports": 3231,
-  "temporal_implausible": 22
+  "link_rate": 0.9418787307571473,
+  "n_distinct_lots_linked": 204,
+  "n_linked": 2998,
+  "n_target_reports": 3183,
+  "temporal_implausible": 145
 }

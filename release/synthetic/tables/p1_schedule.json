@@ -1,0 +1,11 @@
+{
+  "counts": {
+    "dose_not_in_schedule": 43,
+    "early": 848,
+    "late": 224,
+    "on_schedule": 1750,
+    "too_young": 318
+  },
+  "n_invalid": 361,
+  "n_target": 3183
+}

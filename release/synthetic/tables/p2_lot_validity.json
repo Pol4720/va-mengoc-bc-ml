@@ -1,0 +1,23 @@
+{
+  "code_rule": "digits_first1",
+  "code_rule_checks": [
+    {
+      "accepted": true,
+      "agreement_exact": 0.8532608695652174,
+      "agreement_within1": 0.9755434782608695,
+      "n_lots": 736,
+      "rule": "digits_first1"
+    }
+  ],
+  "lot_inconsistent_share": 0.050032916392363395,
+  "lot_status_counts": {
+    "expired": 152,
+    "not_assessable": 145,
+    "valid": 2886
+  },
+  "n_lot_assessable": 3038,
+  "n_lot_before_release": 0,
+  "n_lot_expired": 152,
+  "n_lot_inconsistent": 152,
+  "shelf_life_years": 3
+}
