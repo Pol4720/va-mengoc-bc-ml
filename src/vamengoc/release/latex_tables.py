@@ -85,18 +85,22 @@ MISSING: Lang = ("Not recorded", "No registrado")
 TO = "\\VLang{to}{a}"  # interval separator safe for negative bounds
 FIRST = ">{{\\raggedright\\arraybackslash}}p{{{}}}"  # wrapping first column of a given width
 DESIGNS: dict[str, Lang] = {
-    "primary_all_other_vaccines": ("Primary: all other vaccines", "Principal: resto de vacunas"),
-    "infant_active_comparator": ("Infants <12 months, active comparator", "Lactantes <12 meses, comparador activo"),
+    "primary_finlay_vaccines": ("Primary: other Finlay vaccines", "Principal: otras vacunas Finlay"),
+    "infant_finlay_comparator": ("Infants <12 months, Finlay comparator", "Lactantes <12 meses, comparador Finlay"),
     "excluding_coadministration": ("Single-vaccine reports only", "Solo notificaciones de una vacuna"),
-    "excluding_pentavalent_masking": (
-        "Comparator without PENTA-L reports (masking)",
-        "Comparador sin notificaciones de PENTA-L (enmascaramiento)",
+    "concomitant_influence": (
+        "Concomitant vaccines: with vs without (VA-MENGOC-BC)",
+        "Vacunas concomitantes: con frente a sin (VA-MENGOC-BC)",
+    ),
+    "primary_including_schedule_errors": (
+        "Primary, keeping doses outside the schedule",
+        "Principal, conservando dosis fuera del esquema",
     ),
 }
 SENSITIVITY: dict[str, Lang] = {
     "exact_links_only": ("Exact lot|links only", "Solo enlaces|exactos"),
     "excluding_coadministration": ("Excluding co-|administration", "Excluyendo|coadministración"),
-    "keeping_temporally_implausible": ("Keeping implausible|dates", "Conservando fechas|inverosímiles"),
+    "keeping_inconsistent_lots": ("Keeping expired|lots", "Conservando lotes|vencidos"),
 }
 
 
@@ -205,19 +209,19 @@ class TableSet:
 
     # ----------------------------------------------------------------------------- paper 1
     def characteristics(self, cat: pd.DataFrame, cont: pd.DataFrame, target: str, target_label: Lang) -> None:
-        groups = [target, "Other vaccines", "All"]
+        groups = [target, "Other Finlay vaccines", "All"]
         sex = cat[cat["variable"] == "sex"]
         denom: dict[str, Any] = {
             g: sex.loc[sex["group"] == g, "denominator"].iloc[0] if (sex["group"] == g).any() else None
             for g in groups[:2]
         }
-        d_t, d_o = _float(denom[target]), _float(denom["Other vaccines"])
+        d_t, d_o = _float(denom[target]), _float(denom["Other Finlay vaccines"])
         denom["All"] = d_t + d_o if not (math.isnan(d_t) or math.isnan(d_o)) else None
         self._denoms = denom
         header = [
             hd("Characteristic", "Característica"),
             f"\\makecell{{{vl(*target_label)}\\\\(n\\,=\\,{num(denom[target])})}}",
-            f"\\makecell{{{vl('Other vaccines', 'Otras vacunas')}\\\\(n\\,=\\,{num(denom['Other vaccines'])})}}",
+            f"\\makecell{{{vl('Other Finlay', 'Otras Finlay')}\\\\(n\\,=\\,{num(denom['Other Finlay vaccines'])})}}",
             f"\\makecell{{{vl('All reports', 'Todas')}\\\\(n\\,=\\,{num(denom['All'])})}}",
         ]
         rows: list[str] = []
@@ -511,6 +515,12 @@ class TableSet:
             hd("Lot-level|model", "Modelo|por lote"),
         ]
         rows = []
+        # A model family without estimable rows (tiny data) is released empty: show dashes.
+        key_cols = ["outcome", "exposure"]
+        sens, mixed, lot = (
+            d if all(c in d.columns for c in key_cols) else pd.DataFrame(columns=[*key_cols, "sensitivity", "model"])
+            for d in (sens, mixed, lot)
+        )
         for _, r in single.iterrows():
             oc, ex = str(r["outcome"]), str(r["exposure"])
             cells = [est_ci(r["or_per_sd"], r["or_lo"], r["or_hi"])]

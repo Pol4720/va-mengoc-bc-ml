@@ -72,13 +72,13 @@ LABELS: dict[str, dict[str, str]] = {
     "expected": {"en": "Programme reference rate", "es": "Tasa de referencia del programa"},
     "all_reports": {"en": "All vaccines", "es": "Todas las vacunas"},
     "target": {"en": "VA-MENGOC-BC", "es": "VA-MENGOC-BC"},
-    "others": {"en": "Other vaccines", "es": "Otras vacunas"},
+    "others": {"en": "Other Finlay vaccines", "es": "Otras vacunas Finlay"},
     "ror": {
         "en": "Reporting odds ratio (95% CI, log scale)",
         "es": "Razón de odds de notificación (IC 95 %, escala log)",
     },
-    "primary": {"en": "All other vaccines", "es": "Todas las demás vacunas"},
-    "infant": {"en": "Infant active comparator", "es": "Comparador activo en lactantes"},
+    "primary": {"en": "Other Finlay vaccines", "es": "Otras vacunas Finlay"},
+    "infant": {"en": "Infants, Finlay comparator", "es": "Lactantes, comparador Finlay"},
     "class": {"en": "Latent class", "es": "Clase latente"},
     "item_prob": {
         "en": "Probability of the event within the class",
@@ -110,6 +110,10 @@ LABELS: dict[str, dict[str, str]] = {
         "es": "Nacional − exportación (unidades de ventana, IC 90 %)",
     },
     "margin": {"en": "Equivalence margin", "es": "Margen de equivalencia"},
+    "shap_not_estimable": {
+        "en": "Not estimable: too few hospitalisations in the test years",
+        "es": "No estimable: muy pocas hospitalizaciones en los años de prueba",
+    },
     "synthetic": {"en": "SYNTHETIC DATA — NOT REAL RESULTS", "es": "DATOS SINTÉTICOS — NO SON RESULTADOS REALES"},
 }
 
@@ -249,8 +253,8 @@ def fig_forest_disproportionality(data: dict[str, Any], lang: str, path: Path, s
     df: pd.DataFrame = data["table"]
     labels_map: dict[str, dict[str, str]] = data["labels"]
     designs = [
-        ("primary_all_other_vaccines", PALETTE["blue"], "primary"),
-        ("infant_active_comparator", PALETTE["orange"], "infant"),
+        ("primary_finlay_vaccines", PALETTE["blue"], "primary"),
+        ("infant_finlay_comparator", PALETTE["orange"], "infant"),
     ]
     d = df[df["design"].isin([k for k, _, _ in designs])].copy()
     d["ror_n"] = d["ror"].map(_num)
@@ -341,7 +345,10 @@ def fig_lca(data: dict[str, Any], lang: str, path: Path, synthetic: bool) -> Pat
     cb = fig.colorbar(im, cax=cax)
     cb.set_label(label("item_prob", lang), fontsize=6.5)
     cb.outline.set_visible(False)
-    groups = [(data["target_label"], PALETTE["blue"], "target"), ("Other vaccines", PALETTE["context"], "others")]
+    groups = [
+        (data["target_label"], PALETTE["blue"], "target"),
+        ("Other Finlay vaccines", PALETTE["context"], "others"),
+    ]
     height = 0.36
     for gi, (g, color, key) in enumerate(groups):
         s = by_group[by_group["group"] == g].set_index("lca_class")["n"].map(_num)
@@ -366,6 +373,14 @@ def fig_lca(data: dict[str, Any], lang: str, path: Path, synthetic: bool) -> Pat
 def fig_shap(data: dict[str, Any], lang: str, path: Path, synthetic: bool) -> Path:
     imp: pd.DataFrame = data["importance"].head(12).iloc[::-1]
     names: dict[str, str] = data["names"]
+    if imp.empty:
+        # The boosted model needs enough hospitalisations in the test years; the manuscript
+        # always includes this panel, so an explicit "not estimable" panel is produced.
+        fig, ax = plt.subplots(figsize=(SINGLE_COL + 0.6, 1.1))
+        ax.axis("off")
+        ax.text(0.5, 0.5, label("shap_not_estimable", lang), ha="center", va="center", fontsize=7, wrap=True)
+        _watermark(fig, synthetic, lang)
+        return _save(fig, path)
     fig, ax = plt.subplots(figsize=(SINGLE_COL + 0.6, 0.2 * len(imp) + 0.7))
     ax.barh(range(len(imp)), imp["mean_abs_shap"].map(_num), color=PALETTE["blue"], height=0.55)
     ax.set_yticks(range(len(imp)))

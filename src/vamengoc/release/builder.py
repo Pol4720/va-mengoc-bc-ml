@@ -25,7 +25,7 @@ from vamengoc.config import Project
 from vamengoc.provenance import git_state
 from vamengoc.release import figures as figs
 from vamengoc.release.latex_tables import TableSet
-from vamengoc.release.macros import MacroSet, join_words, lower_first
+from vamengoc.release.macros import MacroSet, join_words, lower_first, macro_name
 from vamengoc.release.sdc import (
     SECONDARY_TOKEN,
     SDCLog,
@@ -112,19 +112,20 @@ FEATURE_NAMES = {
 def _protect_nested_designs(dp: pd.DataFrame, min_cell: int, measures: list[str]) -> pd.DataFrame:
     """Withhold a design row whose counts differ from the primary design by a small count.
 
-    Sensitivity designs are subsets of the primary design, so ``a_primary - a_design`` is itself a
-    count of reports; when it is between 1 and ``min_cell - 1`` the design row is withheld.
+    Sensitivity designs are subsets (or, keeping the schedule errors, a superset) of the primary
+    design, so ``|a_primary - a_design|`` is itself a count of reports; when it is between 1 and
+    ``min_cell - 1`` the design row is withheld.
     """
     out = dp.copy()
-    prim = out[out["design"] == "primary_all_other_vaccines"].set_index("event")
+    prim = out[out["design"] == "primary_finlay_vaccines"].set_index("event")
     for c in ("a", *measures):
         if c in out:
             out[c] = out[c].astype(object)
     for i, r in out.iterrows():
-        if r["design"] == "primary_all_other_vaccines" or r["event"] not in prim.index:
+        if r["design"] == "primary_finlay_vaccines" or r["event"] not in prim.index:
             continue
         for cnt in ("a", "b", "c", "d"):
-            diff = _num(prim.loc[r["event"], cnt]) - _num(r[cnt])
+            diff = abs(_num(prim.loc[r["event"], cnt]) - _num(r[cnt]))
             if 0 < diff < min_cell:
                 if not 0 < _num(r["a"]) < min_cell:  # small a is suppressed as a primary cell later
                     out.loc[i, "a"] = SECONDARY_TOKEN
@@ -539,6 +540,30 @@ def _paper1_tables(w: _Writer, p1: dict[str, Any], labels: dict[str, Any], targe
     w.table("context_incidence_fitted", fitted, description="Annual cases and segmented NB fit (public series)")
     w.table("context_incidence", p1["incidence"], description="National meningococcal disease series (public)")
     w.table("context_coverage", p1["coverage"], description="VA-MENGOC-BC doses and coverage (public)")
+    # Population, comparator products and schedule (counts only, each a scalar under SDC).
+    if "population" in p1:
+        w.json("p1_population", {k: w.small(v) if k.startswith("n_") else v for k, v in p1["population"].items()})
+    if "comparator_products" in p1 and len(p1["comparator_products"]):
+        w.table(
+            "p1_comparator_products",
+            p1["comparator_products"],
+            person_counts=["n"],
+            description="Reports of each Finlay comparator product (a report may hold two)",
+        )
+    if "schedule" in p1:
+        sch = p1["schedule"]
+        w.json(
+            "p1_schedule",
+            {
+                "counts": {k: w.small(v) for k, v in sch["counts"].items()},
+                "n_invalid": w.small(sch["n_invalid"]),
+                "n_target": w.small(sch["n_target"]),
+            },
+        )
+    mc = p1.get("month_coverage")
+    if mc is not None and len(mc):
+        obs = mc.groupby("year")["observed"].sum().astype(int).rename("observed_months").reset_index()
+        w.table("p1_observed_months", obs, description="Months covered by each annual workbook")
     _ = target
 
 
@@ -626,6 +651,38 @@ def _paper2_tables(w: _Writer, p2: dict[str, Any], project: Project, lot_values:
         "temporal_implausible": w.small(ls["temporal_implausible"]),
     }
     w.json("p2_linkage_summary", ls_safe)
+    # Lot validity (expired / not yet released lots) and the feasibility decision for Paper 2.
+    if "lot_status_counts" in ls:
+        share = ls.get("lot_inconsistent_share")
+        w.json(
+            "p2_lot_validity",
+            {
+                "shelf_life_years": ls["shelf_life_years"],
+                "code_rule": ls["code_rule"],
+                "code_rule_checks": ls["code_rule_checks"],
+                "lot_status_counts": {k: w.small(v) for k, v in ls["lot_status_counts"].items()},
+                "n_lot_assessable": w.small(ls["n_lot_assessable"]),
+                "n_lot_inconsistent": w.small(ls["n_lot_inconsistent"]),
+                "n_lot_expired": w.small(ls["n_lot_expired"]),
+                "n_lot_before_release": w.small(ls["n_lot_before_release"]),
+                "lot_inconsistent_share": share
+                if w.small(ls["n_lot_inconsistent"]) != w.cfg.suppression_token
+                else None,
+            },
+        )
+        lby = pd.DataFrame(ls["lot_inconsistent_by_year"])
+        if len(lby):
+            w.table(
+                "p2_lot_validity_by_year",
+                _protect_complement(lby, "n_assessable", "n_inconsistent", w.cfg.min_cell),
+                person_counts=["n_assessable", "n_inconsistent"],
+                description="Reports whose recorded lot was expired or not yet released, by analytic year",
+            )
+    if "p2_feasibility" in p2:
+        fz = dict(p2["p2_feasibility"])
+        for k in ("n_assessable", "n_inconsistent", "n_valid_linked_reports"):
+            fz[k] = w.small(fz[k])
+        w.json("p2_feasibility", fz)
     by_year = pd.DataFrame(ls["by_year"])
     if len(by_year):
         w.table(
@@ -793,19 +850,50 @@ def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, s
     token = w.cfg.suppression_token
     common = MacroSet("V", suppression_token=token)
     common.text("DataOrigin", "synthetic" if synthetic else "real")
-    common.text("StudyFirstYear", str(a.study_years[0]))
-    common.text("StudyLastYear", str(a.study_years[1]))
+    dq = results["data_quality"]
+    years = dq["window"].get("study_years") or [a.study_years[0], a.study_years[1]]
+    common.text("StudyFirstYear", str(years[0]))
+    common.text("StudyLastYear", str(years[1]))
+    partial_years = [int(y) for y in dq["window"].get("partial_years", [])]
+    if partial_years:
+        yl = {lang: join_words([str(y) for y in partial_years], lang) for lang in ("en", "es")}
+        one = len(partial_years) == 1
+        common.bilingual(
+            "PartialYearsSentence",
+            f"{'The year' if one else 'The years'} {yl['en']} {'was' if one else 'were'} covered for fewer "
+            f"than 12 months (the files hold the months delivered so far); {'its' if one else 'their'} reports "
+            f"are analysed, but {'it is' if one else 'they are'} left out of annual reporting rates and trends",
+            f"{'El año' if one else 'Los años'} {yl['es']} {'abarcó' if one else 'abarcaron'} menos de 12 meses "
+            f"(los ficheros contienen los meses entregados hasta la fecha); sus notificaciones se analizan, "
+            f"pero {'queda' if one else 'quedan'} fuera de las tasas anuales de notificación y de las tendencias",
+        )
+    else:
+        common.bilingual(
+            "PartialYearsSentence",
+            "Every analysed year was covered for 12 months",
+            "Todos los años analizados abarcaron 12 meses",
+        )
+    common.number("NPartialYears", len(partial_years))
+    pl = dq["plausibility"]
+    for key, flag in (
+        ("VaccYearImputed", "dq_vaccination_year_imputed"),
+        ("VaccYearDropped", "dq_vaccination_year_dropped"),
+        ("NotifYearImputed", "dq_notification_year_imputed"),
+        ("NotifYearDropped", "dq_notification_year_dropped"),
+    ):
+        n = int(pd.to_numeric(pl.loc[pl["check"] == flag, "n_flagged"], errors="coerce").sum()) if len(pl) else 0
+        common.number(key, w.small(n))
     common.number("MinCell", w.cfg.min_cell)
     common.text("Seed", str(a.seed))
     common.text("CodeVersion", __version__)
-    dq = results["data_quality"]
     common.number("ReportsRaw", w.small(dq["dedup"]["rows_in"]))
     common.number("ExactDuplicates", w.small(dq["dedup"]["exact_duplicates_removed"]))
     common.number("KeyDuplicatesMerged", w.small(dq["dedup"]["key_duplicate_rows_merged"]))
     common.number("ReportsDedup", w.small(dq["dedup"]["rows_out"]))
     common.number("ReportsInWindow", w.small(dq["window"]["n_in_window"]))
     common.number("ReportsOutsideWindow", w.small(dq["window"]["n_outside_window"]))
-    common.number("NFiles", len(dq["schema_reports"]))
+    common.number("NFiles", len([f for f in dq["schema_reports"] if "#" not in f]))
+    common.number("NExtraSheets", len([f for f in dq["schema_reports"] if "#" in f]))
     # Change of notification form: events not recorded in every annual file (analysed only where
     # recorded). The sentence is generated so that the text cannot misstate it.
     partial = [str(e) for e in results["paper1"].get("events_partially_recorded", [])]
@@ -858,6 +946,38 @@ def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, s
             - int(pd.to_numeric(p1["reports_by_year"]["n_target"]).sum())
         ),
     )
+    pop = p1.get("population", {})
+    for key, field in (
+        ("NTargetAll", "n_target"),
+        ("NScheduleInvalid", "n_target_schedule_invalid"),
+        ("NTargetAnalysed", "n_target_analysed"),
+        ("NTargetCoadmin", "n_target_coadministered"),
+        ("NFinlayComparator", "n_finlay_comparator"),
+        ("NNonFinlayOnly", "n_non_finlay_only"),
+        ("NPopulation", "n_population"),
+    ):
+        m1.number(key, w.small(pop.get(field)))
+    m1.percent("PctTargetAll", 100 * pop["n_target"] / pop["n_window"] if pop.get("n_window") else None, 1)
+    m1.percent(
+        "PctScheduleInvalid",
+        100 * pop["n_target_schedule_invalid"] / pop["n_target"] if pop.get("n_target") else None,
+        1,
+    )
+    vac = project.vaccines["vaccines"]
+    cp = p1.get("comparator_products")
+    present = [str(v) for v in (cp["vaccine"] if cp is not None and len(cp) else [])]
+    names_en = join_words([str(vac.get(c, {}).get("label_en", c)) for c in present], "en")
+    names_es = join_words([str(vac.get(c, {}).get("label_es", c)) for c in present], "es")
+    m1.bilingual("ComparatorList", names_en or "none", names_es or "ninguna")
+    m1.number("NComparatorProducts", len(present))
+    sch = p1.get("schedule", {}).get("counts", {})
+    m1.number("NScheduleTooYoung", w.small(sch.get("too_young", 0)))
+    m1.number("NScheduleDoseNotInSchedule", w.small(sch.get("dose_not_in_schedule", 0)))
+    m1.number("NScheduleAboveIndication", w.small(sch.get("above_indication", 0)))
+    m1.number("NScheduleLate", w.small(sch.get("late", 0)))
+    m1.number("NScheduleEarly", w.small(sch.get("early", 0)))
+    m1.number("NScheduleBooster", w.small(sch.get("booster_campaign", 0) + sch.get("booster", 0)))
+    m1.number("NScheduleOnTime", w.small(sch.get("on_schedule", 0)))
     m1.number("NTargetHosp", w.small(int(pd.to_numeric(p1["reports_by_year"]["n_target_hospitalized"]).sum())))
     tot = pd.to_numeric(p1["reports_by_year"]["n_reports"]).sum()
     m1.percent("PctTarget", 100 * pd.to_numeric(p1["reports_by_year"]["n_target"]).sum() / tot if tot else None)
@@ -874,7 +994,7 @@ def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, s
         m1.text("RateLastYear", str(int(tr["last_year"])))
     m1.number("ExpectedRate", a.expected_national_rate_per_100k)
     dp = w.tables["p1_disproportionality"]
-    prim = dp[dp["design"] == "primary_all_other_vaccines"].set_index("event")
+    prim = dp[dp["design"] == "primary_finlay_vaccines"].set_index("event")
     for ev in (
         "ev_fever_39",
         "ev_fever_40",
@@ -909,7 +1029,7 @@ def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, s
     # Analysis settings quoted in the Methods (from the versioned configuration).
     sm_cfg, lc = a.seriousness_model, a.lca
     m1.text("TrainYears", f"{sm_cfg.train_years[0]}--{sm_cfg.train_years[1]}")
-    m1.text("TestYears", f"{sm_cfg.test_years[0]}--{sm_cfg.test_years[1]}")
+    m1.text("TestYears", f"{sm_cfg.test_years[0]}--{sm_cfg.test_years[1] or years[1]}")
     m1.number("LCAKMin", lc.k_range[0])
     m1.number("LCAKMax", lc.k_range[1])
     m1.number("LCAStarts", lc.n_starts)
@@ -978,7 +1098,27 @@ def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, s
     m2.number("CapBootstrap", qcfg.capability_bootstrap)
     m2.number("CVFolds", scfg.cv_folds)
     m2.number("FuzzyThreshold", lcfg.fuzzy_threshold)
-    m2.number("MaxYearsAfterProduction", lcfg.max_years_after_production)
+    m2.number("ShelfLife", lcfg.shelf_life_years)
+    lv = p2["linkage_summary"]
+    checks = {c["rule"]: c for c in lv.get("code_rule_checks", [])}
+    used = lv.get("code_rule")
+    m2.percent("CodeRuleAgreement", 100 * checks[used]["agreement_within1"] if used in checks else None, 1)
+    m2.number("LotAssessable", w.small(lv.get("n_lot_assessable")))
+    m2.number("LotInconsistent", w.small(lv.get("n_lot_inconsistent")))
+    m2.number("LotExpired", w.small(lv.get("n_lot_expired")))
+    m2.number("LotBeforeRelease", w.small(lv.get("n_lot_before_release")))
+    small_bad = w.small(lv.get("n_lot_inconsistent")) == token
+    share = lv.get("lot_inconsistent_share")
+    m2.percent("LotInconsistentPct", None if share is None or small_bad else 100 * share, 1)
+    fz = p2.get("p2_feasibility", {})
+    m2.percent("FeasMaxPct", 100 * fz.get("max_inconsistent_share", a.p2_feasibility.max_inconsistent_share), 0)
+    m2.percent("FeasCautionPct", 100 * fz.get("caution_share", a.p2_feasibility.caution_share), 0)
+    m2.number("FeasMinReports", fz.get("min_linked_reports", a.p2_feasibility.min_linked_reports))
+    m2.number("FeasMinLots", fz.get("min_linked_lots", a.p2_feasibility.min_linked_lots))
+    m2.number("ValidLinkedReports", w.small(fz.get("n_valid_linked_reports")))
+    m2.number("ValidLinkedLots", fz.get("n_valid_linked_lots"))
+    _feasibility_words(m2, fz)
+    m2.number("ScheduleExcluded", w.small(p1.get("population", {}).get("n_target_schedule_invalid")))
     m2.number("NAttributes", len(p2["scales"]))
     m2.number("NComponents", p2["mspc_summary"]["n_components"])
     ev = p2["mspc_summary"]["explained_variance"]
@@ -1001,6 +1141,7 @@ def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, s
     m2.number("NLinkedLots", ls["n_distinct_lots_linked"])
     for lvl in ("exact", "core", "fuzzy", "no_lot_recorded", "no_match"):
         m2.number(f"Link {lvl}", w.small(ls["by_level"].get(lvl, 0)))
+    # Linked reports whose lot was expired or not yet released at vaccination (excluded).
     m2.number("TemporalImplausible", w.small(ls.get("temporal_implausible", 0)))
     fs = p2["qc_frame_summary"]
     m2.number("NAnalysed", w.small(fs["n_reports"]))
@@ -1035,6 +1176,19 @@ def _macros(w: _Writer, results: dict[str, Any], project: Project, root: Path, s
             m2.number(f"{r['outcome']} AUCBase", r["auc_base"], 3)
     m2.number("NPermutations", project.config.analysis.qc_safety.permutation_tests)
     _p2_words(m2, g, p2, a.qc_safety.fdr_alpha)
+    # Every prespecified outcome x exposure pair gets its macros, estimable or not, so that the
+    # manuscripts compile whatever the data (a pair without enough reports reads "not estimable").
+    qs = a.qc_safety
+    for oc in qs.primary_outcomes:
+        for ex in [*qs.primary_exposures, *qs.negative_control_exposures]:
+            key = f"{oc} {ex}"
+            if macro_name("PT", key, "OR") in m2.items:
+                continue
+            m2.number(f"{key} OR", None, 2)
+            m2.interval(f"{key} CI", None, None, 2)
+            m2.pvalue(f"{key} P", None)
+            m2.pvalue(f"{key} Q", None)
+            m2.bilingual(f"{key} Dir", "not estimable for", "no fue estimable para")
     paths.append(m2.write(root / "latex" / "macros_p2.tex", "Paper 2 macros"))
     return paths
 
@@ -1077,7 +1231,7 @@ def _latex_tables(w: _Writer, results: dict[str, Any], project: Project, root: P
         ("VA-MENGOC-BC", "VA-MENGOC-BC"),
     )
     dp = w.tables["p1_disproportionality"]
-    t1.disproportionality(dp, "primary_all_other_vaccines", "DispMain", min_a=w.cfg.min_cell)
+    t1.disproportionality(dp, "primary_finlay_vaccines", "DispMain", min_a=w.cfg.min_cell)
     for design in sorted(dp["design"].unique()):
         t1.disproportionality(dp, design, f"Disp {design}", min_a=None)
     t1.designs(dp, w.tables["p1_design_sizes"])
@@ -1146,12 +1300,22 @@ def _p1_words(
             "below" if phi < expected else "above" if plo > expected else "consistent with",
             "inferior a" if phi < expected else "superior a" if plo > expected else "compatible con",
         )
-    prim = dp[dp["design"] == "primary_all_other_vaccines"]
+    prim = dp[dp["design"] == "primary_finlay_vaccines"]
     flagged = list(prim.loc[prim[sig_col].astype(bool), "event"])
-    designs = sorted(dp["design"].unique())
+    # Robustness is judged over the comparator designs; the concomitant-vaccine analysis answers a
+    # different question (influence of co-administration within VA-MENGOC-BC reports).
+    comp_dp = dp[dp["design"] != "concomitant_influence"]
+    designs = sorted(comp_dp["design"].unique())
     robust = [
-        e for e in flagged if all(bool(g.set_index("event")[sig_col].get(e, False)) for _, g in dp.groupby("design"))
+        e
+        for e in flagged
+        if all(bool(g.set_index("event")[sig_col].get(e, False)) for _, g in comp_dp.groupby("design"))
     ]
+    conc = dp[dp["design"] == "concomitant_influence"]
+    conc_flag = list(conc.loc[conc[sig_col].astype(bool), "event"]) if len(conc) else []
+    m1.number("NConcomitantSignals", len(conc_flag))
+    en, es = _both(lambda lang: join_words([lower_first(_label(ev, e, lang)) for e in conc_flag], lang))
+    m1.bilingual("ConcomitantSignalList", en or "none", es or "ninguno")
     m1.number("NDesigns", len(designs))
     m1.number("NSignalsRobust", len(robust))
     m1.counted("NSignalsRobustPhrase", len(robust), ("signal", "signals"), ("señal", "señales"))
@@ -1184,7 +1348,17 @@ def _p1_words(
         )
     met = p1["seriousness"].metrics
     auc = {k: _num(v.get("auroc")) for k, v in met.items() if k.endswith("test")}
-    if auc and not all(math.isnan(v) for v in auc.values()):
+    if not auc or all(math.isnan(v) for v in auc.values()):
+        # Too few hospitalisations in the test years for temporal validation: say so.
+        m1.bilingual("BestModel", "no model", "ningún modelo")
+        m1.number("BestAuroc", None, 3)
+        m1.bilingual("DiscriminationWord", "not assessable", "no evaluable")
+        m1.bilingual(
+            "HospInterpretation",
+            "There were too few hospitalisations in the test years to validate the models temporally",
+            "Hubo muy pocas hospitalizaciones en los años de prueba para validar los modelos temporalmente",
+        )
+    else:
         best = max(auc, key=lambda k: -math.inf if math.isnan(auc[k]) else auc[k])
         b = auc[best]
         m1.bilingual(
@@ -1217,6 +1391,93 @@ def _p1_words(
         "an abrupt fall" if hi < 1 else "an abrupt rise" if lo > 1 else "no significant step change",
         "una caída abrupta" if hi < 1 else "un aumento abrupto" if lo > 1 else "ningún cambio de nivel significativo",
     )
+
+
+def _feasibility_words(m2: MacroSet, fz: dict[str, Any]) -> None:
+    """Verdict on the lot-level analysis in both languages (generated, never hand-written)."""
+    verdict = fz.get("verdict", "limited")
+    words = {
+        "adequate": ("supported", "respaldado"),
+        "limited": ("supported with limitations", "respaldado con limitaciones"),
+        "insufficient": ("not supported", "no respaldado"),
+    }[verdict]
+    m2.bilingual("FeasibilityWord", *words)
+    if verdict == "insufficient":
+        m2.bilingual(
+            "ConclusionSentence",
+            "Linking release testing with pharmacovigilance requires a reliable record of the lot "
+            "administered; here, the recorded lots were too often impossible to support lot-level conclusions",
+            "Vincular los ensayos de liberación con la farmacovigilancia exige un registro fiable del lote "
+            "administrado; aquí, los lotes registrados eran imposibles con demasiada frecuencia para sustentar "
+            "conclusiones a nivel de lote",
+        )
+    else:
+        m2.bilingual(
+            "ConclusionSentence",
+            "Linking routine release testing with pharmacovigilance is feasible and tests lot-related "
+            "hypotheses about reactogenicity within specification, provided that impossible lot records are "
+            "excluded",
+            "Vincular los ensayos rutinarios de liberación con la farmacovigilancia es factible y permite "
+            "contrastar hipótesis sobre la reactogenicidad dentro de especificación, siempre que se excluyan "
+            "los registros de lote imposibles",
+        )
+    reasons = set(fz.get("reasons", []))
+    share = fz.get("inconsistent_share")
+    pct = f"{100 * share:.1f}" if share is not None else None
+    if verdict == "insufficient":
+        parts_en, parts_es = [], []
+        if "inconsistent_share" in reasons and pct:
+            parts_en.append(
+                f"{pct}% of the reports with a datable lot recorded a lot that was expired or not yet released"
+            )
+            parts_es.append(
+                f"el {pct.replace('.', ',')} % de las notificaciones con un lote datable registraba "
+                "un lote vencido o aún no liberado"
+            )
+        if "too_few_linked_reports" in reasons:
+            parts_en.append("too few reports were linked to a valid lot")
+            parts_es.append("se enlazaron muy pocas notificaciones a un lote válido")
+        if "too_few_linked_lots" in reasons:
+            parts_en.append("too few lots had linked reports")
+            parts_es.append("muy pocos lotes tenían notificaciones enlazadas")
+        m2.bilingual(
+            "FeasibilitySentence",
+            "The data do not support lot-level conclusions: "
+            + "; ".join(parts_en)
+            + ". The lot-level results below are reported for transparency only",
+            "Los datos no respaldan conclusiones a nivel de lote: "
+            + "; ".join(parts_es)
+            + ". Los resultados por lote que siguen se presentan solo por transparencia",
+        )
+    elif verdict == "limited":
+        if pct:
+            en = (
+                f"{pct}% of the reports with a datable lot recorded an expired or not-yet-released lot, a lower "
+                "bound of the error rate of the lot field; the lot-level results are interpreted with this limitation"
+            )
+            es = (
+                f"El {pct.replace('.', ',')} % de las notificaciones con un lote datable registraba un lote vencido o "
+                "aún no liberado, cota inferior del error del campo de lote; los resultados por lote se interpretan "
+                "con esta limitación"
+            )
+        else:
+            en = (
+                "The validity of the recorded lots could not be assessed; the lot-level results are "
+                "interpreted with caution"
+            )
+            es = (
+                "No pudo evaluarse la validez de los lotes registrados; los resultados por lote se interpretan "
+                "con cautela"
+            )
+        m2.bilingual("FeasibilitySentence", en, es)
+    else:
+        m2.bilingual(
+            "FeasibilitySentence",
+            f"Only {pct}% of the reports with a datable lot recorded an expired or not-yet-released lot; these were "
+            "excluded and the lot field was considered reliable for the lot-level analysis",
+            f"Solo el {(pct or '').replace('.', ',')} % de las notificaciones con un lote datable registraba un lote "
+            "vencido o aún no liberado; se excluyeron y el campo de lote se consideró fiable para el análisis por lote",
+        )
 
 
 def _p2_words(m2: MacroSet, gee: pd.DataFrame, p2: dict[str, Any], alpha: float) -> None:
@@ -1395,17 +1656,10 @@ def _figures(
                 synthetic,
             )
         )
-        if len(w.tables.get("p1_shap_importance", [])):
-            term = _term_label(labels, project.vaccines.get("vaccines", {}))
-            names = {f: term(f)[0 if lang == "en" else 1] for f in w.tables["p1_shap_importance"]["feature"]}
-            out.append(
-                figs.fig_shap(
-                    {"importance": w.tables["p1_shap_importance"], "names": names},
-                    lang,
-                    fdir / "p1_shap.pdf",
-                    synthetic,
-                )
-            )
+        shap_imp = w.tables.get("p1_shap_importance", pd.DataFrame(columns=["feature", "mean_abs_shap"]))
+        term = _term_label(labels, project.vaccines.get("vaccines", {}))
+        names = {f: term(f)[0 if lang == "en" else 1] for f in shap_imp["feature"]}
+        out.append(figs.fig_shap({"importance": shap_imp, "names": names}, lang, fdir / "p1_shap.pdf", synthetic))
         its = p1["incidence_its"]
         out.append(
             figs.fig_incidence(
@@ -1526,7 +1780,11 @@ def build_release_from_results(project: Project, results: dict[str, Any], ctx: R
         "git_commit": git.get("commit"),
         "git_dirty": git.get("dirty"),
         "seed": project.config.analysis.seed,
-        "study_years": list(project.config.analysis.study_years),
+        # Resolved window (an open-ended configuration follows the data) and incomplete years.
+        "study_years": list(
+            results["data_quality"]["window"].get("study_years") or project.config.analysis.study_years
+        ),
+        "partial_years": list(results["data_quality"]["window"].get("partial_years", [])),
         "target_vaccine": target,
         "sdc": {
             "min_cell": w.cfg.min_cell,
