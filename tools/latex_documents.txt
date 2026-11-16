@@ -18,3 +18,4 @@ submission/p2-lot-quality/highlights.tex
 reports/informe_tecnico.tex
 reports/resumen_ejecutivo.tex
 reports/kit_reuniones.tex
+docs/consultas/consulta_responsables_datos.tex

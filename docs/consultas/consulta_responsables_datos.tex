@@ -1,0 +1,398 @@
+% Consulta oficial a los responsables de los datos (formulario PDF editable).
+% Autónomo: no depende del release ni del preámbulo de los manuscritos.
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{stix2}
+\usepackage[spanish,es-noshorthands,es-nolists]{babel}
+\usepackage[a4paper,margin=2.3cm]{geometry}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{needspace}
+\usepackage{enumitem}
+\usepackage[hidelinks,pdfusetitle]{hyperref}
+\hypersetup{pdftitle={Consulta a los responsables de los datos: VA-MENGOC-BC},
+  pdfauthor={Richard Alejandro Matos Arderi; Abel Ponce Gonzalez},
+  pdfsubject={Formulario editable de preguntas abiertas sobre las bases de datos de VA-MENGOC-BC}}
+
+\definecolor{azul}{HTML}{1C5CAB}
+\definecolor{gris}{HTML}{8A8A85}
+\definecolor{fondo}{HTML}{FFFFF0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\emergencystretch=3em
+\setlist{nosep}
+
+\newcounter{preg}
+\newcommand{\Fichero}[1]{\textit{«#1»}}
+% Pregunta: id, título, referencia, texto, tratamiento actual, alto del cuadro (cm)
+\newcommand{\Pregunta}[6]{%
+  \Needspace{\dimexpr 9\baselineskip+#6cm\relax}%
+  \refstepcounter{preg}%
+  {\color{azul}\textbf{Pregunta \thepreg.}}\ \textbf{#2}\par
+  \textit{Referencia:} #3\par
+  #4\par
+  \textit{Tratamiento actual en el análisis:} #5\par
+  \smallskip
+  \TextField[name=q\thepreg#1,multiline=true,width=\linewidth,height=#6cm,charsize=10pt,%
+    bordercolor=gris,backgroundcolor=fondo,align=0]{}\par
+  \bigskip}
+\newcommand{\Seccion}[1]{\Needspace{14\baselineskip}\section*{\color{azul}#1}}
+\newcommand{\Campo}[2]{\noindent\makebox[5.4cm][l]{\textbf{#1}}\TextField[name=#2,%
+  width=\dimexpr\linewidth-5.6cm\relax,height=0.6cm,charsize=10pt,bordercolor=gris,backgroundcolor=fondo]{}\par\smallskip}
+
+\begin{document}
+\begin{Form}
+\raggedright
+\begin{center}
+{\small\textcolor{azul}{\textbf{DOCUMENTO DE CONSULTA}}\par}
+\medskip
+{\Large\bfseries Consulta a los responsables de los datos\par}
+\medskip
+{\large Proyecto VA-MENGOC-BC: farmacovigilancia nacional y calidad de lotes\par}
+\medskip
+{\small Dirección de Investigaciones Clínicas y Evaluación de Impacto (DICEI)\\
+Instituto Finlay de Vacunas \textperiodcentered{} 16 de noviembre de 2026\par}
+\end{center}
+
+\section*{\color{azul}Propósito y modo de respuesta}
+El grupo de ciencia de datos de la DICEI prepara dos artículos científicos sobre la vacuna
+VA-MENGOC-BC: el primero, sobre la vigilancia poscomercialización de los eventos supuestamente
+atribuibles a la vacunación o inmunización (ESAVI) en Cuba; el segundo, sobre la relación entre
+los atributos de calidad de los lotes liberados y los eventos notificados. El análisis se ejecuta
+en la estación controlada del Instituto con las bases de datos originales; ningún dato individual
+sale de ella.
+
+Algunas decisiones metodológicas dependen de información que solo conocen quienes administran,
+registran o custodian las bases de datos. Se solicita su respuesta a las preguntas siguientes.
+Cada una indica el fichero, la hoja y, cuando procede, la columna a la que se refiere, y el
+tratamiento que el análisis aplica de forma provisional, de modo que baste confirmarlo o
+corregirlo. Este documento no contiene datos individuales: solo recuentos agregados.
+
+\textbf{Cómo responder.} Haga clic en cada recuadro amarillo y escriba; los recuadros no tienen
+límite de extensión (si el texto excede el recuadro, este se desplaza). Puede responder solo las
+preguntas de su competencia e indicar en el resto «no es mi competencia» o el nombre de quien
+puede responder. Abra el documento en un navegador (Chrome, Edge o Firefox) o en un lector de PDF,
+guárdelo con el nombre «consulta\_respondida» (Ctrl+S o «Guardar como») y devuélvalo al grupo de
+ciencia de datos de la DICEI. Las respuestas se incorporan a la configuración versionada del
+proyecto y se registran con su fecha y responsable.
+
+\subsection*{Datos de quien responde}
+\Campo{Nombre y apellidos}{respnombre}
+\Campo{Cargo}{respcargo}
+\Campo{Institución o dependencia}{respinstitucion}
+\Campo{Fecha de respuesta}{respfecha}
+\Campo{Preguntas que contesta}{resppreguntas}
+
+\Seccion{A. Procedencia, autorización y custodia de los datos}
+\Pregunta{extraccion}{Fecha de extracción y custodio de la base de datos}%
+{Libros anuales de ESAVI \Fichero{EA 2017 TOTAL.xlsx} a \Fichero{EA 2025 TOTAL.xlsx} y los libros de 2026.}%
+{¿En qué fecha se extrajo cada libro del sistema de origen, o desde qué fecha de corte son válidos?
+¿Qué institución o dependencia custodia la base de datos nacional de ESAVI y debe figurar como
+tal en los artículos?}%
+{Ambos datos se imprimen en los manuscritos como «a completar por los autores» hasta recibir su respuesta.}{3.4}
+
+\Pregunta{etica}{Autorización y base legal para el uso de los datos}%
+{Todos los ficheros de ESAVI y el libro de lotes \Fichero{BD para publicación lotes final.xlsx}.}%
+{¿Existe aprobación de un comité de ética de la investigación o autorización de la dirección
+institucional para el uso secundario de estos datos? Indique el órgano, el número y la fecha de la
+resolución, y la base legal aplicada (Ley 149/2022 de protección de datos personales u otra).}%
+{Tratamiento local con seudonimización irreversible de nombres y direcciones (resumen con clave
+secreta), fecha de nacimiento convertida en edad y publicación solo de agregados con supresión de
+recuentos menores que 5.}{3.4}
+
+\Pregunta{retencion}{Retención de los datos y evaluación de impacto en la privacidad}%
+{Capas de datos restringidas (\Fichero{data/raw}, \Fichero{data/curated}) de la estación controlada.}%
+{¿Qué plazo de conservación establece la política institucional para los ficheros originales y para
+la capa seudonimizada? ¿Se exige una evaluación de impacto en la protección de datos antes de la
+publicación de resultados agregados, y quién la realiza?}%
+{Los ficheros originales son de solo lectura, nunca se versionan ni se envían a servicios externos;
+no se ha fijado un plazo de retención.}{3.2}
+
+\Pregunta{lotesabs}{Atributos de calidad publicables en unidades absolutas}%
+{\Fichero{BD para publicación lotes final.xlsx}, hoja 1 (control de calidad de lotes), columnas F a N:
+pH, concentraciones y adsorciones de proteína y polisacárido, Al(OH)\textsubscript{3}, tiomersal, inmunogenicidad
+(actividad bactericida e IgG) y endotoxinas.}%
+{Los datos de lotes son información industrial confidencial. ¿Cuáles de estos atributos pueden
+publicarse en unidades absolutas (por ejemplo, en tablas y figuras de un artículo) y cuáles solo
+como posición dentro de la ventana de especificación? ¿Pueden publicarse los límites de
+especificación?}%
+{Solo se publica la posición normalizada dentro de la ventana de especificación y los índices de
+capacidad; ningún valor absoluto ni límite sale de la estación.}{3.4}
+
+\Seccion{B. Libro de lotes \Fichero{BD para publicación lotes final.xlsx}}
+\Pregunta{inocuidad}{Significado de «-» en la prueba de inocuidad}%
+{Hoja 1 (control de calidad de lotes), columna «Inocuidad»: 108 de las 737 filas contienen «-»; el
+resto es «Satisfactoria».}%
+{¿El guion indica que el ensayo no se realizó, que no era aplicable o que el campo no era
+obligatorio en determinados períodos? Si es así, ¿cuáles?}%
+{Se interpreta como «no determinado»; no se cuenta como ensayo no satisfactorio.}{3.0}
+
+\Pregunta{filasdup}{Filas repetidas por lote}%
+{Hoja 1, columna «Lote de vacuna envasada»: 737 filas para 714 lotes distintos (22 identificadores
+aparecen en más de una fila).}%
+{¿Una misma identificación de lote puede corresponder legítimamente a varias filas (varios destinos
+o varios ensayos del mismo lote) o se trata de lotes distintos que reutilizan la identificación, o de
+errores de registro? ¿Qué fila debe prevalecer si los valores difieren?}%
+{Se mantiene cada fila con una clave compuesta (lote, año, orden) y, al enlazar una notificación,
+se prefiere el lote nacional cuya vigencia cubre la fecha de vacunación.}{3.4}
+
+\Pregunta{destino}{Destino de los lotes}%
+{Hoja 1, columna «Destino»: 21 categorías (Vietnam, Nacional, Venezuela, Colombia, entre otras) y un
+valor «vietnam colombia».}%
+{¿«Nacional» designa los lotes destinados al programa nacional de inmunización? ¿El valor
+«vietnam colombia» representa un lote repartido entre dos mercados o un error de registro? ¿Algún
+destino debe agruparse con otro?}%
+{«Nacional» frente a exportación como único criterio de agrupación; los valores se normalizan por
+mayúsculas, acentos y espacios.}{3.0}
+
+\Pregunta{codigo}{Codificación del número de lote}%
+{Hoja 1, columna «Lote de vacuna envasada»: tres formatos, 999A (71,1 \%), A999 (23,4 \%) y A999A
+(2,7 \%); columna «Año producción de la vacuna» (2011--2025).}%
+{El primer dígito del identificador es la última cifra del año de liberación del lote (un lote de
+2001 o de 2011 empieza por 1). ¿Esta regla se aplica por igual a los tres formatos, incluido el
+formato con letra inicial (A999)? ¿Qué codifican las letras? ¿El «año de producción» de la columna C
+coincide siempre con el año de liberación o puede diferir en un año?}%
+{La regla se aplica al primer dígito del identificador en todos los formatos y se comprueba contra
+la columna C: debe reproducirla (o el año siguiente) en al menos el 90 \% de los lotes.}{3.6}
+
+\Pregunta{vigencia}{Cómputo de la vigencia de tres años}%
+{Mismo libro y columnas que la pregunta anterior; notificaciones de ESAVI de los libros anuales.}%
+{La vigencia de un lote es de tres años. ¿Se cuenta desde la fecha de liberación, desde la de
+producción o hasta el fin del año natural correspondiente? ¿Existen prórrogas de vigencia
+autorizadas para algún lote, o lotes con una vigencia distinta?}%
+{Un lote se considera vencido si se usa después del 31 de diciembre del año de liberación más tres.
+Las notificaciones con un lote vencido o aún no liberado se excluyen del análisis por lote.}{3.4}
+
+\Seccion{C. Libros anuales de ESAVI (\Fichero{EA 2017 TOTAL.xlsx} a \Fichero{EA 2025 TOTAL.xlsx})}
+\Pregunta{duplicados}{Filas exactamente repetidas}%
+{Hoja principal de cada libro; por ejemplo, 119 filas duplicadas en \Fichero{EA 2017 TOTAL.xlsx}, 18 en
+\Fichero{EA 2018 TOTAL.xlsx}, 19 en \Fichero{EA 2019 TOTAL.xlsx}, 9 en \Fichero{EA 2020 TOTAL.xlsx},
+170 en \Fichero{EA 2024 TOTAL.xlsx} y 3 en \Fichero{EA 2025 TOTAL.xlsx}.}%
+{¿Las filas idénticas en todas sus columnas son transcripciones repetidas de una misma notificación o
+pueden corresponder a vacunaciones distintas con los mismos datos (por ejemplo, dos personas con
+iguales datos o dos dosis el mismo día)?}%
+{Se elimina la repetición exacta conservando la primera aparición; además se fusionan los registros
+con la misma persona seudonimizada, fecha de vacunación, vacunas y lotes.}{3.4}
+
+\Pregunta{hoja2018}{Hoja de casos que no entraron en el cierre de 2018}%
+{\Fichero{EA 2018 TOTAL.xlsx}, hoja «Casos que no entraronen el cier» (33 filas, octubre a diciembre
+de 2018, con la misma estructura que «TOTAL EA»).}%
+{¿Estos casos son notificaciones adicionales que no figuran en la hoja «TOTAL EA» y deben sumarse al
+análisis de 2018, o son copia de casos ya incluidos? ¿Existen hojas equivalentes en otros años?}%
+{Se leen además de la hoja principal y se eliminan las repeticiones exactas con ella.}{3.0}
+
+\Pregunta{ea2023}{Cobertura temporal del libro de 2023}%
+{\Fichero{EA 2023 TOTAL.xlsx}, hoja «EA TOTAL» (5072 filas): la columna MES solo contiene los meses 1 a
+7.}%
+{¿Existen notificaciones de agosto a diciembre de 2023? En caso afirmativo, ¿en qué fichero o sistema
+están? Si no existen, ¿se debe a que no se recogieron, a que no se consolidaron o a que no hubo casos?}%
+{Los meses sin datos se tratan como ausentes (no como cero) y 2023 se considera año parcial, sin tasa
+anual de notificación.}{3.2}
+
+\Pregunta{fechas}{Fechas imposibles}%
+{\Fichero{EA 2019 TOTAL.xlsx}, hoja «Hoja1»: F.VACUNACION con años hasta 2029 y F.NOTIFICACION desde 2002;
+\Fichero{EA 2017 TOTAL.xlsx} y \Fichero{EA 2020 TOTAL.xlsx}: F.NACIMIENTO con años como 1699, 1905,
+2075 y 2107.}%
+{¿Existe una fuente primaria (ficha de notificación u otra) con la que corregir estas fechas? ¿Considera adecuada la regla de corrección indicada
+en el tratamiento actual? ¿Hay otro error de tecleo frecuente (por ejemplo, día y mes invertidos)
+que deba tratarse?}%
+{El año de vacunación o de notificación se corrige solo cuando el día y el mes, la otra fecha y el
+año del libro lo determinan con una demora de 0 a 365 días; si no, la fecha no se usa. Las fechas de
+nacimiento imposibles no se corrigen y se usa la edad registrada.}{3.6}
+
+\Pregunta{mes}{Significado de la columna MES}%
+{Todos los libros anuales, columna MES (valores 1 a 12).}%
+{¿MES es el mes de la vacunación, el de la notificación o el de la ocurrencia del evento? ¿Puede
+diferir de F.VACUNACION?}%
+{Se usa como control de calidad y para determinar qué meses cubre cada libro; no define el año de
+análisis, que es el de la fecha de vacunación.}{2.8}
+
+\Pregunta{colfinal}{Columna final sin encabezado}%
+{\Fichero{EA 2017 TOTAL.xlsx}, hoja «TOTAL», columna BI (a continuación de SECUELA), sin título y casi
+vacía.}%
+{¿Qué representa esta columna? ¿Debe incorporarse al análisis o descartarse?}%
+{Se descarta y se informa como columna sin reconocer.}{2.6}
+
+\Pregunta{covid}{Hojas por producto de vacunas contra la COVID-19}%
+{\Fichero{EA 2021 TOTAL.xlsx}, \Fichero{EA 2022 TOTAL.xlsx}, \Fichero{EA 2023 TOTAL.xlsx} y
+\Fichero{EA 2024 TOTAL.xlsx}: hojas como ABDALA, SOBERANA y SOBERANA Plus, además de las hojas de
+intervenciones por municipio.}%
+{¿Estas hojas son extractos de la hoja principal o contienen notificaciones que no figuran en ella? En
+particular, ¿la hoja principal incluye todos los casos de SOBERANA (producto del Instituto Finlay) y de
+ABDALA?}%
+{Las hojas por producto no se leen (se consideran copias filtradas de la hoja principal); los casos
+de la hoja principal con estos productos se clasifican como SOBERANA (Finlay) y ABDALA (CIGB).}{3.4}
+
+\Seccion{D. Formulario de notificación utilizado desde 2024 (\Fichero{EA 2024 TOTAL.xlsx} y \Fichero{EA 2025 TOTAL.xlsx})}
+\Pregunta{fiebre}{Equivalencia de FIEBRE con los indicadores anteriores}%
+{Columna FIEBRE de \Fichero{EA 2024 TOTAL.xlsx} y \Fichero{EA 2025 TOTAL.xlsx}, junto a FEBRICULA; hasta
+2023 existían FIEBRE 39 y FIEBRE 40.}%
+{¿FIEBRE equivale a fiebre de 39\,°C o más, a 40\,°C o más, o a una definición distinta (por ejemplo,
+cualquier temperatura mayor que la de FEBRICULA)? ¿Qué umbral de temperatura define FEBRICULA?}%
+{Cada indicador se trata como distinto y se analiza solo en los años cuyo formulario lo contiene; un
+indicador ausente de un año es desconocido, no «no notificado».}{3.4}
+
+\Pregunta{local}{Reacciones locales: columna combinada y absceso}%
+{Columna «DOLOR, ENROJECIMIENTO, INDURACION» y columna ABSCESO de los libros de 2024 y 2025; hasta
+2023 existían R.L.S., ABS.ESTERIL y ABS.BACTERIANA.}%
+{¿La columna combinada se marca «S» si ocurre cualquiera de las tres manifestaciones? ¿Equivale a la
+reacción local severa (R.L.S.) de los años anteriores o es una categoría más amplia? ¿ABSCESO
+corresponde a absceso estéril, bacteriano o ambos? ¿R.L.S. dejó de registrarse?}%
+{La columna combinada y ABSCESO son indicadores nuevos, sin equivalencia asumida con R.L.S. ni con los
+abscesos de años anteriores.}{3.6}
+
+\Pregunta{otrosind}{Otros indicadores nuevos o desaparecidos}%
+{Libros de 2024 y 2025: ANAFILAXIA, TROMBOCITOPENIA, EHH, TA ALTA, DECAIMIENTO, CEFALEA, CRISIS VAGAL,
+ERITEMA, SOMNOLENCIA, EDEMA LABIAL, EDEMA FACIAL y PARALISIS FACIAL; ya no figuran LLANTO
+PERSISTENTE, COLAPSO, C.FEBRIL, C.AFEBRIL, PURPURA, R.ANAFILACTICA y otros de 2017 a 2023.}%
+{¿ANAFILAXIA equivale a R.ANAFILACTICA y TROMBOCITOPENIA a PURPURA? ¿Qué significa EHH (¿episodio
+hipotónico-hiporreactivo?)? ¿Los indicadores desaparecidos dejaron de registrarse o cambiaron de
+nombre? ¿Dónde se anotan ahora el llanto persistente o las convulsiones?}%
+{Sin equivalencias asumidas; cada indicador se analiza solo en los años que lo registran.}{3.8}
+
+\Pregunta{app}{Antecedentes patológicos personales (APP)}%
+{\Fichero{EA 2024 TOTAL.xlsx}: columnas APP ALERGIA, APP CONVULSON, APP ASMA, APP HTA, APP DM y APP CI;
+\Fichero{EA 2025 TOTAL.xlsx}: columna APP (5 categorías) además de las anteriores.}%
+{¿Qué significan APP CI (¿cardiopatía isquémica?) y la columna APP del libro de 2025? ¿Cómo se relacionan
+con los antecedentes de alergia, convulsión y asma de 2017 a 2023, que incluían antecedentes
+familiares?}%
+{Los antecedentes se conservan como indicadores propios del formulario de cada año; APP CI se trata
+como dato sensible y no se publica.}{3.2}
+
+\Pregunta{grave}{Clasificación GRAVE y NO GRAVE}%
+{\Fichero{EA 2024 TOTAL.xlsx} y \Fichero{EA 2025 TOTAL.xlsx}, columnas GRAVE y NO GRAVE (esta última con 10,4 \%
+de valores vacíos en 2024).}%
+{¿Qué criterio define «grave» (definición de la OMS u otra)? ¿Las dos columnas son complementarias?
+¿Cómo debe interpretarse un valor vacío? Además, ¿existe una clasificación de gravedad por evento y
+alguna codificación MedDRA o CIE-10 en el sistema de origen?}%
+{Se usa la clasificación de la OMS (común, rara, grave) y las definiciones de la Brighton Collaboration
+cuando existen; las columnas GRAVE y NO GRAVE se conservan como dato notificado.}{3.6}
+
+\Pregunta{carne}{Uso del carné de identidad}%
+{\Fichero{EA 2024 TOTAL.xlsx} y \Fichero{EA 2025 TOTAL.xlsx}, columna CARNE DE IDENTIDAD (13,1 \% de valores
+vacíos en 2024).}%
+{¿Se autoriza su uso, dentro de la estación controlada, como clave adicional para detectar
+notificaciones repetidas de una misma persona, o debe descartarse en todos los casos?}%
+{Se reconoce como identificador directo y se descarta al ingresar; el seudónimo se construye con
+nombre, fecha de nacimiento y sexo en todos los años.}{3.0}
+
+\Seccion{E. Esquema de vacunación, siglas de vacunas y comparador}
+\Pregunta{esquema}{Esquema de vacunación de VA-MENGOC-BC}%
+{Columnas EDAD, TIPO DE VACUNA (AM-BC) y DOSIS de todos los libros anuales.}%
+{Se entiende que la dosis 1 se administra a los 3 meses y la dosis 2 a los 5 meses de edad, con un
+intervalo mínimo de 6 a 8 semanas y sin refuerzo en el uso programado. ¿Es correcto para todo el
+período 2017--2026? ¿Hubo campañas de recuperación o usos fuera del esquema (niños mayores o
+adultos, refuerzo «R», dosis 3 o 4) y en qué años? ¿Qué edad máxima corresponde a la indicación?}%
+{Son válidas las dosis 1 y 2 desde 2,87 y 4,25 meses de edad (con 4 días de gracia); se excluyen por
+error de registro las dosis por debajo de esa edad y las dosis 3 o superiores; los refuerzos «R» y
+las dosis tardías de recuperación se conservan.}{4.0}
+
+\Pregunta{dosiscod}{Notación de la dosis con dos vacunas}%
+{Columna DOSIS de todos los libros: valores como «2.1», «2 y 1», «1,1» y «2,1».}%
+{¿Estas notaciones significan una dosis por cada vacuna administrada en la misma sesión (por ejemplo,
+dosis 2 de una vacuna y dosis 1 de otra), en el orden en que aparecen en TIPO DE VACUNA?}%
+{Se interpretan así, en el mismo orden que las vacunas de la columna TIPO DE VACUNA.}{3.0}
+
+\Pregunta{siglas}{Siglas de la columna TIPO DE VACUNA}%
+{Todos los libros anuales, columna TIPO DE VACUNA. Significados asumidos: AM-BC, VA-MENGOC-BC;
+PENTA-L, Heberpenta-L (CIGB); DPT, DT y TT, vacunas del Instituto Finlay; AT, antitifoídica Vi; AL,
+antileptospirósica; PRS, triple viral; AG, antigripal; HB, hepatitis B; HIB, Hib conjugada; OPV e IPV,
+poliomielitis oral e inactivada; PCV-10, Pneumosil-10 (Serum Institute of India, esquema desde 2024).}%
+{Corrija o complete esta lista. En particular, ¿qué significa AA? ¿Se confirman AG y AL? ¿AT designa la
+antitifoídica o la antitetánica? ¿PCV-10 es siempre Pneumosil-10? ¿Qué otras siglas aparecen y a qué
+vacuna y fabricante corresponden?}%
+{Mapeo marcado «inferido» en el diccionario de vacunas; AA queda sin significado confirmado.}{4.4}
+
+\Pregunta{provincias}{Códigos de provincia}%
+{Columna PROVINCIA o PROVINCIAS de todos los libros anuales (16 códigos).}%
+{Se interpretan PR, AT, LH, MY, MT, IJ, VC, CF, SS, CA, CM, LT, HO, GM, SC y GT como Pinar del Río,
+Artemisa, La Habana, Mayabeque, Matanzas, Isla de la Juventud, Villa Clara, Cienfuegos, Sancti
+Spíritus, Ciego de Ávila, Camagüey, Las Tunas, Holguín, Granma, Santiago de Cuba y Guantánamo.
+¿Es correcta la asignación, en especial GM (¿Granma?) y CH?}%
+{Esa asignación; el código CH se agrupa con La Habana.}{3.0}
+
+\Pregunta{comparador}{Comparador del primer artículo: productos del Instituto Finlay}%
+{Columnas TIPO DE VACUNA y FABRICANTE de todos los libros anuales.}%
+{Se acordó con la jefatura del proyecto que VA-MENGOC-BC se compare solo con las vacunas propias del
+Instituto Finlay y con los tratamientos concomitantes. ¿Qué productos de TIPO DE VACUNA deben
+considerarse del Instituto Finlay en cada período? Se han supuesto DPT, DT, TT, antitifoídica Vi (AT),
+antileptospirósica (AL), Quimi-Vio y SOBERANA. ¿Los valores FINLAY, INST FINLAY, INSTITUTO FINLAY e IFV de
+FABRICANTE designan siempre a este Instituto? ¿Qué otro producto debe incluirse o excluirse?}%
+{Comparadores: los productos anteriores; las vacunas de otros fabricantes solo se analizan como
+concomitantes de VA-MENGOC-BC.}{4.0}
+
+\Pregunta{concomitantes}{Tratamientos concomitantes}%
+{Todos los libros anuales (columnas TIPO DE VACUNA, DOSIS, S.APLICACION, V.ADMON., LOTE y CUAL (otro)).}%
+{¿Alguna columna registra tratamientos concomitantes distintos de las vacunas (por ejemplo, antipiréticos
+o antibióticos) o el uso de otros productos el mismo día? ¿Cómo debe definirse «concomitante» (misma
+sesión de vacunación u otra ventana de tiempo)?}%
+{Concomitante significa otra vacuna administrada en la misma notificación; no se dispone de información
+sobre otros tratamientos.}{3.4}
+
+\Seccion{F. Cobertura, incidencia y denominadores (\Fichero{BD para publicación lotes final.xlsx})}
+\Pregunta{cobertura}{Denominador de la hoja de cobertura}%
+{Hoja «Cobertura de vacunación» (1986--2025): columna B sin encabezado con valores de 130\,233 a
+280\,023 (15 valores) y columna «Cobertura» (9 años sin dato; mínimo 82,9).}%
+{¿La columna B es la población objetivo, las dosis administradas de VA-MENGOC-BC o ambas según el año?
+¿Se dispone de las dosis administradas de 2023, 2024 y 2025 (y de 2026 cuando concluya el año)? ¿El
+valor mínimo de cobertura (82,9) corresponde a un año con campaña documentada?}%
+{Se interpreta como dosis administradas; los años sin dato no tienen tasa de notificación y los años con
+menos de 12 meses de notificaciones (2023, 2026) tampoco.}{3.6}
+
+\Pregunta{colhoja}{Columnas sin encabezado y «Referencia» de la hoja de cobertura}%
+{Hoja «Cobertura de vacunación»: columna «Referencia» (9 etiquetas) y columnas L, M y N sin encabezado.}%
+{¿Qué contienen estas columnas? ¿Alguna debe incorporarse al análisis? ¿La columna N (un único valor
+repetido en 7 filas) marca alguna condición administrativa?}%
+{Se descartan y se informa como columnas sin reconocer.}{3.0}
+
+\Pregunta{incidencia}{Serie de incidencia de enfermedad meningocócica}%
+{Hoja 2 (incidencia y mortalidad; encabezado en la fila 5): filas de 1970 a 2024, aunque el título
+indica «1980, 1985--2024»; columnas «Tasax100000 habitantes» (dos veces) y «Defunsiones».}%
+{¿Las filas de 1970 a 1979 son datos reales o un artefacto de importación? ¿La segunda columna
+«Tasax100000 habitantes» es la tasa de mortalidad? En «Defunsiones», ¿las celdas vacías son cero o
+valores menores que 5 omitidos? ¿La fuente de la serie es la Dirección de Registros Médicos y
+Estadísticas de Salud (año 2025)?}%
+{Se usa toda la serie; la segunda tasa se asigna a mortalidad y las celdas vacías de defunciones se tratan
+como no disponibles.}{3.8}
+
+\Pregunta{tasaref}{Tasa de notificación de referencia del programa}%
+{Resultados de tasas de notificación por 100\,000 dosis (primer artículo).}%
+{El análisis compara la tasa de VA-MENGOC-BC con una referencia de 50 notificaciones por 100\,000 dosis,
+tomada de Cruz-Rodríguez y cols. (2021) y referida a las vacunas infantiles en conjunto. ¿Confirma
+este valor y su alcance, o existe una referencia nacional más adecuada y actual?}%
+{Se usa 50 por 100\,000 dosis solo como referencia descriptiva.}{3.0}
+
+\Seccion{G. Entregas mensuales y revisión de señales}
+\Pregunta{entregas}{Formato y política de las entregas mensuales}%
+{Libros de 2026 y sucesivos (\Fichero{EA 2026 TOTAL.xlsx}).}%
+{¿Cada entrega mensual es un libro acumulado del año (con todos los meses desde enero) o contiene solo
+el mes nuevo? ¿Se corrigen o amplían retroactivamente los meses ya entregados? ¿Mantendrá el
+nombre «EA AAAA TOTAL.xlsx» y la hoja y las columnas del formulario de 2025? ¿Cuál es la fecha de
+corte de cada entrega?}%
+{Se espera un libro por año, que sustituye al anterior (no se combinan versiones acumuladas); la
+ventana de estudio sigue a los datos y los años incompletos se señalan como parciales.}{3.8}
+
+\Pregunta{comite}{Revisión de las señales por el comité nacional}%
+{Resultados de desproporcionalidad del primer artículo (eventos no descritos como esperados).}%
+{¿Qué comité o instancia revisará caso a caso, con las historias clínicas, las señales que no
+correspondan a reacciones esperadas, y en qué plazo? ¿Debe incluirse su conclusión en el artículo?}%
+{Las señales se presentan como hipótesis para revisión clínica; el análisis no incluye revisión caso a
+caso.}{3.0}
+
+\Seccion{Observaciones generales}
+\noindent
+\TextField[name=observaciones,multiline=true,width=\linewidth,height=5cm,charsize=10pt,%
+  bordercolor=gris,backgroundcolor=fondo,align=0]{}\par\bigskip
+
+Agradecemos su colaboración. Las respuestas permitirán completar los manuscritos con datos
+verificados y documentar cada decisión metodológica.
+
+\medskip
+\textit{Elaborado por:} Richard Alejandro Matos Arderí y Abel Ponce González, Instituto Finlay de
+Vacunas, DICEI.
+\end{Form}
+\end{document}

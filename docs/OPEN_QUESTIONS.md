@@ -9,7 +9,7 @@ reflejarse en `configs/` (diccionarios versionados) y anotarse aquí con fecha y
 | 2 | Fecha que define el año de un registro; ¿los ficheros 2018–2025 tienen el mismo esquema? | Año analítico = año de F.VACUNACIÓN. Esquemas por año documentados: formulario antiguo 2017–2023, nuevo desde 2024; hoja maestra distinta por año; hojas de producto COVID-19 no se leen (ver `docs/DATA_ISSUES.md`) | `analysis.analytic_year_from`; `configs/schemas/aefi.yaml`; `inputs.aefi_*_sheet*` | Resuelta |
 | 3 | Significado de la columna MES y de la columna final sin cabecera | MES (1–12 en todos los años) se usa como control de calidad y para saber qué meses cubre cada libro (años parciales); la columna sin cabecera se descarta y se informa | `curate/aefi_model.py` (`dq_month_mismatch`), `curate/rules.py` (`month_coverage`) | Confirmar |
 | 4 | Clasificación de gravedad de cada evento; ¿existe codificación MedDRA/CIE-10? | Clasificación OMS (común/rara/grave) y definiciones Brighton cuando existen | `configs/dictionaries/events.yaml` | Pendiente |
-| 5 | Vacuna exacta del fichero de lotes y semántica de "-" en Inocuidad | VA-MENGOC-BC; "-" = no determinado | `configs/schemas/lots.yaml` | Pendiente |
+| 5 | Semántica de "-" en Inocuidad (el fichero de lotes es de VA-MENGOC-BC: resuelto) | "-" = no determinado | `configs/schemas/lots.yaml` | Pendiente |
 | 6 | Clave única de lote y motivo de los 22 identificadores duplicados | Un mismo lote aparece en varias filas (varios destinos o ensayos: 714 lotes en 737 filas). Clave compuesta `lote@año#n`; en el enlace se prefiere el lote nacional cuya vigencia cubre la vacunación | `ingest/lots.py`, `curate/linkage.py` | Resuelta |
 | 7 | Base legal, autorización ética y política de retención; ¿se requiere evaluación de impacto en la privacidad? | Tratamiento local seudonimizado; release agregado con control de divulgación | `docs/DATA_GOVERNANCE.md` | Pendiente |
 | 8 | Dosis aplicadas de VA-MENGOC-BC en los años recientes (denominador) | Un año sin dosis no tiene tasa; un año con menos de 12 meses de datos (2023, el año en curso) tampoco | hoja de cobertura | Confirmar |
@@ -25,3 +25,7 @@ reflejarse en `configs/` (diccionarios versionados) y anotarse aquí con fecha y
 
 Las reglas y su justificación están en [`DATA_ISSUES.md`](DATA_ISSUES.md); la ejecución local y la
 entrega de resultados, en [`RUN_LOCAL.md`](RUN_LOCAL.md).
+
+Las preguntas que siguen pendientes se han reunido en un formulario PDF editable para circular con los
+responsables de los datos: [`consultas/consulta_responsables_datos.pdf`](consultas/consulta_responsables_datos.pdf)
+(fuente LaTeX en la misma carpeta).
